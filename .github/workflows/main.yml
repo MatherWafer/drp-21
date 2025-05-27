@@ -38,7 +38,6 @@ jobs:
           vercel pull --yes --environment=preview \
                       --token=$VERCEL_TOKEN \
                       --scope leon-kuessners-projects \
-                      --project drp-21
 
       - name: Deploy to staging
         env:
@@ -47,7 +46,6 @@ jobs:
           vercel deploy --prod --confirm \
             --token=$VERCEL_TOKEN \
             --scope leon-kuessners-projects \
-            --project drp-21-staging
 
   deploy-production:
     name: Deploy to Production
@@ -82,7 +80,6 @@ jobs:
           vercel pull --yes --environment=production 
             --token=$VERCEL_TOKEN \
             --scope matherwafers-projects \
-            --project drp-21
 
       - name: Deploy to production
         env:
@@ -91,4 +88,3 @@ jobs:
           vercel deploy --prod --confirm \
             --token=$VERCEL_TOKEN \
             --scope matherwafers-projects \
-            --project drp-21
