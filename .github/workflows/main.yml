@@ -1,0 +1,88 @@
+name: Deploy to Vercel Staging and Production
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'  # Change to your actual Node version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build the app
+        run: npm run build  # Adjust if you use a different build command
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Pull staging environment
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          vercel pull --yes --environment=preview \
+            --token=$VERCEL_TOKEN \
+            --scope matherwafer \
+            --project drp-21
+
+      - name: Deploy to staging
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          vercel deploy --prod --confirm \
+            --token=$VERCEL_STAGING_KEY \
+            --scope leonkuessner1 \
+            --project drp-21-staging
+
+  deploy-production:
+    name: Deploy to Production
+    needs: deploy-staging  # Only runs if staging passes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build the app
+        run: npm run build
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Pull production environment
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          vercel pull --yes --environment=production \
+            --token=$VERCEL_DEPLOYMENT_KEY \
+            --scope your-vercel-team \
+            --project your-production-project
+
+      - name: Deploy to production
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          vercel deploy --prod --confirm \
+            --token=$VERCEL_TOKEN \
+            --scope your-vercel-team \
+            --project your-production-project
