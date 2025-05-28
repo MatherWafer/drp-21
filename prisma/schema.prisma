@@ -25,6 +25,6 @@ datasource db {
 }
 
 model Counter {
-  id Int @id @default(autoincrement())
-  count Int @default(0)
+  id    Int @id @default(1) // always 1
+  value Int @default(0)
 }
