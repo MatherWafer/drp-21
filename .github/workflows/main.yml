@@ -26,6 +26,8 @@ jobs:
         run: npx prisma generate
 
       - name: Build the app
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: npm run build  
 
       - name: Install Vercel CLI
@@ -71,6 +73,8 @@ jobs:
         run: npx prisma generate
 
       - name: Build the app
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: npm run build
 
       - name: Install Vercel CLI
