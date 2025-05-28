@@ -1,29 +1,32 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-export default function CounterButton({ id }: { id: number }) {
-  const [count, setCount] = useState<number | null>(null);
+export default function Home() {
+  const [count, setCount] = useState<number>(0);
 
-  async function increment() {
-    const res = await fetch('/api/increment', {
-      method: 'POST',
-      body: JSON.stringify({ id }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+  // Load on first render
+  useEffect(() => {
+    fetch('/api/increment')
+      .then((res) => res.json())
+      .then((data) => setCount(data.value));
+  }, []);
 
+  const increment = async () => {
+    const res = await fetch('/api/increment', { method: 'POST' });
     const data = await res.json();
-    setCount(data.count);
-  }
+    setCount(data.value);
+  };
 
   return (
-    <div>
-      <button onClick={increment} className="p-2 bg-blue-500 text-white rounded">
+    <main className="p-8 text-center">
+      <h1 className="text-3xl mb-4">Count: {count}</h1>
+      <button
+        className="px-4 py-2 bg-blue-600 text-white rounded"
+        onClick={increment}
+      >
         Increment
       </button>
-      {count !== null && <p>Count: {count}</p>}
-    </div>
+    </main>
   );
 }
