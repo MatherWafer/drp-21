@@ -28,7 +28,7 @@ jobs:
       - name: Build the app
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: npm run build  
+        run: npx prisma generate && npm run build  
 
       - name: Install Vercel CLI
         run: npm install -g vercel
@@ -75,7 +75,7 @@ jobs:
       - name: Build the app
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: npm run build
+        run: npx prisma generate && npm run build
 
       - name: Install Vercel CLI
         run: npm install -g vercel
