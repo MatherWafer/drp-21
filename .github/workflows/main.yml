@@ -43,7 +43,7 @@ jobs:
   precheck:
     name: Testing
     runs-on: ubuntu-latest
-    requires: build
+    needs: build
     steps:
       - name: Echo start
         run: echo "testing start"
