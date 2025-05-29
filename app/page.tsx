@@ -1,32 +1,82 @@
 'use client';
 
+import Link from 'next/link';
+import { RedirectType, redirect, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+
+
+
 export default function Home() {
-  const [count, setCount] = useState<number>(0);
-
-  // Load on first render
-  useEffect(() => {
-    fetch('/api/increment')
-      .then((res) => res.json())
-      .then((data) => setCount(data.value));
-  }, []);
-
-  const increment = async () => {
-    const res = await fetch('/api/increment', { method: 'POST' });
-    const data = await res.json();
-    setCount(data.value);
+  const getName = (uid: string) => {
+    fetch("/api/home", {
+      method: "POST",
+      body: JSON.stringify({ uuid: uid }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to get name");
+        return res.json();
+      })
+      .then((data) => {
+        setName(data.name)
+      })
+      .catch((err) => {
+        console.error("Error submitting name:", err);
+      });
   };
+
+  function UserOptionTab(props: {uo:UserOption}) {
+    return(
+    <div>
+      <Link href={{pathname:props.uo.url}}> {props.uo.description}</Link>
+    </div>
+    )
+  }
+
+  const [name, setName] = useState<string>("")
+  const [uuid, setUuid] = useState<string>("")
+  const router = useRouter()
+  useEffect(() => {
+    console.log(localStorage.getItem("uuid"))
+    if(!localStorage?.getItem("uuid")){
+      redirect("/register",RedirectType.replace)
+   };
+    const uuid = localStorage.getItem("uuid") as string
+    getName(uuid)
+    setUuid(uuid)
+  })
+
+  type UserOption = {
+    url: string,
+    description: String
+  }
+
+  const userOptions: UserOption[] = [
+    {
+      url: "/feed",
+      description: "View Feed"
+    },
+    {
+      url: "/create",
+      description: "Make a post"
+    },
+    {
+      url: "/posts",
+      description: "View my posts"
+    },
+    {
+      url: "/bookmarked",
+      description: "View my bookmarked posts"
+    }
+  ]
 
   return (
     <main className="p-8 text-center">
-      <h1 className="text-3xl mb-4">Count: {count}</h1>
-      <button
-        className="px-4 py-2 bg-blue-600 text-white rounded"
-        onClick={increment}
-      >
-        Increment
-      </button>
-    </main>
-  );
+    <h1 className="text-3xl mb-4">Hi {name}</h1>
+    <div className="flex justify-center items-stretch space-x-2">
+      {userOptions.map(uo => <UserOptionTab uo={uo} key={uo.url}  />)}
+    </div>
+  </main>
+);
+  
 }

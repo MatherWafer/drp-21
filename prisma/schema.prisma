@@ -1,21 +1,10 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-// generator client {
-//   provider = "prisma-client-js"
-//   output   = "../app/generated/prisma"
-// }
-
-// datasource db {
-//   provider = "postgresql"
-//   url      = env("DATABASE_URL")
-// }
-
 generator client {
-  provider = "prisma-client-js"
+  provider             = "prisma-client-js"
+  recursive_type_depth = -1
+  interface            = "sync"
 }
 
 datasource db {
@@ -24,7 +13,28 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model Counter {
-  id    Int @id @default(1) // always 1
-  value Int @default(0)
+model Profile {
+  id   String @id @default(uuid())
+  name String
+  Posts Post[]
+  Likes Like[]
+}
+
+model Post {
+  id          String  @id @default(uuid())
+  profileId   String
+  title       String
+  location    String
+  description String
+  creator     Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  Likes        Like[]
+} 
+
+model Like {
+  postId    String
+  profileId String
+  user      Profile @relation(fields: [profileId], references: [id])
+  post      Post    @relation(fields: [postId], references: [id])
+
+  @@id([postId, profileId])
 }
