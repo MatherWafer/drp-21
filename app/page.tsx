@@ -53,7 +53,7 @@ export default function Home() {
 
   const userOptions: UserOption[] = [
     {
-      url: "/feed",
+      url: "user/posts/feed",
       description: "View Feed"
     },
     {
@@ -76,6 +76,7 @@ export default function Home() {
     <div className="flex justify-center items-stretch space-x-2">
       {userOptions.map(uo => <UserOptionTab uo={uo} key={uo.url}  />)}
     </div>
+    <button onClick={() => fetch("/api/posts/feed", {method:"POST"})}>eoirgjeiprgt</button>
   </main>
 );
   
