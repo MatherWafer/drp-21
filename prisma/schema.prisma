@@ -2,38 +2,39 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-py"
-  output = "../server/prisma"
+  provider             = "prisma-client-js"
   recursive_type_depth = -1
-  interface = "sync"
+  interface            = "sync"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
 model Profile {
-  id        String   @id @default(uuid())
-  name      String?
+  id   String @id @default(uuid())
+  name String
+  Posts Post[]
+  Likes Like[]
 }
-
 
 model Post {
-    id              String @id @default(uuid())
-    posterId        String
-    title           String 
-    location        String 
-    description     String
-    creator         Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-}
+  id          String  @id @default(uuid())
+  profileId   String
+  title       String
+  location    String
+  description String
+  creator     Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  Likes        Like[]
+} 
 
 model Like {
-    postId          String 
-    profileId       String 
-    user            proifle @relation(fields: [userId], references: [id])
-    post            Post @relation(fields: [postId], references: [id])
-    @@id([postId, userId])
-}
+  postId    String
+  profileId String
+  user      Profile @relation(fields: [profileId], references: [id])
+  post      Post    @relation(fields: [postId], references: [id])
 
+  @@id([postId, profileId])
+}
