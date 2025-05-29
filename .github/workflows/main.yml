@@ -6,6 +6,15 @@ on:
       - main
 
 jobs:
+  precheck:
+    name: Pre-deployment Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo start
+        run: echo "testing start"
+
+      - name: Echo finish
+        run: echo "testing finish"
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
