@@ -65,7 +65,7 @@ export default function Home() {
       description: "View my posts"
     },
     {
-      url: "/bookmarked",
+      url: "user/posts/bookmarked",
       description: "View my bookmarked posts"
     }
   ]
@@ -76,7 +76,6 @@ export default function Home() {
     <div className="flex justify-center items-stretch space-x-2">
       {userOptions.map(uo => <UserOptionTab uo={uo} key={uo.url}  />)}
     </div>
-    <button onClick={() => fetch("/api/posts/feed", {method:"POST"})}>eoirgjeiprgt</button>
   </main>
 );
   

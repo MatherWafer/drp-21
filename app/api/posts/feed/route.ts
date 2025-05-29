@@ -24,10 +24,19 @@ export async function GET(req: NextRequest) {
       creator: true,
       _count: {
         select: {
-          Likes: true
+          Likes: true,
+          Favourites: true
         }
       },
       Likes: {
+        where: {
+          profileId: userId
+        },
+        select: {
+          postId:true
+        }
+      },
+      Favourites: {
         where: {
           profileId: userId
         },
@@ -41,7 +50,9 @@ export async function GET(req: NextRequest) {
   const transformedPosts = posts.map(post => ({
     ...post,
     likeCount: post._count.Likes,
-    hasLiked: post.Likes.length > 0 
+    hasLiked: post.Likes.length > 0,
+    favouriteCount: post._count.Favourites,
+    hasFavourited: post.Favourites.length > 0
   }));
 
   return NextResponse.json({ posts: transformedPosts });

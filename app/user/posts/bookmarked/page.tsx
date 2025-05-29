@@ -13,7 +13,7 @@ export default function Home() {
   const [posts,setPosts] = useState<PostInfo[]>([])
   const uuid = parseCookies().uuid
   const getPosts = async () => {
-    fetch("/api/posts/ownPosts", {
+    fetch("/api/posts/bookmarked", {
       method: "GET",
       headers: {
         "x-user-id": uuid
@@ -38,7 +38,7 @@ export default function Home() {
   },[])
   return (
     <main className="min-h-screen p-8 flex flex-col items-center">
-      <h1 className="text-3xl mb-8">Your Posts:</h1>
+      <h1 className="text-3xl mb-8">Your Bookmarked Posts:</h1>
         <PostStream posts={posts}/>
     </main>
   );
