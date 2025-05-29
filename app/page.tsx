@@ -61,7 +61,7 @@ export default function Home() {
       description: "Make a post"
     },
     {
-      url: "/posts",
+      url: "user/posts/ownPosts",
       description: "View my posts"
     },
     {

@@ -13,7 +13,7 @@ export default function Home() {
   const [posts,setPosts] = useState<PostInfo[]>([])
   const uuid = parseCookies().uuid
   const getPosts = async () => {
-    fetch("/api/posts/feed", {
+    fetch("/api/posts/ownPosts", {
       method: "GET",
       headers: {
         "x-user-id": uuid
