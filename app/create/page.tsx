@@ -15,6 +15,10 @@ export default function Ask() {
   const router = useRouter()
 
   const makePost = async () => {
+    if(!(title && location)){
+      alert("Your post needs a title and location")
+      return
+    }
     setDescription("")
     const res = await fetch("/api/create", {
       method: "POST",
@@ -33,7 +37,6 @@ export default function Ask() {
     <main className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto space-y-6">
         <h1 className="text-3xl font-bold text-center">Make a Post</h1>
-        {/* Question Input */}
         <div className="space-y-2">
           <label htmlFor="title" className="block text-sm font-medium text-[#cccccc]-700">
             Post title
@@ -73,7 +76,6 @@ export default function Ask() {
             Submit
           </button>
         </div>
-        {/* Response Display */}
         {postSuccess && (
           <div className="bg-[#111111] p-4 rounded-lg shadow border border-gray-200">
             <h2 className="font-semibold text-[#cccccc] mb-2">Post created</h2>

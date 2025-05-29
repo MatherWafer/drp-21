@@ -35,8 +35,8 @@ model Post {
 model Like {
   postId    String
   profileId String
-  user      Profile @relation(fields: [profileId], references: [id])
-  post      Post    @relation(fields: [postId], references: [id])
+  user      Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@id([postId, profileId])
 }
@@ -44,8 +44,8 @@ model Like {
 model Favourite {
   postId    String
   profileId String
-  user      Profile @relation(fields: [profileId], references: [id])
-  post      Post    @relation(fields: [postId], references: [id])
+  user      Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@id([postId, profileId])
 }

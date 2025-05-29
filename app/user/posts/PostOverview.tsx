@@ -70,7 +70,7 @@ export default function PostOverview({ post }: { post: PostInfo }) {
         </div>
       </div>
       
-      <p className="text-gray-300 mb-3">{post.description}</p>
+      <p className="text-left text-gray-300 mb-3">{post.description}</p>
       
       <div className="flex justify-between items-center">
         <div className="flex items-center text-sm text-gray-400">
