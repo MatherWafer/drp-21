@@ -23,12 +23,12 @@ jobs:
         run: npm ci
 
       - name: generate prisma client
-        run: prisma generate
+        run: npx prisma generate
 
       - name: Build the app
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: prisma generate && npm run build  
+        run: npx prisma generate && npm run build  
 
       - name: Install Vercel CLI
         run: npm install -g vercel
@@ -70,12 +70,12 @@ jobs:
         run: npm ci
         
       - name: generate prisma client
-        run: prisma generate
+        run: npx prisma generate
 
       - name: Build the app
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: prisma generate && npm run build
+        run: npx prisma generate && npm run build
 
       - name: Install Vercel CLI
         run: npm install -g vercel
