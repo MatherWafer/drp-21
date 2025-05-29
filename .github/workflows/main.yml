@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build and Test
+    name: Build
     runs-on: ubuntu-latest
 
     steps:
@@ -43,6 +43,7 @@ jobs:
   precheck:
     name: Testing
     runs-on: ubuntu-latest
+    requires: build
     steps:
       - name: Echo start
         run: echo "testing start"
