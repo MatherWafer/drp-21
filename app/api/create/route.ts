@@ -6,15 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
-  const {uuid} = await req.json()
-  const user = await prisma.profile.findUnique({
-    where: {
-        id: uuid
-    }
-  })
-  const cookieStore = await cookies();
-  if(user?.name){
-    cookieStore.set("name", user.name)
-  }
+  const data = await req.json()
+  const post = await prisma.post.create({data})
   return new NextResponse();
 }

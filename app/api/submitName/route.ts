@@ -1,5 +1,6 @@
 // app/api/increment/route.ts
 import { PrismaClient } from '@prisma/client';
+import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 const prisma = new PrismaClient();
@@ -12,5 +13,8 @@ export async function POST(req: NextRequest) {
     }
   })
   console.log(inserted)
-  return NextResponse.json({ value: inserted.id });
+  const cookieStore=  await (cookies());
+  cookieStore.set("uuid", inserted.id)
+  cookieStore.set("name", inserted.name)
+  return new NextResponse();
 }

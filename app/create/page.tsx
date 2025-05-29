@@ -1,36 +1,34 @@
 "use client";
+import { useRouter } from "next/navigation";
+import { parseCookies } from "nookies";
 import { SetStateAction, useEffect, useState } from "react";
 import { cursorTo } from "readline";
 
-export default async function Ask() {
+export default function Ask() {
   const [description, setDescription] = useState("");
   const [postSuccess, setPostSuccess] = useState(false);
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
   const [namespace, setNamespace] = useState("");
-  const [blobs,setBlobs] = useState<string[]>([])
-  const getBlobs = async () => {
-    const res = await fetch("/api/ask", {
-      method: "GET"
-    })
-    const data = await res.json();
-    setBlobs(data.blobs)
-  }
+  const [blobs,setBlobs] = useState<string[]>([])    
+  const uuid = parseCookies().uuid
+  const router = useRouter()
 
-  const handleAsk = async () => {
+  const makePost = async () => {
     setDescription("")
-    const res = await fetch("/api/ask", {
+    const res = await fetch("/api/create", {
       method: "POST",
-      body: JSON.stringify({ description, namespace }),
+      body: JSON.stringify({profileId:uuid,title,location,description}),
     });
-    const data = await res.json();
-    setPostSuccess(data.answer);
+    if(res.ok){
+      alert("Post success!")
+      router.push("/")
+    }
   };
   const handleSelectChange = (event: { target: { value: SetStateAction<string>; }; }) => {
     setNamespace(event.target.value);
   };
 
-  useEffect(() => {getBlobs()},[])
   return (
     <main className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto space-y-6">
@@ -55,7 +53,7 @@ export default async function Ask() {
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows={4}
             value={description}
-            onKeyDown={(ke) => {if(description.trim() && ke.key == "Enter" && !ke.shiftKey){handleAsk();}}}
+            onKeyDown={(ke) => {if(description.trim() && ke.key == "Enter" && !ke.shiftKey){makePost();}}}
             onChange={(e) => setDescription(e.target.value)}
           />
          <label htmlFor="title" className="block text-sm font-medium text-[#cccccc]-700">
@@ -69,7 +67,7 @@ export default async function Ask() {
             onChange={(e) => setLocation(e.target.value)}
           />
           <button
-            onClick={handleAsk}
+            onClick={makePost}
             className="px-4 py-2 bg-blue-600 text-[#cccccc] rounded hover:bg-blue-700"
           >
             Submit
