@@ -14,20 +14,22 @@ datasource db {
 }
 
 model Profile {
-  id   String @id @default(uuid())
-  name String
-  Posts Post[]
-  Likes Like[]
+  id            String @id @default(uuid())
+  name          String
+  Posts         Post[]
+  Likes         Like[]
+  Favourites    Favourite[]
 }
 
 model Post {
-  id          String  @id @default(uuid())
-  profileId   String
-  title       String
-  location    String
-  description String
-  creator     Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  Likes        Like[]
+  id              String  @id @default(uuid())
+  profileId       String
+  title           String
+  location        String
+  description     String
+  creator         Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  Likes           Like[]
+  Favourites      Favourite[]
 } 
 
 model Like {
@@ -38,3 +40,13 @@ model Like {
 
   @@id([postId, profileId])
 }
+
+model Favourite {
+  postId    String
+  profileId String
+  user      Profile @relation(fields: [profileId], references: [id])
+  post      Post    @relation(fields: [postId], references: [id])
+
+  @@id([postId, profileId])
+}
+
