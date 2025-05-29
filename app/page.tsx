@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { RedirectType, redirect, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
+import { parseCookies, setCookie, destroyCookie } from 'nookies';
 
 
 
@@ -19,6 +19,7 @@ export default function Home() {
       })
       .then((data) => {
         setName(data.name)
+        setCookie(null,"name",name,)
       })
       .catch((err) => {
         console.error("Error submitting name:", err);
@@ -37,13 +38,12 @@ export default function Home() {
   const [uuid, setUuid] = useState<string>("")
   const router = useRouter()
   useEffect(() => {
-    console.log(localStorage.getItem("uuid"))
-    if(!localStorage?.getItem("uuid")){
+    const cookies = parseCookies()
+    if(!cookies.uuid){
       redirect("/register",RedirectType.replace)
    };
-    const uuid = localStorage.getItem("uuid") as string
-    getName(uuid)
-    setUuid(uuid)
+    setUuid(cookies.uuid)
+    if(!cookies.name){(getName(uuid))} else {setName(cookies.name)}
   })
 
   type UserOption = {

@@ -1,6 +1,7 @@
-'use client';
-
+"use client"
+import { parseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { RedirectType, redirect, useRouter } from 'next/navigation';
+import { parseCookies, setCookie } from 'nookies';
 import { useEffect, useState } from 'react';
 
 const redirWrapper = (url: string) =>{
@@ -8,7 +9,7 @@ const redirWrapper = (url: string) =>{
   redirect(url,RedirectType.replace)
 }
 
-export default async function Home() {
+export default function Home() {
   const [name,setName] = useState<string>("")
   const router = useRouter();
   const submitName = () => {
@@ -21,18 +22,16 @@ export default async function Home() {
     })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to submit name");
-        return res.json();
-      })
-      .then((data) => {
-        console.log(localStorage)
-        localStorage.setItem("uuid", data.value); 
         router.push("/")
       })
-      .catch((err) => {
-        console.error("Error submitting name:", err);
-      });
-  };
-  
+    }
+
+  useEffect(() => {
+    const cookies = parseCookies()
+    if(cookies.uuid){
+      router.push("/")
+    }
+  })
   return (
     <main className="p-8 text-center">
       <h1 className="text-3xl mb-4">What's your name?</h1>
@@ -55,4 +54,4 @@ export default async function Home() {
       </div>
     </main>
   );
-}
+  }
