@@ -34,7 +34,7 @@ export default function Home() {
   })
   return (
     <main className="p-8 text-center">
-      <h1 className="text-3xl mb-4">What's your name?</h1>
+      <h1 className="text-3xl mb-4">Oi, What's your name?</h1>
       <div className="flex justify-center items-stretch space-x-2">
         <textarea
               id="question"
