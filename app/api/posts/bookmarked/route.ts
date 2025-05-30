@@ -24,8 +24,10 @@ export async function GET(req: NextRequest) {
           id: true,
           profileId: true,
           title: true,
-          location: true,
+          latitude: true,
+          longitude: true,
           description: true,
+          locationText: true,
           creator: true,
           _count: {
             select: {

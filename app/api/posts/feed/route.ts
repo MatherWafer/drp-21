@@ -19,9 +19,11 @@ export async function GET(req: NextRequest) {
       id: true,
       profileId: true,
       title: true,
-      location: true,
+      latitude: true,
+      longitude: true,
       description: true,
       creator: true,
+      locationText:true,
       _count: {
         select: {
           Likes: true,

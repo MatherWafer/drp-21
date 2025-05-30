@@ -25,7 +25,9 @@ model Post {
   id              String  @id @default(uuid())
   profileId       String
   title           String
-  location        String
+  latitude        Float
+  longitude       Float
+  locationText    String
   description     String
   creator         Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   Likes           Like[]

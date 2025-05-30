@@ -3,26 +3,33 @@ import { useRouter } from "next/navigation";
 import { parseCookies } from "nookies";
 import { SetStateAction, useEffect, useState } from "react";
 import { cursorTo } from "readline";
+import LocationPicker, { LocationCoordinates } from "../map/LocPicker";
 
 export default function Ask() {
   const [description, setDescription] = useState("");
   const [postSuccess, setPostSuccess] = useState(false);
   const [title, setTitle] = useState("");
-  const [location, setLocation] = useState("");
+  const [latitude, setLatitude] = useState(0)
+  const [longitude, setLongitude] = useState(0)
   const [namespace, setNamespace] = useState("");
   const [blobs,setBlobs] = useState<string[]>([])    
   const uuid = parseCookies().uuid
   const router = useRouter()
+  const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
 
   const makePost = async () => {
-    if(!(title && location)){
+    console.log(title)
+    console.log(latitude)
+    console.log(longitude)
+
+    if(!(title && latitude && longitude)){
       alert("Your post needs a title and location")
       return
     }
     setDescription("")
     const res = await fetch("/api/create", {
       method: "POST",
-      body: JSON.stringify({profileId:uuid,title,location,description}),
+      body: JSON.stringify({profileId:uuid,title,latitude,longitude,description}),
     });
     if(res.ok){
       alert("Post success!")
@@ -62,13 +69,13 @@ export default function Ask() {
          <label htmlFor="title" className="block text-sm font-medium text-[#cccccc]-700">
             Location
           </label>
-          <textarea
-            id="location"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            rows={1}
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-          />
+          <div>
+            
+        <LocationPicker
+          apiKey={GOOGLE_MAPS_API_KEY}
+          onLocationSelect={(loc) => {setLatitude(loc.lat);setLongitude(loc.lng)}}
+        />
+          </div>
           <button
             onClick={makePost}
             className="px-4 py-2 bg-blue-600 text-[#cccccc] rounded hover:bg-blue-700"
