@@ -7,15 +7,13 @@ import { parseCookies, setCookie } from 'nookies';
 import PostStream from './user/posts/PostStream';
 import { PostInfo } from './user/posts/PostOverview';
 import PostMapView from './map/MapPostView';
-import { GOOGLE_MAPS_API_KEY } from './create/page';
-
 export default function Home() {
   const [name, setName] = useState<string>('');
   const [uuid, setUuid] = useState<string>('');
   const [posts, setPosts] = useState<PostInfo[]>([]);
   const [showMap, setShowMap] = useState<boolean>(false);
   const router = useRouter();
-
+  const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
   const getPosts = async () => {
     const cookies = parseCookies();
     fetch("/api/posts/feed", {
