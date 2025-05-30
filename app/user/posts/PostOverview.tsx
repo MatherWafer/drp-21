@@ -14,6 +14,8 @@ export type PostInfo = {
   favouriteCount: number;
   hasFavourited: boolean;
   locationText: string;
+  latitude:number;
+  longitude:number
 };
 
 export default function PostOverview({ post }: { post: PostInfo }) {

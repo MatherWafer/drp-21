@@ -4,7 +4,7 @@ import { parseCookies } from "nookies";
 import { SetStateAction, useEffect, useState } from "react";
 import { cursorTo } from "readline";
 import LocationPicker, { LocationCoordinates } from "../map/LocPicker";
-
+export   const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
 export default function Ask() {
   const [description, setDescription] = useState("");
   const [postSuccess, setPostSuccess] = useState(false);
@@ -15,7 +15,6 @@ export default function Ask() {
   const [blobs,setBlobs] = useState<string[]>([])    
   const uuid = parseCookies().uuid
   const router = useRouter()
-  const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
 
   const makePost = async () => {
     console.log(title)

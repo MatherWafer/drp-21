@@ -5,13 +5,37 @@ import { RedirectType, redirect, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { parseCookies, setCookie } from 'nookies';
 import PostStream from './user/posts/PostStream';
-import Feed from './user/posts/feed/page';
+import { PostInfo } from './user/posts/PostOverview';
+import PostMapView from './map/MapPostView';
+import { GOOGLE_MAPS_API_KEY } from './create/page';
 
 export default function Home() {
   const [name, setName] = useState<string>('');
   const [uuid, setUuid] = useState<string>('');
-  
+  const [posts, setPosts] = useState<PostInfo[]>([]);
+  const [showMap, setShowMap] = useState<boolean>(false);
   const router = useRouter();
+
+  const getPosts = async () => {
+    const cookies = parseCookies();
+    fetch("/api/posts/feed", {
+      method: "GET",
+      headers: {
+        "x-user-id": cookies.uuid
+      }
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch posts");
+        return res.json();
+      })
+      .then((data) => {
+        setPosts(data.posts);
+        console.log(data.posts);
+      })
+      .catch((err) => {
+        console.error("Error fetching posts:", err);
+      });
+  };
 
   const getName = (uid: string) => {
     fetch('/api/home', {
@@ -42,6 +66,7 @@ export default function Home() {
     } else {
       setName(cookies.name);
     }
+    getPosts();
   }, []);
 
   type UserOption = {
@@ -68,17 +93,41 @@ export default function Home() {
 
   return (
     <main className="p-8 text-center min-h-screen bg-zinc-900 text-white">
-      <h1 className="text-4xl font-bold mb-8">Hi, {name} </h1>
+      <h1 className="text-4xl font-bold mb-8">Hi, {name}</h1>
       <div className="flex flex-col">
-          <div className="flex flex-wrap justify-center gap-6 mb-12">
-            {userOptions.map((uo) => (
-              <UserOptionTab uo={uo} key={uo.url} />
-            ))}
-          </div>  
-          <div>
-            <h1 className="text-3xl mb-8">Latest posts:</h1>
-            <Feed/>
-          </div>
+        {/* User Options Bar */}
+        <div className="flex flex-wrap justify-center gap-6 mb-12">
+          {userOptions.map((uo) => (
+            <UserOptionTab uo={uo} key={uo.url} />
+          ))}
+        </div>
+
+        {/* Toggle Button */}
+        <div className="mb-8">
+          <button
+            onClick={() => setShowMap((prev) => !prev)}
+            className="bg-zinc-800 hover:bg-zinc-700 text-white px-6 py-3 rounded-xl shadow-md transition-all duration-300"
+          >
+            {showMap ? 'Show Feed' : 'Show Map'}
+          </button>
+        </div>
+
+        {/* Conditional Content */}
+        <div className="w-full max-w-screen-lg mx-auto">
+          {showMap ? (
+            <>
+              <h1 className="text-3xl mb-8">Where people have ideas:</h1>
+              <div className="w-full h-[400px]">
+                <PostMapView apiKey={GOOGLE_MAPS_API_KEY} posts={posts} />
+              </div>
+            </>
+          ) : (
+            <>
+              <h1 className="text-3xl mb-8">Latest posts:</h1>
+              <PostStream posts={posts} />
+            </>
+          )}
+        </div>
       </div>
     </main>
   );
