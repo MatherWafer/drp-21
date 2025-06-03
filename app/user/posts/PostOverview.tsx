@@ -8,6 +8,7 @@ export type PostInfo = {
   title: string;
   location: string;
   description: string;
+  category: string;
   creator: Profile;
   likeCount: number;
   hasLiked: boolean;
@@ -73,6 +74,7 @@ export default function PostOverview({ post }: { post: PostInfo }) {
         </div>
       </div>
       
+      <p className="text-left text-blue-300 mb-3">{post.category}</p>
       <p className="text-left text-gray-300 mb-3">{post.description}</p>
       
       <div className="flex justify-between items-center">

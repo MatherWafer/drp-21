@@ -28,6 +28,7 @@ model Post {
   latitude        Float
   longitude       Float
   locationText    String
+  category        String @default("Other")
   description     String
   creator         Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   Likes           Like[]

@@ -6,11 +6,13 @@ import { useEffect, useState } from 'react';
 import { parseCookies, setCookie, destroyCookie } from 'nookies';
 import PostOverview, { PostInfo } from '../PostOverview';
 import PostStream from '../PostStream';
+import CategoryDropdown from '../CategoryDropdown';
 
 
 
 export default function Feed() {
   const [posts,setPosts] = useState<PostInfo[]>([])
+  const [category, setCategory] = useState<string>("None")
   const uuid = parseCookies().uuid
   const getPosts = async () => {
     fetch("/api/posts/feed", {
@@ -37,7 +39,10 @@ export default function Feed() {
     getPosts()
   },[])
   return (
-      <PostStream posts={posts}/>
+      <div>
+      <CategoryDropdown setFunc={setCategory} category={category}/>
+      <PostStream posts={posts} category={category}/>
+      </div>
   );
 
 }

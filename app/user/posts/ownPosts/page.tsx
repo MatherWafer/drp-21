@@ -6,11 +6,13 @@ import { useEffect, useState } from 'react';
 import { parseCookies, setCookie, destroyCookie } from 'nookies';
 import PostOverview, { PostInfo } from '../PostOverview';
 import PostStream from '../PostStream';
+import CategoryDropdown from '../CategoryDropdown';
 
 
 
 export default function Home() {
   const [posts,setPosts] = useState<PostInfo[]>([])
+  const [category, setCategory] = useState<string>("None")
   const uuid = parseCookies().uuid
   const getPosts = async () => {
     fetch("/api/posts/ownPosts", {
@@ -41,7 +43,10 @@ export default function Home() {
       <h1 className="text-3xl mb-8">Your Posts:</h1>
         {
           posts ? 
-        <PostStream posts={posts}/>
+        <div>
+          <CategoryDropdown setFunc={setCategory} category={category}/>
+          <PostStream posts={posts} category={category}/>
+        </div>
         : 
         <a>No posts...</a>
         }

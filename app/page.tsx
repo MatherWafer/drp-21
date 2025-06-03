@@ -7,9 +7,11 @@ import { parseCookies, setCookie } from 'nookies';
 import PostStream from './user/posts/PostStream';
 import { PostInfo } from './user/posts/PostOverview';
 import PostMapView from './map/MapPostView';
+import CategoryDropdown from './user/posts/CategoryDropdown';
 export default function Home() {
   const [name, setName] = useState<string>('');
   const [uuid, setUuid] = useState<string>('');
+  const [category, setCategory] = useState("None");
   const [posts, setPosts] = useState<PostInfo[]>([]);
   const [showMap, setShowMap] = useState<boolean>(false);
   const router = useRouter();
@@ -26,7 +28,7 @@ export default function Home() {
         if (!res.ok) throw new Error("Failed to fetch posts");
         return res.json();
       })
-      .then((data) => {
+      .then((data) => { 
         setPosts(data.posts);
         console.log(data.posts);
       })
@@ -110,6 +112,7 @@ export default function Home() {
           </button>
         </div>
 
+
         {/* Conditional Content */}
         <div className="w-full max-w-screen-lg mx-auto">
           {showMap ? (
@@ -122,7 +125,8 @@ export default function Home() {
           ) : (
             <>
               <h1 className="text-3xl mb-8">Latest posts:</h1>
-              <PostStream posts={posts} />
+              <CategoryDropdown setFunc={setCategory} category={category}/>
+              <PostStream posts={posts} category={category}/>
             </>
           )}
         </div>
