@@ -171,10 +171,6 @@ const PanToUserLocation: React.FC<{ userLocation: LocationCoordinates | null, ra
   useEffect(() => {
     if (!map || !userLocation) return;
 
-    // // Set zoom
-    // const zoom = getZoomForRadius(radiusMiles);
-    // map.setZoom(zoom);
-
     // Pan to location (once)
     if (!hasPannedRef.current) {
       map.panTo(userLocation);
