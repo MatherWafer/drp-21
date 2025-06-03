@@ -103,7 +103,7 @@ const PostMapView: React.FC<PostMapViewProps> = ({
             value={radiusMiles}
             onChange={(e) => setRadiusMiles(Number(e.target.value))}
           >
-            {[0.25, 0.5, 1, 1.5, 2].map((miles) => (
+            {[0.25, 0.5, 1, 1.5, 2, 3, 4].map((miles) => (
               <option key={miles} value={miles}>{miles} miles</option>
             ))}
           </select>
@@ -161,7 +161,9 @@ const PanToUserLocation: React.FC<{ userLocation: LocationCoordinates | null, ra
     if (miles <= 0.5) return 15.5;
     if (miles <= 1) return 14;
     if (miles <= 1.5) return 13;
-    if (miles <= 2) return 12.5; // up to 2 miles
+    if (miles <= 2) return 12.5; 
+    if (miles <= 3) return 12;
+    if (miles <= 4) return 11.5;
     return 14;
   };
 
