@@ -2,6 +2,8 @@
 import { PrismaClient } from '@prisma/client';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '../../../utils/supabase/server';
+import { getUserId } from '../util/backendUtils';
 
 const prisma = new PrismaClient();
 
@@ -9,7 +11,7 @@ export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
     const { latitude, longitude } = data;
-
+    const userId = await getUserId()
     // Validate latitude and longitude
     if (typeof latitude !== 'number' || typeof longitude !== 'number' || 
         latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
@@ -49,6 +51,7 @@ export async function POST(req: NextRequest) {
     // Add location to the data object
     const postData = {
       ...data,
+      profileId: userId,
       locationText:location, // Assuming your Prisma schema has a 'location' field
     };
 

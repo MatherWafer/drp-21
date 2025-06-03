@@ -2,16 +2,19 @@
 
 import Link from 'next/link';
 import { RedirectType, redirect, useRouter } from 'next/navigation';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState } from 'react';
 import { parseCookies, setCookie } from 'nookies';
 import PostStream from './user/posts/PostStream';
 import { PostInfo } from './user/posts/PostOverview';
 import PostMapView from './map/MapPostView';
+import { useUser } from './context/userContext';
 export default function Home() {
-  const [name, setName] = useState<string>('');
+  const { displayName } = useUser();
   const [uuid, setUuid] = useState<string>('');
   const [posts, setPosts] = useState<PostInfo[]>([]);
   const [showMap, setShowMap] = useState<boolean>(false);
+  const supabase = createClientComponentClient();
   const router = useRouter();
   const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
   const getPosts = async () => {
@@ -35,35 +38,8 @@ export default function Home() {
       });
   };
 
-  const getName = (uid: string) => {
-    fetch('/api/home', {
-      method: 'POST',
-      body: JSON.stringify({ uuid: uid }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to get name');
-        return res.json();
-      })
-      .then((data) => {
-        setName(data.name);
-        setCookie(null, 'name', data.name);
-      })
-      .catch((err) => {
-        console.error('Error submitting name:', err);
-      });
-  };
 
   useEffect(() => {
-    const cookies = parseCookies();
-    if (!cookies.uuid) {
-      redirect('/register', RedirectType.replace);
-    }
-    setUuid(cookies.uuid);
-    if (!cookies.name) {
-      getName(cookies.uuid);
-    } else {
-      setName(cookies.name);
-    }
     getPosts();
   }, []);
 
@@ -89,9 +65,11 @@ export default function Home() {
     );
   }
 
+
+
   return (
     <main className="p-8 text-center min-h-screen bg-zinc-900 text-white">
-      <h1 className="text-4xl font-bold mb-8">Hi, {name}</h1>
+      <h1 className="text-4xl font-bold mb-8">Hi, {displayName}</h1>
       <div className="flex flex-col">
         {/* User Options Bar */}
         <div className="flex flex-wrap justify-center gap-6 mb-12">
@@ -126,6 +104,7 @@ export default function Home() {
             </>
           )}
         </div>
+
       </div>
     </main>
   );
