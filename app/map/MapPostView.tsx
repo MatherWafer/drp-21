@@ -28,7 +28,7 @@ const PostMapView: React.FC<PostMapViewProps> = ({
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
   const [focusedPost,setFocusedPost] = useState<PostInfo>()
   const [userLocation, setUserLocation] = useState<LocationCoordinates | null>(null); // For live location
-  const [radiusMiles, setRadiusMiles] = useState(1); // Radius Circle
+  const [radiusMiles, setRadiusMiles] = useState(0); // Radius Circle
 
   
     useEffect(() => {
@@ -103,6 +103,7 @@ const PostMapView: React.FC<PostMapViewProps> = ({
             value={radiusMiles}
             onChange={(e) => setRadiusMiles(Number(e.target.value))}
           >
+            <option value={0}>-- Select Radius --</option>
             {[0.25, 0.5, 1, 1.5, 2, 3, 4].map((miles) => (
               <option key={miles} value={miles}>{miles} miles</option>
             ))}
@@ -170,14 +171,19 @@ const PanToUserLocation: React.FC<{ userLocation: LocationCoordinates | null, ra
   useEffect(() => {
     if (!map || !userLocation) return;
 
-    // Set zoom
-    const zoom = getZoomForRadius(radiusMiles);
-    map.setZoom(zoom);
+    // // Set zoom
+    // const zoom = getZoomForRadius(radiusMiles);
+    // map.setZoom(zoom);
 
     // Pan to location (once)
     if (!hasPannedRef.current) {
       map.panTo(userLocation);
       hasPannedRef.current = true;
+    }
+
+    if (radiusMiles > 0) {
+      const zoom = getZoomForRadius(radiusMiles);
+      map.setZoom(zoom);
     }
   }, [map, userLocation, radiusMiles]);
 
@@ -193,7 +199,7 @@ const RadiusCircle: React.FC<{
   const circleRef = useRef<google.maps.Circle | null>(null);
 
   useEffect(() => {
-    if (!map || !center || !radiusMiles) return;
+    if (!map || !center || radiusMiles === 0) return;
 
     const radiusMeters = radiusMiles * 1609.34;
 
