@@ -122,11 +122,27 @@ const PostMapView: React.FC<PostMapViewProps> = ({
               />
             </AdvancedMarker>
           )}
+          
+          <PanToUserLocation userLocation={userLocation} />
           </Map>
         </div>
         {focusedPost && <PostOverview post={focusedPost as PostInfo}/>}
       </APIProvider>
   );
+};
+
+const PanToUserLocation: React.FC<{ userLocation: LocationCoordinates | null }> = ({ userLocation }) => {
+  const map = useMap();
+  const hasPannedRef = useRef(false);
+
+  useEffect(() => {
+    if (map && userLocation && !hasPannedRef.current) {
+      map.panTo(userLocation);
+      hasPannedRef.current = true;
+    }
+  }, [map, userLocation]);
+
+  return null;
 };
 
 export default PostMapView;
