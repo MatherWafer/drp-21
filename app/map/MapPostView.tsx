@@ -178,6 +178,7 @@ const PanToUserLocation: React.FC<{ userLocation: LocationCoordinates | null, ra
     }
 
     if (radiusMiles > 0) {
+      map.panTo(userLocation);
       const zoom = getZoomForRadius(radiusMiles);
       map.setZoom(zoom);
     }
