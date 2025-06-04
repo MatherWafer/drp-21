@@ -1,33 +1,35 @@
 'use client';
-
+export const dynamic = 'force-dynamic'	
 import Link from 'next/link';
 import { RedirectType, redirect, useRouter } from 'next/navigation';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState } from 'react';
 import { parseCookies, setCookie } from 'nookies';
 import PostStream from './user/posts/PostStream';
 import { PostInfo } from './user/posts/PostOverview';
 import PostMapView from './map/MapPostView';
+import CategoryDropdown from './user/posts/CategoryDropdown';
+import { useUser } from './context/userContext';
+
 import PostMapView2 from './map/MapPostView2';
 export default function Home() {
-  const [name, setName] = useState<string>('');
+  const { displayName, loadProfile } = useUser();
   const [uuid, setUuid] = useState<string>('');
   const [posts, setPosts] = useState<PostInfo[]>([]);
   const [showMap, setShowMap] = useState<boolean>(false);
+  const supabase = createClientComponentClient();
   const router = useRouter();
   const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
   const getPosts = async () => {
     const cookies = parseCookies();
     fetch("/api/posts/feed", {
       method: "GET",
-      headers: {
-        "x-user-id": cookies.uuid
-      }
     })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch posts");
         return res.json();
       })
-      .then((data) => {
+      .then((data) => { 
         setPosts(data.posts);
         console.log(data.posts);
       })
@@ -36,36 +38,10 @@ export default function Home() {
       });
   };
 
-  const getName = (uid: string) => {
-    fetch('/api/home', {
-      method: 'POST',
-      body: JSON.stringify({ uuid: uid }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to get name');
-        return res.json();
-      })
-      .then((data) => {
-        setName(data.name);
-        setCookie(null, 'name', data.name);
-      })
-      .catch((err) => {
-        console.error('Error submitting name:', err);
-      });
-  };
 
   useEffect(() => {
-    const cookies = parseCookies();
-    if (!cookies.uuid) {
-      redirect('/register', RedirectType.replace);
-    }
-    setUuid(cookies.uuid);
-    if (!cookies.name) {
-      getName(cookies.uuid);
-    } else {
-      setName(cookies.name);
-    }
     getPosts();
+    // if(!displayName){loadProfile &&  loadProfile()};
   }, []);
 
   type UserOption = {
@@ -90,18 +66,18 @@ export default function Home() {
     );
   }
 
+
+
   return (
     <main className="p-8 text-center min-h-screen bg-zinc-900 text-white">
-      <h1 className="text-4xl font-bold mb-8">Hi, {name}</h1>
+      <h1 className="text-4xl font-bold mb-8">Hi, {displayName}</h1>
       <div className="flex flex-col">
-        {/* User Options Bar */}
         <div className="flex flex-wrap justify-center gap-6 mb-12">
           {userOptions.map((uo) => (
             <UserOptionTab uo={uo} key={uo.url} />
           ))}
         </div>
 
-        {/* Toggle Button */}
         <div className="mb-8">
           <button
             onClick={() => setShowMap((prev) => !prev)}
@@ -110,6 +86,7 @@ export default function Home() {
             {showMap ? 'Show Feed' : 'Show Map'}
           </button>
         </div>
+
 
         {/* Conditional Content */}
         <div className="w-full max-w-screen-lg mx-auto">
@@ -123,10 +100,12 @@ export default function Home() {
           ) : (
             <>
               <h1 className="text-3xl mb-8">Latest posts:</h1>
-              <PostStream posts={posts} />
+              <CategoryDropdown/>
+              <PostStream posts={posts}/>
             </>
           )}
         </div>
+
       </div>
     </main>
   );

@@ -2,6 +2,8 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
 import PostOverview, { PostInfo } from '../user/posts/PostOverview';
 import PostMarker from './PostMarker';
+import CategoryDropdown from '../user/posts/CategoryDropdown';
+import { useCategory } from '../user/posts/CategoryContext';
 
 export interface LocationCoordinates {
   lat: number;
@@ -23,6 +25,7 @@ const PostMapView: React.FC<PostMapViewProps> = ({
 }) => {
   const [selectedLocation, setSelectedLocation] = useState<LocationCoordinates>(initialLocation);
   const [locationName, setLocationName] = useState<string>('');
+  const { category } = useCategory();
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
@@ -96,6 +99,7 @@ const PostMapView: React.FC<PostMapViewProps> = ({
           setApiError(`Failed to load Google Maps API: ${error}`);
         }}
       >
+        <CategoryDropdown/>
         <div style={{ marginBottom: '1rem', textAlign: 'right' }}>
           <label htmlFor="radius-select" style={{ marginRight: '8px' }}>Search Radius:</label>
           <select
@@ -121,29 +125,8 @@ const PostMapView: React.FC<PostMapViewProps> = ({
             style={{ width: '100%', height: '100%' }}
             onClick={handleMapClick}
           >
-            {posts.map(post => <PostMarker setter={setFocusedPost} key={post.id} post={post}/>)}
-                        
-            {userLocation && (
-            <AdvancedMarker position={userLocation}>
-              <div
-                style={{
-                  width: '16px',
-                  height: '16px',
-                  borderRadius: '50%',
-                  backgroundColor: '#4285f4',
-                  border: '2px solid white',
-                  boxShadow: '0 0 6px rgba(0,0,0,0.5)',
-                }}
-                title="Your Location"
-              />
-            </AdvancedMarker>
-          )}
-
-          {userLocation && (
-            <RadiusCircle center={userLocation} radiusMiles={radiusMiles} />
-          )}
-          
-          <PanToUserLocation userLocation={userLocation} radiusMiles={radiusMiles} />
+            {posts.filter(post => category == 'None' || category == post.category).
+              map(post => <PostMarker setter={setFocusedPost} key={post.id} post={post}/>)}
           </Map>
         </div>
         {focusedPost && <PostOverview post={focusedPost as PostInfo}/>}

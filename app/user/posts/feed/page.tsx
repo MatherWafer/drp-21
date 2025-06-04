@@ -6,8 +6,7 @@ import { useEffect, useState } from 'react';
 import { parseCookies, setCookie, destroyCookie } from 'nookies';
 import PostOverview, { PostInfo } from '../PostOverview';
 import PostStream from '../PostStream';
-
-
+import CategoryDropdown from '../CategoryDropdown';
 
 export default function Feed() {
   const [posts,setPosts] = useState<PostInfo[]>([])
@@ -37,7 +36,10 @@ export default function Feed() {
     getPosts()
   },[])
   return (
+      <div>
+      <CategoryDropdown/>
       <PostStream posts={posts}/>
+      </div>
   );
 
 }

@@ -1,10 +1,7 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider             = "prisma-client-js"
-  recursive_type_depth = -1
   interface            = "sync"
+  recursive_type_depth = "-1"
 }
 
 datasource db {
@@ -14,41 +11,41 @@ datasource db {
 }
 
 model Profile {
-  id            String @id @default(uuid())
-  name          String
-  Posts         Post[]
-  Likes         Like[]
-  Favourites    Favourite[]
+  id         String      @id @db.Uuid
+  name       String
+  Favourites Favourite[]
+  Likes      Like[]
+  Posts      Post[]
 }
 
 model Post {
-  id              String  @id @default(uuid())
-  profileId       String
-  title           String
-  latitude        Float
-  longitude       Float
-  locationText    String
-  description     String
-  creator         Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  Likes           Like[]
-  Favourites      Favourite[]
-} 
+  id           String      @id @default(uuid()) @db.Uuid
+  profileId    String      @db.Uuid
+  title        String
+  latitude     Float
+  longitude    Float
+  locationText String
+  category        String @default("Other")
+  description  String
+  Favourites   Favourite[]
+  Likes        Like[]
+  creator      Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
 
 model Like {
-  postId    String
-  profileId String
-  user      Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  postId    String  @db.Uuid
+  profileId String  @db.Uuid
   post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@id([postId, profileId])
 }
 
 model Favourite {
-  postId    String
-  profileId String
-  user      Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  postId    String  @db.Uuid
+  profileId String  @db.Uuid
   post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@id([postId, profileId])
 }
-

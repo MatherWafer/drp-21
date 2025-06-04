@@ -6,8 +6,7 @@ import { useEffect, useState } from 'react';
 import { parseCookies, setCookie, destroyCookie } from 'nookies';
 import PostOverview, { PostInfo } from '../PostOverview';
 import PostStream from '../PostStream';
-
-
+import CategoryDropdown from '../CategoryDropdown';
 
 export default function Home() {
   const [posts,setPosts] = useState<PostInfo[]>([])
@@ -41,7 +40,10 @@ export default function Home() {
       <h1 className="text-3xl mb-8">Your Posts:</h1>
         {
           posts ? 
-        <PostStream posts={posts}/>
+        <div>
+          <CategoryDropdown/>
+          <PostStream posts={posts} />
+        </div>
         : 
         <a>No posts...</a>
         }
