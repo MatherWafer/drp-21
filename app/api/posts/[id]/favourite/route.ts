@@ -7,8 +7,8 @@ import { getUserId, withProfileId } from '../../../util/backendUtils';
 const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
-  const data = await req.json() 
-  const data_dash = await withProfileId(data)
+  const data = await req.json() as {postId: string}
+  const data_dash = await withProfileId(data) 
   const post = await prisma.favourite.create({data:data_dash})
   return new NextResponse();
 }
