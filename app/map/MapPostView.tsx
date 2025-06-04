@@ -2,7 +2,6 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { APIProvider, Map, AdvancedMarker } from '@vis.gl/react-google-maps';
 import PostOverview, { PostInfo } from '../user/posts/PostOverview';
 import PostMarker from './PostMarker';
-import CategoryDropdown from '../user/posts/CategoryDropdown';
 import { useCategory } from '../user/posts/CategoryContext';
 
 export interface LocationCoordinates {
@@ -76,7 +75,6 @@ const PostMapView: React.FC<PostMapViewProps> = ({
           setApiError(`Failed to load Google Maps API: ${error}`);
         }}
       >
-        <CategoryDropdown/>
         <div style={{ height: '400px', width: '100%', marginBottom: '20px' }}>
           <Map
             zoomControl={true}

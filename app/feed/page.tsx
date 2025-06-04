@@ -4,10 +4,10 @@ import { RedirectType, redirect, useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState } from 'react';
 import { parseCookies, setCookie } from 'nookies';
-import PostStream from './user/posts/PostStream';
-import { PostInfo } from './user/posts/PostOverview';
-import PostMapView from './map/MapPostView';
-import { useUser } from './context/userContext';
+import PostStream from '../user/posts/PostStream';
+import { PostInfo } from '../user/posts/PostOverview';
+import PostMapView from '../map/MapPostView';
+import { useUser } from '../context/userContext';
 
 export default function Home() {
   const { displayName, loadProfile } = useUser();
@@ -43,15 +43,13 @@ export default function Home() {
 
 
   return (
-    <main className="text-center min-h-screen bg-zinc-900 text-white">
+    <main className="p-8 text-center min-h-screen bg-zinc-900 text-white">
       <div className="flex flex-col">
         {/* Conditional Content */}
         <div className="w-full max-w-screen-lg mx-auto">
             <>
-              <h1 className="text-3xl mb-8">Where people have ideas:</h1>
-              <div className="w-full h-[400px]">
-                <PostMapView apiKey={GOOGLE_MAPS_API_KEY} posts={posts} />
-              </div>
+              <h1 className="text-3xl mb-8">Latest posts:</h1>
+              <PostStream posts={posts}/>
             </>
         </div>
 

@@ -3,6 +3,9 @@ import { UserProvider } from './context/userContext';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { CategoryProvider } from './user/posts/CategoryContext';
+import Footer from './layout/Footer';
+import Header from './layout/Header';
+import Selector from './layout/Selector';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -25,11 +28,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-zinc-900 text-white min-h-screen`}>
+    <html lang="en" className="dark h-full">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-zinc-900 text-white h-full`}>
         <UserProvider>
           <CategoryProvider>
-            {children}
+            <div className="flex flex-col h-screen overflow-hidden">
+              <Header />
+              <Selector />
+              <main className="flex-1 overflow-y-auto px-2">
+                {children}
+              </main>
+              <div className="pt-5">
+                <Footer />
+              </div>
+            </div>
           </CategoryProvider>
         </UserProvider>
       </body>

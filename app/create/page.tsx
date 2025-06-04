@@ -42,7 +42,7 @@ export default function Ask() {
     <main className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto space-y-6">
         <h1 className="text-3xl font-bold text-center">Make a Post</h1>
-        <div className="space-y-2">
+        <div className="space-y-2 items-center">
           <label htmlFor="title" className="block text-sm font-medium text-[#cccccc]-700">
             Post title
           </label>
