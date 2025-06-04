@@ -11,11 +11,9 @@ import CategoryDropdown from './user/posts/CategoryDropdown';
 import { useUser } from './context/userContext';
 
 export default function Home() {
-  // const { displayName, loadProfile } = useUser();
-  // const [uuid, setUuid] = useState<string>('');
+  const { displayName, loadProfile } = useUser();
   const [posts, setPosts] = useState<PostInfo[]>([]);
   const [showMap, setShowMap] = useState<boolean>(false);
-  // const router = useRouter();
   const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
   const getPosts = async () => {
     fetch("/api/posts/feed", {
@@ -37,7 +35,7 @@ export default function Home() {
 
   useEffect(() => {
     getPosts();
-    // if(!displayName){loadProfile &&  loadProfile()};
+    if(!displayName){loadProfile &&  loadProfile()};
   }, []);
 
   type UserOption = {
