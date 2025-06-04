@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { RedirectType, redirect, useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState } from 'react';
-import { parseCookies, setCookie } from 'nookies';
 import PostStream from './user/posts/PostStream';
 import { PostInfo } from './user/posts/PostOverview';
 import PostMapView from './map/MapPostView';
@@ -12,36 +11,34 @@ import CategoryDropdown from './user/posts/CategoryDropdown';
 import { useUser } from './context/userContext';
 
 export default function Home() {
-  const { displayName, loadProfile } = useUser();
-  const [uuid, setUuid] = useState<string>('');
-  const [posts, setPosts] = useState<PostInfo[]>([]);
+  // const { displayName, loadProfile } = useUser();
+  // const [uuid, setUuid] = useState<string>('');
+  // const [posts, setPosts] = useState<PostInfo[]>([]);
   const [showMap, setShowMap] = useState<boolean>(false);
-  const supabase = createClientComponentClient();
-  const router = useRouter();
+  // const router = useRouter();
   const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
-  const getPosts = async () => {
-    const cookies = parseCookies();
-    fetch("/api/posts/feed", {
-      method: "GET",
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch posts");
-        return res.json();
-      })
-      .then((data) => { 
-        setPosts(data.posts);
-        console.log(data.posts);
-      })
-      .catch((err) => {
-        console.error("Error fetching posts:", err);
-      });
-  };
+  // const getPosts = async () => {
+  //   fetch("/api/posts/feed", {
+  //     method: "GET",
+  //   })
+  //     .then((res) => {
+  //       if (!res.ok) throw new Error("Failed to fetch posts");
+  //       return res.json();
+  //     })
+  //     .then((data) => { 
+  //       setPosts(data.posts);
+  //       console.log(data.posts);
+  //     })
+  //     .catch((err) => {
+  //       console.error("Error fetching posts:", err);
+  //     });
+  // };
 
 
-  useEffect(() => {
-    getPosts();
-    // if(!displayName){loadProfile &&  loadProfile()};
-  }, []);
+  // useEffect(() => {
+  //   getPosts();
+  //   // if(!displayName){loadProfile &&  loadProfile()};
+  // }, []);
 
   type UserOption = {
     url: string;
@@ -69,7 +66,7 @@ export default function Home() {
 
   return (
     <main className="p-8 text-center min-h-screen bg-zinc-900 text-white">
-      <h1 className="text-4xl font-bold mb-8">Hi, {displayName}</h1>
+      {/* <h1 className="text-4xl font-bold mb-8">Hi, {displayName}</h1> */}
       <div className="flex flex-col">
         <div className="flex flex-wrap justify-center gap-6 mb-12">
           {userOptions.map((uo) => (
@@ -93,14 +90,14 @@ export default function Home() {
             <>
               <h1 className="text-3xl mb-8">Where people have ideas:</h1>
               <div className="w-full h-[400px]">
-                <PostMapView apiKey={GOOGLE_MAPS_API_KEY} posts={posts} />
+                <PostMapView apiKey={GOOGLE_MAPS_API_KEY} posts={[]} />
               </div>
             </>
           ) : (
             <>
               <h1 className="text-3xl mb-8">Latest posts:</h1>
               <CategoryDropdown/>
-              <PostStream posts={posts}/>
+              {/* <PostStream posts={posts}/> */}
             </>
           )}
         </div>
