@@ -24,8 +24,8 @@ jobs:
 
       - name: generate prisma client
         env: 
-          DATABASE_URL: ${{secrets.DATABASE_URL}}
-          DIRECT_URL: ${{secrets.DIRECT_URL}}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
         run: npx prisma db pull && npx prisma generate
 
       - name: Build the app
