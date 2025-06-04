@@ -8,14 +8,14 @@ export interface LocationCoordinates {
   lng: number;
 }
 
-interface PostMapViewProps {
+interface SelectMapAreaProps {
   onLocationSelect?: (coordinates: LocationCoordinates) => void;
   initialLocation?: LocationCoordinates;
   apiKey: string;
   posts: PostInfo[]
 }
 
-const PostMapView2: React.FC<PostMapViewProps> = ({
+const SelectMapArea: React.FC<SelectMapAreaProps> = ({
   onLocationSelect,
   initialLocation = { lat: 51.512409, lng: -0.125146 },
   apiKey,
@@ -44,9 +44,6 @@ const PostMapView2: React.FC<PostMapViewProps> = ({
             };
             setUserLocation(coords);
           },
-          (error) => {
-            console.error('Error getting user location:', error);
-          }
         );
       } else {
         console.warn('Geolocation not supported by this browser.');
@@ -121,20 +118,7 @@ const PostMapView2: React.FC<PostMapViewProps> = ({
             {isDrawing ? 'Reset Area' : 'Draw Area'}
           </button>
         </div>
-      
-        <div style={{ marginBottom: '1rem', textAlign: 'right' }}>
-          <label htmlFor="radius-select" style={{ marginRight: '8px' }}>Search Radius:</label>
-          <select
-            id="radius-select"
-            value={radiusMiles}
-            onChange={(e) => setRadiusMiles(Number(e.target.value))}
-          >
-            <option value={0}>-- Select Radius --</option>
-            {[0.25, 0.5, 1, 1.5, 2, 3, 4].map((miles) => (
-              <option key={miles} value={miles}>{miles} miles</option>
-            ))}
-          </select>
-        </div>
+
         
         <div style={{ height: '400px', width: '100%', marginBottom: '20px' }}>
           <Map
@@ -147,8 +131,6 @@ const PostMapView2: React.FC<PostMapViewProps> = ({
             style={{ width: '100%', height: '100%' }}
             onClick={handleMapClick}
           >
-            {posts.map(post => <PostMarker setter={setFocusedPost} key={post.id} post={post}/>)}
-                        
             {userLocation && (
             <AdvancedMarker position={userLocation}>
               <div
@@ -163,10 +145,6 @@ const PostMapView2: React.FC<PostMapViewProps> = ({
                 title="Your Location"
               />
             </AdvancedMarker>
-          )}
-
-          {userLocation && (
-            <RadiusCircle center={userLocation} radiusMiles={radiusMiles} />
           )}
           
           <PanToUserLocation userLocation={userLocation} radiusMiles={radiusMiles} />
@@ -235,44 +213,6 @@ const PanToUserLocation: React.FC<{ userLocation: LocationCoordinates | null, ra
   return null;
 };
 
-// Circle component to show the user's location radius
-const RadiusCircle: React.FC<{
-    center: LocationCoordinates;
-    radiusMiles: number;
-  }> = ({ center, radiusMiles }) => {
-  const map = useMap();
-  const circleRef = useRef<google.maps.Circle | null>(null);
-
-  useEffect(() => {
-    if (!map || !center || radiusMiles === 0) return;
-
-    const radiusMeters = radiusMiles * 1609.34;
-
-    if (circleRef.current) {
-      circleRef.current.setMap(null);
-    }
-
-    circleRef.current = new google.maps.Circle({
-      center,
-      radius: radiusMeters,
-      map,
-      strokeColor: '#4285f4',
-      strokeOpacity: 0.5,
-      strokeWeight: 2,
-      fillColor: '#4285f4',
-      fillOpacity: 0.1,
-    });
-
-    return () => {
-      if (circleRef.current) {
-        circleRef.current.setMap(null);
-      }
-    };
-  }, [map, center, radiusMiles]);
-
-  return null;
-};
-
 // Map out area
 const PolygonDrawer: React.FC<{
   isDrawing: boolean;
@@ -323,4 +263,4 @@ const PolygonDrawer: React.FC<{
 };
 
 
-export default PostMapView2;
+export default SelectMapArea;

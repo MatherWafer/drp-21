@@ -100,6 +100,7 @@ const PostMapView: React.FC<PostMapViewProps> = ({
         }}
       >
         <CategoryDropdown/>
+
         <div style={{ marginBottom: '1rem', textAlign: 'right' }}>
           <label htmlFor="radius-select" style={{ marginRight: '8px' }}>Search Radius:</label>
           <select
@@ -113,7 +114,23 @@ const PostMapView: React.FC<PostMapViewProps> = ({
             ))}
           </select>
         </div>
-        
+
+        {userLocation && (
+                    <AdvancedMarker position={userLocation}>
+                      <div
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          borderRadius: '50%',
+                          backgroundColor: '#4285f4',
+                          border: '2px solid white',
+                          boxShadow: '0 0 6px rgba(0,0,0,0.5)',
+                        }}
+                        title="Your Location"
+                      />
+                    </AdvancedMarker>
+                  )}
+
         <div style={{ height: '400px', width: '100%', marginBottom: '20px' }}>
           <Map
             zoomControl={true}
@@ -129,6 +146,14 @@ const PostMapView: React.FC<PostMapViewProps> = ({
               map(post => <PostMarker setter={setFocusedPost} key={post.id} post={post}/>)}
           </Map>
         </div>
+        
+        <PanToUserLocation userLocation={userLocation} radiusMiles={radiusMiles} />
+              
+        
+        {userLocation && (
+            <RadiusCircle center={userLocation} radiusMiles={radiusMiles} />
+          )}
+
         {focusedPost && <PostOverview post={focusedPost as PostInfo}/>}
       </APIProvider>
   );
