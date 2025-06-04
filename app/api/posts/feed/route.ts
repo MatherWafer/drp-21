@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
     hasFavourited: post.Favourites.length > 0
   }));
 
-  const polygon = await prisma.polygon.findFirst({
+  const polygon = await prisma.interestRegion.findFirst({
     where: {
       profileId: userId
     },
@@ -72,17 +72,16 @@ export async function GET(req: NextRequest) {
     }
   }) ?? { region: [] };
 
-  if polygon.region.length === 0 || !filterPolygon) {
+  if (polygon.region.length === 0 || !filterPolygon) {
     return NextResponse.json({ posts: transformedPosts });
   }
   
-  const ring = polygon.region.map(({lat, lng}) => ({
-    latitude: lat,
-    longitude: lng
-  }));
+  const ring = polygon.region.map((pos) => 
+    new google.maps.LatLng(pos.lat, pos.lng)
+  );
 
   const filtered = transformedPosts.filter(p =>
-    google.maps.geometry.poly.containsLocation(ring, polygon)
+    google.maps.geometry.poly.containsLocation(new google.maps.LatLng(p.latitude, p.longitude),ring)
   );
 
   return NextResponse.json({ posts: filtered });
