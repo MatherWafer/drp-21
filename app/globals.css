@@ -7,12 +7,6 @@
 
 html,
 body {
-  @apply bg-zinc-900 text-white min-h-screen font-sans;
+  @apply bg-white text-white min-h-screen font-sans;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}

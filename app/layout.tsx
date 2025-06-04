@@ -29,13 +29,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark h-full">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-zinc-900 text-white h-full`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-teal-900 text-white h-full`}>
         <UserProvider>
           <CategoryProvider>
             <div className="flex flex-col h-screen overflow-hidden">
               <Header />
               <Selector />
-              <main className="flex-1 overflow-y-auto px-2">
+              <main className="flex-1 overflow-y-auto px-2 rounded-lg">
                 {children}
               </main>
               <div className="pt-5">

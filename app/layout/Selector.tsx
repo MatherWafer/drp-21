@@ -15,7 +15,7 @@ export default function Selector() {
 
   // Otherwise, render your usual stuff
   return (
-    <div className="flex items-center justify-center w-full-center">
+    <div className="bg-blue flex items-center justify-center w-full-center">
       <CategoryDropdown/>
     </div>
   );

@@ -43,7 +43,7 @@ export default function Home() {
 
 
   return (
-    <main className="p-8 text-center min-h-screen bg-zinc-900 text-white">
+    <main className="p-8 text-center min-h-screen bg-teal-900 rounded-lg text-white">
       <div className="flex flex-col">
         {/* Conditional Content */}
         <div className="w-full max-w-screen-lg mx-auto">
