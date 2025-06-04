@@ -7,6 +7,7 @@ import { parseCookies, setCookie } from 'nookies';
 import PostStream from './user/posts/PostStream';
 import { PostInfo } from './user/posts/PostOverview';
 import PostMapView from './map/MapPostView';
+import PostMapView2 from './map/MapPostView2';
 export default function Home() {
   const [name, setName] = useState<string>('');
   const [uuid, setUuid] = useState<string>('');
@@ -116,7 +117,7 @@ export default function Home() {
             <>
               <h1 className="text-3xl mb-8">Where people have ideas:</h1>
               <div className="w-full h-[400px]">
-                <PostMapView apiKey={GOOGLE_MAPS_API_KEY} posts={posts} />
+                <PostMapView2 apiKey={GOOGLE_MAPS_API_KEY} posts={posts} />
               </div>
             </>
           ) : (
