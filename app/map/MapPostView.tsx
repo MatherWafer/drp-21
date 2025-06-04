@@ -4,11 +4,47 @@ import PostOverview, { PostInfo } from '../user/posts/PostOverview';
 import PostMarker from './PostMarker';
 import CategoryDropdown from '../user/posts/CategoryDropdown';
 import { useCategory } from '../user/posts/CategoryContext';
+import { LatLng } from '../api/util/geoHelpers';
 
 export interface LocationCoordinates {
   lat: number;
   lng: number;
 }
+
+const RegionPolygon: React.FC<{ map: google.maps.Map | null; region: LatLng[] }> = ({ map, region }) => {
+  const polygonRef = useRef<google.maps.Polygon | null>(null);
+
+  useEffect(() => {
+    if (!map || region.length === 0) return;
+
+    // Remove existing polygon if any
+    if (polygonRef.current) {
+      polygonRef.current.setMap(null);
+    }
+
+    // Create the polygon
+    polygonRef.current = new google.maps.Polygon({
+      paths: region,
+      strokeColor: '#FF0000',
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: '#FF0000',
+      fillOpacity: 0.1,
+    });
+
+    polygonRef.current.setMap(map);
+
+    // Cleanup on unmount or region/map change
+    return () => {
+      if (polygonRef.current) {
+        polygonRef.current.setMap(null);
+      }
+    };
+  }, [map, region]);
+
+  return null;
+};
+
 
 interface PostMapViewProps {
   onLocationSelect?: (coordinates: LocationCoordinates) => void;
@@ -23,12 +59,7 @@ const PostMapView: React.FC<PostMapViewProps> = ({
   apiKey,
   posts
 }) => {
-  const [selectedLocation, setSelectedLocation] = useState<LocationCoordinates>(initialLocation);
-  const [locationName, setLocationName] = useState<string>('');
   const { category } = useCategory();
-  const [isGeocoding, setIsGeocoding] = useState(false);
-  const [apiError, setApiError] = useState<string | null>(null);
-  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
   const [focusedPost,setFocusedPost] = useState<PostInfo>()
   const [userLocation, setUserLocation] = useState<LocationCoordinates | null>(null); // For live location
   const [radiusMiles, setRadiusMiles] = useState(0); // Radius Circle
@@ -54,29 +85,7 @@ const PostMapView: React.FC<PostMapViewProps> = ({
     }, []);
 
   // Function to perform geocoding via HTTP API
-  const geocodeViaHttp = async (location: LocationCoordinates) => {
-    try {
-      setIsGeocoding(true);
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.lat},${location.lng}&key=${apiKey}`
-      );
-      const data = await response.json();
-      setIsGeocoding(false);
-      if (data.status === 'OK' && data.results?.[0]) {
-        setLocationName(data.results[0].formatted_address.split(',')[0]);
-        setApiError(null);
-      } else {
-        setLocationName('Unknown location');
-        setApiError(`Geocoding failed: ${data.status}`);
-        console.error('Geocoding error:', data.status, data.error_message);
-      }
-    } catch (error) {
-      setIsGeocoding(false);
-      setLocationName('Unknown location');
-      setApiError('Geocoding API request failed');
-      console.error('Geocoding API error:', error);
-    }
-  };
+
 
   const handleMapClick = useCallback((event: any) => {
     if (event.detail?.latLng) {
@@ -84,7 +93,6 @@ const PostMapView: React.FC<PostMapViewProps> = ({
         lat: event.detail.latLng.lat,
         lng: event.detail.latLng.lng,
       };
-      setSelectedLocation(newLocation);
       onLocationSelect?.(newLocation);
     }
   }, [onLocationSelect]);
@@ -96,7 +104,6 @@ const PostMapView: React.FC<PostMapViewProps> = ({
         onLoad={() => console.log('APIProvider loaded')}
         onError={(error) => {
           console.error('APIProvider error:', error);
-          setApiError(`Failed to load Google Maps API: ${error}`);
         }}
       >
         <CategoryDropdown/>
@@ -202,16 +209,12 @@ const RadiusCircle: React.FC<{
   }> = ({ center, radiusMiles }) => {
   const map = useMap();
   const circleRef = useRef<google.maps.Circle | null>(null);
-
   useEffect(() => {
     if (!map || !center || radiusMiles === 0) return;
-
     const radiusMeters = radiusMiles * 1609.34;
-
     if (circleRef.current) {
       circleRef.current.setMap(null);
     }
-
     circleRef.current = new google.maps.Circle({
       center,
       radius: radiusMeters,
@@ -222,7 +225,6 @@ const RadiusCircle: React.FC<{
       fillColor: '#4285f4',
       fillOpacity: 0.1,
     });
-
     return () => {
       if (circleRef.current) {
         circleRef.current.setMap(null);

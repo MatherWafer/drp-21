@@ -12,7 +12,7 @@ import CategoryDropdown from './user/posts/CategoryDropdown';
 import { useUser } from './context/userContext';
 
 export default function Home() {
-  const { displayName, loadProfile } = useUser();
+  const { displayName, interestRegion } = useUser();
   const [uuid, setUuid] = useState<string>('');
   const [posts, setPosts] = useState<PostInfo[]>([]);
   const [showMap, setShowMap] = useState<boolean>(false);
@@ -93,7 +93,7 @@ export default function Home() {
             <>
               <h1 className="text-3xl mb-8">Where people have ideas:</h1>
               <div className="w-full h-[400px]">
-                <PostMapView apiKey={GOOGLE_MAPS_API_KEY} posts={posts} />
+                <PostMapView apiKey={GOOGLE_MAPS_API_KEY} posts={posts} region={interestRegion} />
               </div>
             </>
           ) : (

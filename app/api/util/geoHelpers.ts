@@ -18,8 +18,8 @@ export function isInside(
   if (region.length < 3) throw new Error("Polygon needs ≥ 3 vertices");
 
   // GeoJSON uses [lng, lat] order ➜ convert once
+  region.push(region[0])
   const ring = region.map(({ lat, lng }) => [lng, lat]) as [number, number][];
-
   const poly   = polygon([ring]);                     // { type: 'Polygon', ... }
   const pt     = point([target.lng, target.lat]);     // { type: 'Point', ... }
 

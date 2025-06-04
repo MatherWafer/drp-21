@@ -10,16 +10,20 @@ export async function GET(req: NextRequest) {
   console.log("ID: %s", id)
   const res = await prisma.profile.findFirst({
     select: {
-        name:true
+        name:true,
+        InterestRegion: {
+          select: {
+            region: true
+          }
+        }
     },
     where:{
         id:id
     }
-
-    
   })
+
   if( res != null) {
-    return NextResponse.json({name:res.name});
+    return NextResponse.json({name:res.name, interestRegion: res.InterestRegion.region});
   }
 }
 

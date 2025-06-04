@@ -5,7 +5,7 @@ import { createClient } from '../../../../utils/supabase/server';
 import { getUserId } from '../../util/backendUtils';
 import { latLngEquals,
  } from '@vis.gl/react-google-maps';
-import { isInside } from '../../util/geoHelpers';
+import { LatLng, isInside } from '../../util/geoHelpers';
 
 const prisma = new PrismaClient();
 
@@ -78,7 +78,7 @@ export async function GET(req: NextRequest) {
   //   return NextResponse.json({ posts: transformedPosts });
   // }
   
-  const ring = polygon.region as LatLong[]
+  const ring = polygon.region as LatLng[]
   const filtered = transformedPosts.filter(p =>
     isInside({lat:p.latitude, lng:p.longitude},ring)
   );
