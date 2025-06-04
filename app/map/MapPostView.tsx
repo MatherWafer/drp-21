@@ -11,11 +11,13 @@ export interface LocationCoordinates {
   lng: number;
 }
 
-const RegionPolygon: React.FC<{ map: google.maps.Map | null; region: LatLng[] }> = ({ map, region }) => {
-  const polygonRef = useRef<google.maps.Polygon | null>(null);
 
+const RegionPolygon: React.FC<{ region: LatLng[] }> = ({ region }) => {
+  const polygonRef = useRef<google.maps.Polygon | null>(null);
+  const map = useMap();
+  
   useEffect(() => {
-    if (!map || region.length === 0) return;
+    if (!map || !window.google || !window.google.maps || region.length === 0) return;
 
     // Remove existing polygon if any
     if (polygonRef.current) {
@@ -23,7 +25,7 @@ const RegionPolygon: React.FC<{ map: google.maps.Map | null; region: LatLng[] }>
     }
 
     // Create the polygon
-    polygonRef.current = new google.maps.Polygon({
+    polygonRef.current = new window.google.maps.Polygon({
       paths: region,
       strokeColor: '#FF0000',
       strokeOpacity: 0.8,
@@ -40,7 +42,7 @@ const RegionPolygon: React.FC<{ map: google.maps.Map | null; region: LatLng[] }>
         polygonRef.current.setMap(null);
       }
     };
-  }, [map, region]);
+  }, [region, map]);
 
   return null;
 };
@@ -51,19 +53,22 @@ interface PostMapViewProps {
   initialLocation?: LocationCoordinates;
   apiKey: string;
   posts: PostInfo[]
+  interestRegion: LatLng[]
 }
 
 const PostMapView: React.FC<PostMapViewProps> = ({
   onLocationSelect,
   initialLocation = { lat: 51.512409, lng: -0.125146 },
   apiKey,
-  posts
+  posts,
+  interestRegion
 }) => {
   const { category } = useCategory();
   const [focusedPost,setFocusedPost] = useState<PostInfo>()
   const [userLocation, setUserLocation] = useState<LocationCoordinates | null>(null); // For live location
-  const [radiusMiles, setRadiusMiles] = useState(0); // Radius Circle
-
+  initialLocation = interestRegion ? 
+  averageLoc(interestRegion)
+  : initialLocation
   
     useEffect(() => {
       if (navigator.geolocation) {
@@ -108,35 +113,8 @@ const PostMapView: React.FC<PostMapViewProps> = ({
       >
         <CategoryDropdown/>
 
-        <div style={{ marginBottom: '1rem', textAlign: 'right' }}>
-          <label htmlFor="radius-select" style={{ marginRight: '8px' }}>Search Radius:</label>
-          <select
-            id="radius-select"
-            value={radiusMiles}
-            onChange={(e) => setRadiusMiles(Number(e.target.value))}
-          >
-            <option value={0}>-- Select Radius --</option>
-            {[0.25, 0.5, 1, 1.5, 2, 3, 4].map((miles) => (
-              <option key={miles} value={miles}>{miles} miles</option>
-            ))}
-          </select>
-        </div>
 
-        {userLocation && (
-                    <AdvancedMarker position={userLocation}>
-                      <div
-                        style={{
-                          width: '16px',
-                          height: '16px',
-                          borderRadius: '50%',
-                          backgroundColor: '#4285f4',
-                          border: '2px solid white',
-                          boxShadow: '0 0 6px rgba(0,0,0,0.5)',
-                        }}
-                        title="Your Location"
-                      />
-                    </AdvancedMarker>
-                  )}
+
 
         <div style={{ height: '400px', width: '100%', marginBottom: '20px' }}>
           <Map
@@ -144,7 +122,7 @@ const PostMapView: React.FC<PostMapViewProps> = ({
             scrollwheel={true}
             defaultZoom={13}
             gestureHandling="cooperative"
-            defaultCenter={initialLocation}
+            defaultCenter={userLocation || initialLocation}
             mapId="a2bc871f26d67c06e4448720"
             style={{ width: '100%', height: '100%' }}
             onClick={handleMapClick}
@@ -154,12 +132,8 @@ const PostMapView: React.FC<PostMapViewProps> = ({
           </Map>
         </div>
         
-        <PanToUserLocation userLocation={userLocation} radiusMiles={radiusMiles} />
-              
-        
-        {userLocation && (
-            <RadiusCircle center={userLocation} radiusMiles={radiusMiles} />
-          )}
+        <RegionPolygon region={interestRegion}/>
+  
 
         {focusedPost && <PostOverview post={focusedPost as PostInfo}/>}
       </APIProvider>
@@ -167,72 +141,23 @@ const PostMapView: React.FC<PostMapViewProps> = ({
 };
 
 // Component to pan the map to the user's current location
-const PanToUserLocation: React.FC<{ userLocation: LocationCoordinates | null, radiusMiles: number }> = ({ userLocation, radiusMiles }) => {
-  const map = useMap();
-  const hasPannedRef = useRef(false);
-
-  // Determine zoom level based on radius
-  const getZoomForRadius = (miles: number): number => {
-    if (miles <= 0.25) return 16.5;
-    if (miles <= 0.5) return 15.5;
-    if (miles <= 1) return 14;
-    if (miles <= 1.5) return 13;
-    if (miles <= 2) return 12.5; 
-    if (miles <= 3) return 12;
-    if (miles <= 4) return 11.5;
-    return 14;
-  };
-
-  useEffect(() => {
-    if (!map || !userLocation) return;
-
-    // Pan to location (once)
-    if (!hasPannedRef.current) {
-      map.panTo(userLocation);
-      hasPannedRef.current = true;
-    }
-
-    if (radiusMiles > 0) {
-      map.panTo(userLocation);
-      const zoom = getZoomForRadius(radiusMiles);
-      map.setZoom(zoom);
-    }
-  }, [map, userLocation, radiusMiles]);
-
-  return null;
-};
 
 // Circle component to show the user's location radius
-const RadiusCircle: React.FC<{
-    center: LocationCoordinates;
-    radiusMiles: number;
-  }> = ({ center, radiusMiles }) => {
-  const map = useMap();
-  const circleRef = useRef<google.maps.Circle | null>(null);
-  useEffect(() => {
-    if (!map || !center || radiusMiles === 0) return;
-    const radiusMeters = radiusMiles * 1609.34;
-    if (circleRef.current) {
-      circleRef.current.setMap(null);
-    }
-    circleRef.current = new google.maps.Circle({
-      center,
-      radius: radiusMeters,
-      map,
-      strokeColor: '#4285f4',
-      strokeOpacity: 0.5,
-      strokeWeight: 2,
-      fillColor: '#4285f4',
-      fillOpacity: 0.1,
-    });
-    return () => {
-      if (circleRef.current) {
-        circleRef.current.setMap(null);
-      }
-    };
-  }, [map, center, radiusMiles]);
 
-  return null;
-};
 
 export default PostMapView;
+function averageLoc(interestRegion: LatLng[]): LocationCoordinates {
+  
+  const { lat, lng } = interestRegion.reduce(
+    (acc, { lat, lng }) => ({
+      lat: acc.lat + lat,
+      lng: acc.lng + lng
+    }),
+    { lat: 0, lng: 0 }
+  );
+
+  return {
+    lat: lat / interestRegion.length,
+    lng: lng / interestRegion.length
+  };
+}
