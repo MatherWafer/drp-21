@@ -25,9 +25,6 @@ export default function Home() {
     const cookies = parseCookies();
     fetch("/api/posts/feed", {
       method: "GET",
-      headers: {
-        "x-user-id": cookies.uuid
-      }
     })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch posts");
@@ -45,7 +42,7 @@ export default function Home() {
 
   useEffect(() => {
     getPosts();
-    if(!displayName){loadProfile &&  loadProfile()};
+    // if(!displayName){loadProfile &&  loadProfile()};
   }, []);
 
   type UserOption = {
