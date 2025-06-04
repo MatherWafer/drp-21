@@ -1,5 +1,5 @@
 'use client';
-
+export const dynamic = 'force-dynamic'	
 import Link from 'next/link';
 import { RedirectType, redirect, useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
