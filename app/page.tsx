@@ -64,7 +64,7 @@ export default function Home() {
 
   return (
     <main className="p-8 text-center min-h-screen bg-zinc-900 text-white">
-      {/* <h1 className="text-4xl font-bold mb-8">Hi, {displayName}</h1> */}
+      <h1 className="text-4xl font-bold mb-8">Hi, {displayName}</h1>
       <div className="flex flex-col">
         <div className="flex flex-wrap justify-center gap-6 mb-12">
           {userOptions.map((uo) => (
@@ -88,14 +88,14 @@ export default function Home() {
             <>
               <h1 className="text-3xl mb-8">Where people have ideas:</h1>
               <div className="w-full h-[400px]">
-                <PostMapView apiKey={GOOGLE_MAPS_API_KEY} posts={[]} />
+                <PostMapView apiKey={GOOGLE_MAPS_API_KEY} posts={posts} />
               </div>
             </>
           ) : (
             <>
               <h1 className="text-3xl mb-8">Latest posts:</h1>
               <CategoryDropdown/>
-              {/* <PostStream posts={posts}/> */}
+              <PostStream posts={posts}/>
             </>
           )}
         </div>
