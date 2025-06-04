@@ -23,7 +23,7 @@ jobs:
         run: npm ci
 
       - name: generate prisma client
-        run: npx prisma generate
+        run: npx prisma db pull && npx prisma generate
 
       - name: Build the app
         env:
