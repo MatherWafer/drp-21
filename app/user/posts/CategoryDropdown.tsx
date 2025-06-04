@@ -4,11 +4,11 @@ export default function CategoryDropdown() {
   const { category, setCategory } = useCategory();
 
   return (
-    <div className="bg-indigo-500 rounded-lg mb-8 p-3">
+    <div className="bg-sky-800 rounded-lg p-1">
       <label>Filter by category: </label>
       <select
         id="category"
-        className="w-half p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-half border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         value={category}
         onChange={(e) => setCategory(e.target.value)}
       >
@@ -16,7 +16,7 @@ export default function CategoryDropdown() {
           <option
             key={option}
             value={option}
-            style={{ backgroundColor: "teal", color: "white" }}
+            className="bg-sky-800 color-white"
           >
             {option}
           </option>

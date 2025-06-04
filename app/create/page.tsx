@@ -88,6 +88,7 @@ export default function Ask() {
         <LocationPicker
           apiKey={GOOGLE_MAPS_API_KEY}
           onLocationSelect={(loc) => {setLatitude(loc.lat);setLongitude(loc.lng)}}
+          height={'300px'}
         />
           </div>
           <button

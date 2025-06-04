@@ -41,12 +41,12 @@ export default function Feed() {
 
 
   return (
-    <main className="p-8 text-center min-h-screen bg-teal-900 rounded-lg text-white">
+    <main className="p-4 text-center min-h-screen rounded-lg text-white">
       <div className="flex flex-col">
         {/* Conditional Content */}
         <div className="w-full max-w-screen-lg mx-auto">
             <>
-              <h1 className="text-3xl mb-8">Latest posts:</h1>
+              <h1 className="text-black mb-4 text-lg">Latest posts:</h1>
               <PostStream posts={posts}/>
             </>
         </div>

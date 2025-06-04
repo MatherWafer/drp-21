@@ -13,14 +13,16 @@ interface PostMapViewProps {
   onLocationSelect?: (coordinates: LocationCoordinates) => void;
   initialLocation?: LocationCoordinates;
   apiKey: string;
-  posts: PostInfo[]
+  posts: PostInfo[];
+  height: number
 }
 
 const PostMapView: React.FC<PostMapViewProps> = ({
   onLocationSelect,
   initialLocation = { lat: 51.512409, lng: -0.125146 },
   apiKey,
-  posts
+  posts,
+  height
 }) => {
   const [selectedLocation, setSelectedLocation] = useState<LocationCoordinates>(initialLocation);
   const [locationName, setLocationName] = useState<string>('');
@@ -75,7 +77,7 @@ const PostMapView: React.FC<PostMapViewProps> = ({
           setApiError(`Failed to load Google Maps API: ${error}`);
         }}
       >
-        <div style={{ height: '400px', width: '100%', marginBottom: '20px' }}>
+        <div style={{ height, width: '100%', marginBottom: '20px' }}>
           <Map
             zoomControl={true}
             scrollwheel={true}

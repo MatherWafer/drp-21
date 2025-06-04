@@ -1,4 +1,7 @@
+'use client';
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCategory } from "../user/posts/CategoryContext";
 
 export default function Footer() {
@@ -14,11 +17,16 @@ export default function Footer() {
     { url: '/feed', description: 'Show Feed' },
   ];
 
+  const pathname = usePathname();
+
   function UserOptionTab({ uo }: { uo: UserOption }) {
+    const isActive = pathname === uo.url;
+
     return (
       <Link
         href={uo.url}
-        className="bg-teal-800 hover:bg-teal-700 text-white px-4 py-3 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center text-lg font-semibold w-48 text-center border border-teal-700 flex-shrink text-center"
+        className={`px-4 py-3 rounded-xl shadow-lg transition-all duration-300 transform flex items-center justify-center text-lg font-semibold w-48 text-center border
+          ${isActive ? 'bg-teal-600 border-teal-400 scale-105' : 'bg-teal-800 hover:bg-teal-700 border-teal-700'} text-white`}
       >
         {uo.description}
       </Link>

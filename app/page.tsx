@@ -45,7 +45,7 @@ export default function Home() {
             <>
               <h1 className="text-3xl text-teal mb-8">Where people have ideas:</h1>
               <div className="w-full h-full">
-                <PostMapView apiKey={GOOGLE_MAPS_API_KEY} posts={posts} />
+                <PostMapView apiKey={GOOGLE_MAPS_API_KEY} posts={posts} height={400} />
               </div>
             </>
         </div>

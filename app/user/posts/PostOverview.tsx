@@ -62,13 +62,11 @@ export default function PostOverview({ post }: { post: PostInfo }) {
   };
 
   return (
-    <div className="w-full p-6 mb-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-700">
-      <div className="flex justify-between items-start mb-4">
+    <div className="w-full p-6 mb-6 bg-[#d9ebff] rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+      <div className="justify-between items-start mb-4">
         <h3 className="text-xl text-left font-bold text-black">{post.title} </h3>
-        <div className="flex items-center">
           <span className="text-sm text-gray-800 mr-2">Posted by:</span>
           <span className="text-sm font-medium text-gray-500">{post.creator.name}</span>
-        </div>
       </div>
       
       <p className="text-left text-blue-300 mb-3">{post.category}</p>
@@ -80,7 +78,7 @@ export default function PostOverview({ post }: { post: PostInfo }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          <span>{post.locationText}</span>
+          <span >{post.locationText.split(',').slice(0, 2).join(',')}</span>
         </div>
         
         <div className="flex space-x-2">
