@@ -9,13 +9,11 @@ import { PostInfo } from '../user/posts/PostOverview';
 import PostMapView from '../map/MapPostView';
 import { useUser } from '../context/userContext';
 
-export default function Home() {
+export default function Feed() {
   const { displayName, loadProfile } = useUser();
   const [uuid, setUuid] = useState<string>('');
   const [posts, setPosts] = useState<PostInfo[]>([]);
   const [showMap, setShowMap] = useState<boolean>(false);
-  const supabase = createClientComponentClient();
-  const router = useRouter();
   const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
   const getPosts = async () => {
     const cookies = parseCookies();
