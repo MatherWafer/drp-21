@@ -11,11 +11,9 @@ import PostMapView from './map/MapPostView';
 import CategoryDropdown from './user/posts/CategoryDropdown';
 import { useUser } from './context/userContext';
 
-
 export default function Home() {
   const { displayName, loadProfile } = useUser();
   const [uuid, setUuid] = useState<string>('');
-  const [category, setCategory] = useState("None");
   const [posts, setPosts] = useState<PostInfo[]>([]);
   const [showMap, setShowMap] = useState<boolean>(false);
   const supabase = createClientComponentClient();
@@ -104,8 +102,8 @@ export default function Home() {
           ) : (
             <>
               <h1 className="text-3xl mb-8">Latest posts:</h1>
-              <CategoryDropdown setFunc={setCategory} category={category}/>
-              <PostStream posts={posts} category={category}/>
+              <CategoryDropdown/>
+              <PostStream posts={posts}/>
             </>
           )}
         </div>
