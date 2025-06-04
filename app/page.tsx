@@ -10,7 +10,7 @@ import { PostInfo } from './user/posts/PostOverview';
 import PostMapView from './map/MapPostView';
 import { useUser } from './context/userContext';
 export default function Home() {
-  const { displayName } = useUser();
+  const { displayName, loadProfile } = useUser();
   const [uuid, setUuid] = useState<string>('');
   const [posts, setPosts] = useState<PostInfo[]>([]);
   const [showMap, setShowMap] = useState<boolean>(false);
@@ -41,6 +41,7 @@ export default function Home() {
 
   useEffect(() => {
     getPosts();
+    if(!displayName){loadProfile &&  loadProfile()};
   }, []);
 
   type UserOption = {
@@ -71,14 +72,12 @@ export default function Home() {
     <main className="p-8 text-center min-h-screen bg-zinc-900 text-white">
       <h1 className="text-4xl font-bold mb-8">Hi, {displayName}</h1>
       <div className="flex flex-col">
-        {/* User Options Bar */}
         <div className="flex flex-wrap justify-center gap-6 mb-12">
           {userOptions.map((uo) => (
             <UserOptionTab uo={uo} key={uo.url} />
           ))}
         </div>
 
-        {/* Toggle Button */}
         <div className="mb-8">
           <button
             onClick={() => setShowMap((prev) => !prev)}
@@ -88,7 +87,6 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Conditional Content */}
         <div className="w-full max-w-screen-lg mx-auto">
           {showMap ? (
             <>
