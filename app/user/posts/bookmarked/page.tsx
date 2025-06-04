@@ -5,7 +5,6 @@ import { RedirectType, redirect, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { parseCookies, setCookie, destroyCookie } from 'nookies';
 import PostOverview, { PostInfo } from '../PostOverview';
-import CategoryDropdown from '../CategoryDropdown';
 import PostStream from '../PostStream';
 
 export default function Home() {
@@ -36,10 +35,8 @@ export default function Home() {
     getPosts()
   },[])
   return (
-    <main className="min-h-screen p-8 flex flex-col items-center">
-      <h1 className="text-3xl mb-8">Your Bookmarked Posts:</h1>
-      
-        <CategoryDropdown />
+    <main className="mt-2 min-h-screen p-8 flex flex-col items-center">
+      <h1 className="text-2xl mb-8 text-black">Your Bookmarked Posts:</h1>
         <PostStream posts={posts}/>
     </main>
   );

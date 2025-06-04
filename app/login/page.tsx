@@ -32,7 +32,7 @@ export default function AuthForm({
   };
 
   return (
-    <div className="bg-zinc-800 p-8 rounded-2xl shadow-lg max-w-md mx-auto mt-12 border border-zinc-700">
+    <div className="bg-[#d9ebff] p-8 rounded-2xl shadow-lg max-w-md mx-auto mt-12 border border-teal-700">
       <h2 className="text-2xl font-bold mb-4 text-center">
         {isLogin ? 'Welcome Back!' : 'Join Us!'}
       </h2>
@@ -50,7 +50,7 @@ export default function AuthForm({
         <div>
           <label
             htmlFor="email"
-            className="block mb-1 text-sm font-medium text-zinc-300"
+            className="block mb-1 text-sm font-medium text-teal-300"
           >
             Email
           </label>
@@ -59,7 +59,7 @@ export default function AuthForm({
             name="email"
             type="email"
             required
-            className="w-full px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+            className="w-full px-4 py-2 rounded-lg bg-teal-900 border border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
         </div>
 
@@ -67,7 +67,7 @@ export default function AuthForm({
           <div>
             <label
               htmlFor="name"
-              className="block mb-1 text-sm font-medium text-zinc-300"
+              className="block mb-1 text-sm font-medium text-teal-300"
             >
               Name
             </label>
@@ -76,7 +76,7 @@ export default function AuthForm({
               name="name"
               type="text"
               required
-              className="w-full px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+              className="w-full px-4 py-2 rounded-lg bg-teal-900 border border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
         )}
@@ -84,7 +84,7 @@ export default function AuthForm({
         <div>
           <label
             htmlFor="password"
-            className="block mb-1 text-sm font-medium text-zinc-300"
+            className="block mb-1 text-sm font-medium text-teal-300"
           >
             Password
           </label>
@@ -93,7 +93,7 @@ export default function AuthForm({
             name="password"
             type="password"
             required
-            className="w-full px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+            className="w-full px-4 py-2 rounded-lg bg-teal-900 border border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
         </div>
 
@@ -101,7 +101,7 @@ export default function AuthForm({
           <button
             type={isLogin ? 'submit' : 'submit'}
             onClick={() => isLogin && null}
-            className="w-full bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded-xl transition-all duration-300 border border-zinc-600"
+            className="w-full bg-teal-700 hover:bg-teal-600 text-white px-4 py-2 rounded-xl transition-all duration-300 border border-teal-600"
             {...(isLogin
               ? { formAction: login }
               : { formAction: signup })}
@@ -118,7 +118,7 @@ export default function AuthForm({
             setIsLogin(!isLogin);
             setEmailSent(false);
           }}
-          className="text-sm text-zinc-400 hover:underline"
+          className="text-sm text-teal-400 hover:underline"
         >
           {isLogin
             ? "Don't have an account? Sign up"

@@ -2,7 +2,6 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
 import PostOverview, { PostInfo } from '../user/posts/PostOverview';
 import PostMarker from './PostMarker';
-import CategoryDropdown from '../user/posts/CategoryDropdown';
 import { useCategory } from '../user/posts/CategoryContext';
 import { LatLng } from '../api/util/geoHelpers';
 
@@ -125,51 +124,29 @@ const PostMapView: React.FC<PostMapViewProps> = ({
   const displayedPosts = showGenericFeed ? genericFeed : posts;
 
   return (
-    <APIProvider
-      apiKey={apiKey}
-      onLoad={() => console.log('APIProvider loaded')}
-      onError={(error) => {
-        console.error('APIProvider error:', error);
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-        <CategoryDropdown />
-        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-          <input 
-            type="checkbox" 
-            checked={showGenericFeed}
-            onChange={() => setShowGenericFeed(!showGenericFeed)}
-          />
-          Show All Posts
-        </label>
-      </div>
-
-      <div style={{ height: '400px', width: '100%', marginBottom: '20px' }}>
-        <Map
-          zoomControl={true}
-          scrollwheel={true}
-          defaultZoom={13}
-          gestureHandling="cooperative"
-          defaultCenter={userLocation || initialLocation}
-          mapId="a2bc871f26d67c06e4448720"
-          style={{ width: '100%', height: '100%' }}
-          onClick={handleMapClick}
-        >
-          {displayedPosts
-            .filter(post => category === 'None' || category === post.category)
-            .map(post => (
-              <PostMarker 
-                setter={setFocusedPost} 
-                key={post.id} 
-                post={post}
-              />
-            ))}
-        </Map>
-      </div>
-      
-      <RegionPolygon region={interestRegion}/>
-      {focusedPost && <PostOverview post={focusedPost as PostInfo}/>}
-    </APIProvider>
+      <APIProvider
+        apiKey={apiKey}
+        onLoad={() => console.log('APIProvider loaded')}
+        onError={(error) => {
+          console.error('APIProvider error:', error);
+        }}
+      >
+        <div style={{ height: '100vh', width: '100%'}}>
+          <Map
+            zoomControl={true}
+            scrollwheel={true}
+            defaultZoom={13}
+            gestureHandling="cooperative"
+            defaultCenter={initialLocation}
+            mapId="a2bc871f26d67c06e4448720"
+            style={{ width: '100%', height: '100vh' }}
+            mapTypeControl={false}
+          >
+            {posts.filter(post => category == 'None' || category == post.category).
+              map(post => <PostMarker setter={setFocusedPost} key={post.id} post={post}/>)}
+          </Map>
+        </div>
+      </APIProvider>
   );
 };
 

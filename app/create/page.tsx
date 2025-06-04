@@ -35,10 +35,10 @@ export default function Ask() {
   };
 
   return (
-    <main className="min-h-screen p-6">
+    <main className="bg-teal-800 rounded-lg min-h-screen p-6">
       <div className="max-w-2xl mx-auto space-y-6">
         <h1 className="text-3xl font-bold text-center">Make a Post</h1>
-        <div className="space-y-2">
+        <div className="space-y-2 items-center">
           <label htmlFor="title" className="block text-sm font-medium text-[#cccccc]-700">
             Post title
           </label>
@@ -60,10 +60,10 @@ export default function Ask() {
             <option value="" disabled hidden>
               Select a category...
             </option>
-            <option style={{backgroundColor: 'black', color: 'white'}} value="Cycling">Cycling</option>
-            <option style={{backgroundColor: 'black', color: 'white'}} value="Roadworks">Roadworks</option>
-            <option style={{backgroundColor: 'black', color: 'white'}} value="Parks">Parks</option>
-            <option style={{backgroundColor: 'black', color: 'white'}} value="Other">Other</option>
+            <option className="bg-teal-800 text-white" value="Cycling">Cycling</option>
+            <option className="bg-teal-800 text-white" value="Roadworks">Roadworks</option>
+            <option className="bg-teal-800 text-white" value="Parks">Parks</option>
+            <option className="bg-teal-800 text-white" value="Other">Other</option>
           </select>
           <label htmlFor="description" className="block text-sm font-medium text-[#cccccc]-700">
             Description
@@ -84,11 +84,12 @@ export default function Ask() {
         <LocationPicker
           apiKey={GOOGLE_MAPS_API_KEY}
           onLocationSelect={(loc) => {setLatitude(loc.lat);setLongitude(loc.lng)}}
+          height={'300px'}
         />
           </div>
           <button
             onClick={makePost}
-            className="px-4 py-2 bg-blue-600 text-[#cccccc] rounded hover:bg-blue-700"
+            className="block mx-auto px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
           >
             Submit
           </button>
