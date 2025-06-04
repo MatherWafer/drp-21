@@ -23,6 +23,9 @@ jobs:
         run: npm ci
 
       - name: generate prisma client
+        env: 
+          DATABASE_URL: ${{secrets.DATABASE_URL}}
+          DIRECT_URL: ${{secrets.DIRECT_URL}}
         run: npx prisma db pull && npx prisma generate
 
       - name: Build the app
