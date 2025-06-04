@@ -3,9 +3,11 @@ import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '../../../../utils/supabase/server';
 import { getUserId } from '../../util/backendUtils';
+import { latLngEquals } from '@vis.gl/react-google-maps';
 
 const prisma = new PrismaClient();
 
+// New parameter in header, x-filter-polygon
 export async function GET(req: NextRequest) {
   const userId = await getUserId()
   if (!userId) {
@@ -14,6 +16,8 @@ export async function GET(req: NextRequest) {
       { status: 401 }
     );
   }
+
+  const filterPolygon = (req.headers.get('x-filter-polygon') ?? '').toLowerCase() === 'true';
 
   const posts = await prisma.post.findMany({
     select: {
@@ -59,5 +63,27 @@ export async function GET(req: NextRequest) {
     hasFavourited: post.Favourites.length > 0
   }));
 
-  return NextResponse.json({ posts: transformedPosts });
+  const polygon = await prisma.polygon.findFirst({
+    where: {
+      profileId: userId
+    },
+    select: {
+      region: true
+    }
+  }) ?? { region: [] };
+
+  if polygon.region.length === 0 || !filterPolygon) {
+    return NextResponse.json({ posts: transformedPosts });
+  }
+  
+  const ring = polygon.region.map(({lat, lng}) => ({
+    latitude: lat,
+    longitude: lng
+  }));
+
+  const filtered = transformedPosts.filter(p =>
+    google.maps.geometry.poly.containsLocation(ring, polygon)
+  );
+
+  return NextResponse.json({ posts: filtered });
 }
