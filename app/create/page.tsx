@@ -12,7 +12,6 @@ export default function Ask() {
   const [longitude, setLongitude] = useState(0)
   const [namespace, setNamespace] = useState("");
   const [blobs,setBlobs] = useState<string[]>([])    
-  const uuid = parseCookies().uuid
   const router = useRouter()
   const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
   const makePost = async () => {
@@ -27,7 +26,7 @@ export default function Ask() {
     setDescription("")
     const res = await fetch("/api/create", {
       method: "POST",
-      body: JSON.stringify({profileId:uuid,title,latitude,longitude,description}),
+      body: JSON.stringify({title,latitude,longitude,description}),
     });
     if(res.ok){
       alert("Post success!")

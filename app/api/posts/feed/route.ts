@@ -1,12 +1,13 @@
 // app/api/increment/route.ts
 import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '../../../../utils/supabase/server';
+import { getUserId } from '../../util/backendUtils';
 
 const prisma = new PrismaClient();
 
 export async function GET(req: NextRequest) {
-  const userId = req.headers.get('x-user-id');
-  
+  const userId = await getUserId()
   if (!userId) {
     return NextResponse.json(
       { error: 'Unauthorized - missing user ID' },

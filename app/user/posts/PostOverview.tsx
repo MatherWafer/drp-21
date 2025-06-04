@@ -23,14 +23,12 @@ export default function PostOverview({ post }: { post: PostInfo }) {
   const [currentLikeCount, setCurrentLikeCount] = useState(post.likeCount);
   const [favourited, setFavourited] = useState(post.hasFavourited);
   const [currentFavouriteCount, setCurrentFavouriteCount] = useState(post.favouriteCount);
-  const uuid = parseCookies().uuid;
 
   const handleLike = async () => {
     try {
       const response = await fetch(`/api/posts/${post.id}/like`, {
         method: liked ? 'DELETE' : 'POST',
         body: JSON.stringify({
-          profileId: uuid,
           postId: post.id
         })
       });
@@ -49,8 +47,7 @@ export default function PostOverview({ post }: { post: PostInfo }) {
       const response = await fetch(`/api/posts/${post.id}/favourite`, {
         method: favourited ? 'DELETE' : 'POST',
         body: JSON.stringify({
-          profileId: uuid,
-          postId: post.id
+        postId: post.id
         })
       });
       
