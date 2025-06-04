@@ -7,6 +7,6 @@
 
 html,
 body {
-  @apply bg-white text-white min-h-screen font-sans;
+  @apply bg-white text-white font-sans m-0;
 }
 

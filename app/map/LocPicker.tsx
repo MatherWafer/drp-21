@@ -93,7 +93,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
           setApiError(`Failed to load Google Maps API: ${error}`);
         }}
       >
-        <div style={{ height, width: '100%', marginBottom: '20px' }}>
+        <div style={{ height, width: '100%'}}>
           <Map
             zoomControl={true}
             scrollwheel={true}

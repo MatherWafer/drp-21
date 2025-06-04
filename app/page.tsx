@@ -38,19 +38,8 @@ export default function Home() {
 
 
   return (
-    <main className="text-center min-h-screen bg-white text-teal">
-      <div className="flex flex-col">
-        {/* Conditional Content */}
-        <div className="w-full max-w-screen-lg mx-auto">
-            <>
-              <h1 className="text-3xl text-teal mb-8">Where people have ideas:</h1>
-              <div className="w-full h-full">
-                <PostMapView apiKey={GOOGLE_MAPS_API_KEY} posts={posts} height={400} />
-              </div>
-            </>
-        </div>
-
-      </div>
+    <main className="text-center bg-white text-teal m-0">
+        <PostMapView apiKey={GOOGLE_MAPS_API_KEY} posts={posts} />
     </main>
   );
 }

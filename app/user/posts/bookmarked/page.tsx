@@ -35,8 +35,8 @@ export default function Home() {
     getPosts()
   },[])
   return (
-    <main className="bg-teal-800 rounded-lg min-h-screen p-8 flex flex-col items-center">
-      <h1 className="text-2xl mb-8">Your Bookmarked Posts:</h1>
+    <main className="mt-2 min-h-screen p-8 flex flex-col items-center">
+      <h1 className="text-2xl mb-8 text-black">Your Bookmarked Posts:</h1>
         <PostStream posts={posts}/>
     </main>
   );
