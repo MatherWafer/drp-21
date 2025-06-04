@@ -102,7 +102,7 @@ export default function Home() {
               <CategoryDropdown/>
               <PostStream posts={posts}/>
             </>
-          )}
+          )},
         </div>
 
       </div>
