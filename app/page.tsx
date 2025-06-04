@@ -13,32 +13,32 @@ import { useUser } from './context/userContext';
 export default function Home() {
   // const { displayName, loadProfile } = useUser();
   // const [uuid, setUuid] = useState<string>('');
-  // const [posts, setPosts] = useState<PostInfo[]>([]);
+  const [posts, setPosts] = useState<PostInfo[]>([]);
   const [showMap, setShowMap] = useState<boolean>(false);
   // const router = useRouter();
   const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
-  // const getPosts = async () => {
-  //   fetch("/api/posts/feed", {
-  //     method: "GET",
-  //   })
-  //     .then((res) => {
-  //       if (!res.ok) throw new Error("Failed to fetch posts");
-  //       return res.json();
-  //     })
-  //     .then((data) => { 
-  //       setPosts(data.posts);
-  //       console.log(data.posts);
-  //     })
-  //     .catch((err) => {
-  //       console.error("Error fetching posts:", err);
-  //     });
-  // };
+  const getPosts = async () => {
+    fetch("/api/posts/feed", {
+      method: "GET",
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch posts");
+        return res.json();
+      })
+      .then((data) => { 
+        setPosts(data.posts);
+        console.log(data.posts);
+      })
+      .catch((err) => {
+        console.error("Error fetching posts:", err);
+      });
+  };
 
 
-  // useEffect(() => {
-  //   getPosts();
-  //   // if(!displayName){loadProfile &&  loadProfile()};
-  // }, []);
+  useEffect(() => {
+    getPosts();
+    // if(!displayName){loadProfile &&  loadProfile()};
+  }, []);
 
   type UserOption = {
     url: string;
