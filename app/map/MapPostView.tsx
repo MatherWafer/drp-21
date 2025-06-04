@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { APIProvider, Map, AdvancedMarker } from '@vis.gl/react-google-maps';
+import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
 import PostOverview, { PostInfo } from '../user/posts/PostOverview';
 import PostMarker from './PostMarker';
 import CategoryDropdown from '../user/posts/CategoryDropdown';
@@ -29,7 +29,30 @@ const PostMapView: React.FC<PostMapViewProps> = ({
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
-  const [focsedPost,setFocusedPost] = useState<PostInfo>()
+  const [focusedPost,setFocusedPost] = useState<PostInfo>()
+  const [userLocation, setUserLocation] = useState<LocationCoordinates | null>(null); // For live location
+  const [radiusMiles, setRadiusMiles] = useState(0); // Radius Circle
+
+  
+    useEffect(() => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const coords = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+            setUserLocation(coords);
+          },
+          (error) => {
+            console.error('Error getting user location:', error);
+          }
+        );
+      } else {
+        console.warn('Geolocation not supported by this browser.');
+      }
+    }, []);
+
   // Function to perform geocoding via HTTP API
   const geocodeViaHttp = async (location: LocationCoordinates) => {
     try {
@@ -77,6 +100,37 @@ const PostMapView: React.FC<PostMapViewProps> = ({
         }}
       >
         <CategoryDropdown/>
+
+        <div style={{ marginBottom: '1rem', textAlign: 'right' }}>
+          <label htmlFor="radius-select" style={{ marginRight: '8px' }}>Search Radius:</label>
+          <select
+            id="radius-select"
+            value={radiusMiles}
+            onChange={(e) => setRadiusMiles(Number(e.target.value))}
+          >
+            <option value={0}>-- Select Radius --</option>
+            {[0.25, 0.5, 1, 1.5, 2, 3, 4].map((miles) => (
+              <option key={miles} value={miles}>{miles} miles</option>
+            ))}
+          </select>
+        </div>
+
+        {userLocation && (
+                    <AdvancedMarker position={userLocation}>
+                      <div
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          borderRadius: '50%',
+                          backgroundColor: '#4285f4',
+                          border: '2px solid white',
+                          boxShadow: '0 0 6px rgba(0,0,0,0.5)',
+                        }}
+                        title="Your Location"
+                      />
+                    </AdvancedMarker>
+                  )}
+
         <div style={{ height: '400px', width: '100%', marginBottom: '20px' }}>
           <Map
             zoomControl={true}
@@ -86,14 +140,97 @@ const PostMapView: React.FC<PostMapViewProps> = ({
             defaultCenter={initialLocation}
             mapId="a2bc871f26d67c06e4448720"
             style={{ width: '100%', height: '100%' }}
+            onClick={handleMapClick}
           >
             {posts.filter(post => category == 'None' || category == post.category).
               map(post => <PostMarker setter={setFocusedPost} key={post.id} post={post}/>)}
           </Map>
         </div>
-        {focsedPost && <PostOverview post={focsedPost as PostInfo}/>}
+        
+        <PanToUserLocation userLocation={userLocation} radiusMiles={radiusMiles} />
+              
+        
+        {userLocation && (
+            <RadiusCircle center={userLocation} radiusMiles={radiusMiles} />
+          )}
+
+        {focusedPost && <PostOverview post={focusedPost as PostInfo}/>}
       </APIProvider>
   );
+};
+
+// Component to pan the map to the user's current location
+const PanToUserLocation: React.FC<{ userLocation: LocationCoordinates | null, radiusMiles: number }> = ({ userLocation, radiusMiles }) => {
+  const map = useMap();
+  const hasPannedRef = useRef(false);
+
+  // Determine zoom level based on radius
+  const getZoomForRadius = (miles: number): number => {
+    if (miles <= 0.25) return 16.5;
+    if (miles <= 0.5) return 15.5;
+    if (miles <= 1) return 14;
+    if (miles <= 1.5) return 13;
+    if (miles <= 2) return 12.5; 
+    if (miles <= 3) return 12;
+    if (miles <= 4) return 11.5;
+    return 14;
+  };
+
+  useEffect(() => {
+    if (!map || !userLocation) return;
+
+    // Pan to location (once)
+    if (!hasPannedRef.current) {
+      map.panTo(userLocation);
+      hasPannedRef.current = true;
+    }
+
+    if (radiusMiles > 0) {
+      map.panTo(userLocation);
+      const zoom = getZoomForRadius(radiusMiles);
+      map.setZoom(zoom);
+    }
+  }, [map, userLocation, radiusMiles]);
+
+  return null;
+};
+
+// Circle component to show the user's location radius
+const RadiusCircle: React.FC<{
+    center: LocationCoordinates;
+    radiusMiles: number;
+  }> = ({ center, radiusMiles }) => {
+  const map = useMap();
+  const circleRef = useRef<google.maps.Circle | null>(null);
+
+  useEffect(() => {
+    if (!map || !center || radiusMiles === 0) return;
+
+    const radiusMeters = radiusMiles * 1609.34;
+
+    if (circleRef.current) {
+      circleRef.current.setMap(null);
+    }
+
+    circleRef.current = new google.maps.Circle({
+      center,
+      radius: radiusMeters,
+      map,
+      strokeColor: '#4285f4',
+      strokeOpacity: 0.5,
+      strokeWeight: 2,
+      fillColor: '#4285f4',
+      fillOpacity: 0.1,
+    });
+
+    return () => {
+      if (circleRef.current) {
+        circleRef.current.setMap(null);
+      }
+    };
+  }, [map, center, radiusMiles]);
+
+  return null;
 };
 
 export default PostMapView;
