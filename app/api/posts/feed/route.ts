@@ -3,7 +3,9 @@ import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '../../../../utils/supabase/server';
 import { getUserId } from '../../util/backendUtils';
-import { latLngEquals } from '@vis.gl/react-google-maps';
+import { latLngEquals,
+ } from '@vis.gl/react-google-maps';
+import { isInside } from '../../util/geoHelpers';
 
 const prisma = new PrismaClient();
 
@@ -72,17 +74,15 @@ export async function GET(req: NextRequest) {
     }
   }) ?? { region: [] };
 
-  if (polygon.region.length === 0 || !filterPolygon) {
-    return NextResponse.json({ posts: transformedPosts });
-  }
+  // if (polygon.region.length === 0 || !filterPolygon) {
+  //   return NextResponse.json({ posts: transformedPosts });
+  // }
   
-  const ring = polygon.region.map((pos) => 
-    new google.maps.LatLng(pos.lat, pos.lng)
-  );
-
+  const ring = polygon.region as LatLong[]
   const filtered = transformedPosts.filter(p =>
-    google.maps.geometry.poly.containsLocation(new google.maps.LatLng(p.latitude, p.longitude),ring)
+    isInside({lat:p.latitude, lng:p.longitude},ring)
   );
+  console.log(`Filtered ${filtered} posts to ${filtered.length} posts within polygon`);
 
   return NextResponse.json({ posts: filtered });
 }
