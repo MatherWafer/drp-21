@@ -26,6 +26,7 @@ export async function GET(req: NextRequest) {
       latitude: true,
       longitude: true,
       locationText:true,
+      category: true,
       description: true,
       creator: true,
       _count: {

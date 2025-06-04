@@ -25,6 +25,7 @@ model Post {
   latitude     Float
   longitude    Float
   locationText String
+  category        String @default("Other")
   description  String
   Favourites   Favourite[]
   Likes        Like[]

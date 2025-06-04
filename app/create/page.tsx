@@ -8,6 +8,7 @@ export default function Ask() {
   const [description, setDescription] = useState("");
   const [postSuccess, setPostSuccess] = useState(false);
   const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("");
   const [latitude, setLatitude] = useState(0)
   const [longitude, setLongitude] = useState(0)
   const [namespace, setNamespace] = useState("");
@@ -26,7 +27,7 @@ export default function Ask() {
     setDescription("")
     const res = await fetch("/api/create", {
       method: "POST",
-      body: JSON.stringify({title,latitude,longitude,description}),
+      body: JSON.stringify({title,latitude,longitude,category,description}),
     });
     if(res.ok){
       alert("Post success!")
@@ -52,6 +53,22 @@ export default function Ask() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
+          <label htmlFor="category" className="block text-sm font-medium text-[#cccccc]-700">
+            Category
+          </label>
+          <select id="category"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="" disabled hidden>
+              Select a category...
+            </option>
+            <option style={{backgroundColor: 'black', color: 'white'}} value="Cycling">Cycling</option>
+            <option style={{backgroundColor: 'black', color: 'white'}} value="Roadworks">Roadworks</option>
+            <option style={{backgroundColor: 'black', color: 'white'}} value="Parks">Parks</option>
+            <option style={{backgroundColor: 'black', color: 'white'}} value="Other">Other</option>
+          </select>
           <label htmlFor="description" className="block text-sm font-medium text-[#cccccc]-700">
             Description
           </label>
