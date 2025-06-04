@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import SelectMapArea from '../app/map/SelectMapArea';
+import { useUser } from '../app/context/userContext';
 const SelectRoiPage = () => {
   const [poly, setPoly] = useState<google.maps.MVCArray<google.maps.LatLng>>();
   const router = useRouter();
   const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
-
+  const {loadProfile} = useUser()
   const handlePolyComplete = (p: google.maps.Polygon) => {
     setPoly(p.getPath());
   };
@@ -22,7 +23,8 @@ const SelectRoiPage = () => {
       body: JSON.stringify({ region: poly.Eg }),
     });
     if (res.ok) {
-      alert("Region uploaded");
+      loadProfile && (await loadProfile())
+      router.push("/")
     }
   };
 

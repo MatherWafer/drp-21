@@ -30,7 +30,7 @@ const loadProfile = async (setDisplayName: Dispatch<SetStateAction<string | null
   console.log(body)
   if(res){
     setDisplayName(body.name);
-    setInterestRegion(body.interestRegion)
+    body.interestRegion && setInterestRegion(body.interestRegion)
   }
 }
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {

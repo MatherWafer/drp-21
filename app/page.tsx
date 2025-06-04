@@ -23,6 +23,9 @@ export default function Home() {
     const cookies = parseCookies();
     fetch("/api/posts/feed", {
       method: "GET",
+      headers: {
+        "x-filter-roi": "true"
+      }
     })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch posts");

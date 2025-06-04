@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const filterPolygon = (req.headers.get('x-filter-polygon') ?? '').toLowerCase() === 'true';
+  const filterPolygon = (req.headers.get('x-filter-roi') ?? '').toLowerCase() === 'true';
 
   const posts = await prisma.post.findMany({
     select: {
@@ -65,24 +65,22 @@ export async function GET(req: NextRequest) {
     hasFavourited: post.Favourites.length > 0
   }));
 
-  const polygon = await prisma.interestRegion.findFirst({
+  const region = ((await prisma.interestRegion.findFirst({
     where: {
       profileId: userId
     },
     select: {
       region: true
     }
-  }) ?? { region: [] };
+  }))?.region ?? []) as LatLng[]
 
-  // if (polygon.region.length === 0 || !filterPolygon) {
-  //   return NextResponse.json({ posts: transformedPosts });
-  // }
+  if (region.length === 0 || !filterPolygon) {
+    return NextResponse.json({ posts: transformedPosts });
+  }
   
-  const ring = polygon.region as LatLng[]
   const filtered = transformedPosts.filter(p =>
-    isInside({lat:p.latitude, lng:p.longitude},ring)
+    isInside({lat:p.latitude, lng:p.longitude},region)
   );
-  console.log(`Filtered ${filtered} posts to ${filtered.length} posts within polygon`);
 
   return NextResponse.json({ posts: filtered });
 }
