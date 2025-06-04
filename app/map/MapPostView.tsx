@@ -2,6 +2,8 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { APIProvider, Map, AdvancedMarker } from '@vis.gl/react-google-maps';
 import PostOverview, { PostInfo } from '../user/posts/PostOverview';
 import PostMarker from './PostMarker';
+import CategoryDropdown from '../user/posts/CategoryDropdown';
+import { useCategory } from '../user/posts/CategoryContext';
 
 export interface LocationCoordinates {
   lat: number;
@@ -23,6 +25,7 @@ const PostMapView: React.FC<PostMapViewProps> = ({
 }) => {
   const [selectedLocation, setSelectedLocation] = useState<LocationCoordinates>(initialLocation);
   const [locationName, setLocationName] = useState<string>('');
+  const { category } = useCategory();
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
@@ -73,6 +76,7 @@ const PostMapView: React.FC<PostMapViewProps> = ({
           setApiError(`Failed to load Google Maps API: ${error}`);
         }}
       >
+        <CategoryDropdown/>
         <div style={{ height: '400px', width: '100%', marginBottom: '20px' }}>
           <Map
             zoomControl={true}
@@ -83,7 +87,8 @@ const PostMapView: React.FC<PostMapViewProps> = ({
             mapId="a2bc871f26d67c06e4448720"
             style={{ width: '100%', height: '100%' }}
           >
-            {posts.map(post => <PostMarker setter={setFocusedPost} key={post.id} post={post}/>)}
+            {posts.filter(post => category == 'None' || category == post.category).
+              map(post => <PostMarker setter={setFocusedPost} key={post.id} post={post}/>)}
           </Map>
         </div>
         {focsedPost && <PostOverview post={focsedPost as PostInfo}/>}
