@@ -1,10 +1,9 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
+import { APIProvider, Map, useMap } from '@vis.gl/react-google-maps';
 import PostOverview, { PostInfo } from '../user/posts/PostOverview';
 import PostMarker from './PostMarker';
 import { useFiltered } from '../user/posts/FilterContext';
 import { LatLng } from '../api/util/geoHelpers';
-import Selector from '../layout/Selector';
 import { RoiData, useUser } from '../context/userContext';
 
 export interface LocationCoordinates {
@@ -15,7 +14,7 @@ export interface LocationCoordinates {
 const RegionPolygon: React.FC<{ region: LatLng[] }> = ({ region }) => {
   const polygonRef = useRef<google.maps.Polygon | null>(null);
   const map = useMap();
-  
+
   useEffect(() => {
     if (!map || !window.google || !window.google.maps || region.length === 0) return;
 
@@ -48,8 +47,8 @@ interface PostMapViewProps {
   onLocationSelect?: (coordinates: LocationCoordinates) => void;
   initialLocation?: LocationCoordinates;
   apiKey: string;
-  posts: PostInfo[]
-  interestRegion: RoiData
+  posts: PostInfo[];
+  interestRegion: RoiData;
 }
 
 const PostMapView: React.FC<PostMapViewProps> = ({
@@ -57,24 +56,23 @@ const PostMapView: React.FC<PostMapViewProps> = ({
   initialLocation = { lat: 51.512409, lng: -0.125146 },
   apiKey,
   posts,
-  interestRegion
+  interestRegion,
 }) => {
   const { category, filtered } = useFiltered();
   const [focusedPost, setFocusedPost] = useState<PostInfo>();
   const [genericFeed, setGenericFeed] = useState<PostInfo[]>([]);
   const [userLocation, setUserLocation] = useState<LocationCoordinates | null>(null);
-  const {interestRegion:{center}} = useUser()
-  useEffect(() => {
+  const { interestRegion: { center } } = useUser();
+  const alertRef = useRef<HTMLDivElement>(null);
 
-    console.log(center)
+  useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const coords = {
+          setUserLocation({
             lat: position.coords.latitude,
             lng: position.coords.longitude,
-          };
-          setUserLocation(coords);
+          });
         },
         (error) => {
           console.error('Error getting user location:', error);
@@ -92,38 +90,67 @@ const PostMapView: React.FC<PostMapViewProps> = ({
   }, [filtered]);
 
   const getGenericFeed = async () => {
-    fetch("/api/posts/feed", {
-      method: "GET",
-      headers: {
-        "x-filter-roi": "false"
-      }
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch posts");
-        return res.json();
-      })
-      .then((data) => { 
-        setGenericFeed(data.posts);
-      })
-      .catch((err) => {
-        console.error("Error fetching posts:", err);
-      });
+    try {
+      const res = await fetch('/api/posts/feed', { method: 'GET', headers: { 'x-filter-roi': 'false' } });
+      if (!res.ok) throw new Error('Failed to fetch posts');
+      const data = await res.json();
+      setGenericFeed(data.posts);
+    } catch (err) {
+      console.error('Error fetching posts:', err);
+    }
   };
 
-  const handleMapClick = useCallback((event: any) => {
-    if (event.detail?.latLng) {
-      const newLocation = {
-        lat: event.detail.latLng.lat,
-        lng: event.detail.latLng.lng,
-      };
-      onLocationSelect?.(newLocation);
+useEffect(() => {
+  function handleClickOutside(event: MouseEvent) {
+    if (!focusedPost) return; // only run if focusedPost is set
+
+    if (alertRef.current && !alertRef.current.contains(event.target as Node)) {
+      // optionally check here if click is inside map or marker elements and ignore
+      setFocusedPost(undefined);
     }
-  }, [onLocationSelect]);
+  }
+
+  document.addEventListener('mousedown', handleClickOutside);
+
+  return () => {
+    document.removeEventListener('mousedown', handleClickOutside);
+  };
+}, [focusedPost]);
 
   const displayedPosts = filtered ? posts : genericFeed;
 
+  const handleMapClick = useCallback(
+    (event: any) => {
+      if (event.detail?.latLng) {
+        const newLocation = {
+          lat: event.detail.latLng.lat,
+          lng: event.detail.latLng.lng,
+        };
+        onLocationSelect?.(newLocation);
+      }
+    },
+    [onLocationSelect]
+  );
+
   return (
     <>
+      {focusedPost && (
+        <div
+          ref={alertRef}
+         className="fixed top-50 z-50 w-full px-3 py-2"
+
+        >
+          <button
+          onClick={() => setFocusedPost(undefined)}
+          className="absolute top-2 right-4 text-yellow-800 hover:text-yellow-600 font-bold text-xl leading-none"
+          aria-label="Close"
+        >
+          &times;
+        </button>
+          <PostOverview key={focusedPost.id} post={focusedPost} />
+        </div>
+      )}
+
       <APIProvider
         apiKey={apiKey}
         onLoad={() => console.log('APIProvider loaded')}
@@ -131,7 +158,7 @@ const PostMapView: React.FC<PostMapViewProps> = ({
           console.error('APIProvider error:', error);
         }}
       >
-        <div style={{ height: '100vh', width: '100%'}}>
+        <div style={{ height: '100vh', width: '100%' }}>
           <Map
             zoomControl={true}
             scrollwheel={true}
@@ -141,17 +168,19 @@ const PostMapView: React.FC<PostMapViewProps> = ({
             style={{ width: '100%', height: '100vh' }}
             mapTypeControl={false}
             defaultCenter={center}
+            onClick={handleMapClick}
           >
-            {displayedPosts.filter(post => category == 'None' || category == post.category).
-              map(post => <PostMarker setter={setFocusedPost} key={post.id} post={post}/>)}
-            <RegionPolygon region={interestRegion.perimeter}/>
+            {displayedPosts
+              .filter((post) => category === 'None' || category === post.category)
+              .map((post) => (
+                <PostMarker setter={setFocusedPost} key={post.id} post={post} />
+              ))}
+            <RegionPolygon region={interestRegion.perimeter} />
           </Map>
         </div>
       </APIProvider>
     </>
   );
 };
-
-
 
 export default PostMapView;

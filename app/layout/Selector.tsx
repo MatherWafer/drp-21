@@ -18,7 +18,7 @@ export default function Selector({ className }: SelectorProps) {
   // Otherwise, render your usual stuff
   return (
     <div className={`bg-blue flex items-center justify-center w-full-center ${className}`}>
-      <RegionToggle />
+      { !pathname.includes('ownPosts') && <RegionToggle /> }
       <CategoryDropdown/>
     </div>
   );
