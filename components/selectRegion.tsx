@@ -20,8 +20,7 @@ const SelectRoiPage = () => {
     }
     const res = await fetch("/api/select-roi", {
       method: "POST",
-      // @ts-expect-error
-      body: JSON.stringify({ region: poly.Eg }),
+      body: JSON.stringify({ region: poly.getArray() }),
     });
     if (res.ok) {
       loadProfile && (await loadProfile())
