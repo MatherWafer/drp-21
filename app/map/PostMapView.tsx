@@ -5,7 +5,7 @@ import PostMarker from './PostMarker';
 import { useCategory } from '../user/posts/CategoryContext';
 import { LatLng } from '../api/util/geoHelpers';
 import Selector from '../layout/Selector';
-import { RoiData } from '../context/userContext';
+import { RoiData, useUser } from '../context/userContext';
 
 export interface LocationCoordinates {
   lat: number;
@@ -64,13 +64,11 @@ const PostMapView: React.FC<PostMapViewProps> = ({
   const [genericFeed, setGenericFeed] = useState<PostInfo[]>([]);
   const [showGenericFeed, setShowGenericFeed] = useState(false);
   const [userLocation, setUserLocation] = useState<LocationCoordinates | null>(null);
-  
+  const {interestRegion:{center}} = useUser()
 
   useEffect(() => {
-    initialLocation = interestRegion ? 
-    (interestRegion.center) : 
-    initialLocation;
-  
+
+    console.log(center)
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -144,7 +142,7 @@ const PostMapView: React.FC<PostMapViewProps> = ({
             mapId="a2bc871f26d67c06e4448720"
             style={{ width: '100%', height: '100vh' }}
             mapTypeControl={false}
-            defaultCenter={initialLocation}
+            defaultCenter={center}
           >
             {displayedPosts.filter(post => category == 'None' || category == post.category).
               map(post => <PostMarker setter={setFocusedPost} key={post.id} post={post}/>)}
