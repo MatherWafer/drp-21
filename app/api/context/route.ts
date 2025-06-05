@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
   })
 
   if( res != null) {
-    return NextResponse.json({name:res.name, interestRegion: res.InterestRegion.region});
+    return NextResponse.json({name:res.name, interestRegion: res.InterestRegion?.region});
   }
 }
 
