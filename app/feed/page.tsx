@@ -43,21 +43,15 @@ export default function Feed() {
 
 
   return (
-    <main className="p-4 text-center min-h-screen rounded-lg text-white">
-      <div className="flex flex-col">
-        <div className="w-full max-w-screen-lg mx-auto">
-            <>
-                    <div className="w-full max-w-2xl sticky top-0 bg-white z-10 pb-4">
-                      <h1 className="text-2xl mb-3 text-black text-center justify-center flex">Latest Posts:</h1>
-                      <Selector />
-                    </div>
-                      <div className="w-full max-w-2xl overflow-y-auto flex-1">
-                      <PostStream posts={posts} />
-                    </div>
-                    </>
-        </div>
-
+        <main className="min-h-screen px-8 py-4 flex flex-col items-center">
+      <div className="w-full max-w-2xl sticky top-0 bg-white z-10 pt-2 pb-4">
+        <h1 className="text-2xl mb-4 text-black text-center">Latest Posts:</h1>
+        <Selector />
       </div>
-    </main>
+        <div className="w-full max-w-2xl overflow-y-auto flex-1">
+        <PostStream posts={posts} />
+      </div>
+        
+        </main>
   );
 }
