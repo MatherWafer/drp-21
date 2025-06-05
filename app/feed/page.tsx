@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { parseCookies, setCookie } from 'nookies';
 import PostStream from '../user/posts/PostStream';
 import { PostInfo } from '../user/posts/PostOverview';
-import PostMapView from '../map/MapPostView';
+import PostMapView from '../map/PostMapView';
 import { useUser } from '../context/userContext';
 
 export default function Feed() {

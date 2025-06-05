@@ -1,12 +1,10 @@
 'use client';
 export const dynamic = 'force-dynamic'	
-import { RedirectType, redirect, useRouter } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState } from 'react';
-import PostStream from './user/posts/PostStream';
 import { PostInfo } from './user/posts/PostOverview';
-import PostMapView from './map/MapPostView';
+import PostMapView from './map/PostMapView';
 import { useUser } from './context/userContext';
+import Selector from './layout/Selector';
 
 export default function Home() {
   const { displayName, interestRegion, loadProfile } = useUser();
@@ -40,8 +38,10 @@ export default function Home() {
 
 
   return (
-    <main className="text-center bg-white text-teal m-0">
-        <PostMapView apiKey={GOOGLE_MAPS_API_KEY} interestRegion={interestRegion} posts={posts} />
-    </main>
+    <>
+      <main className="text-center bg-white text-teal m-0">
+          <PostMapView apiKey={GOOGLE_MAPS_API_KEY} interestRegion={interestRegion} posts={posts} />
+      </main>
+    </>
   );
 }

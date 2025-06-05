@@ -4,6 +4,7 @@ import PostOverview, { PostInfo } from '../user/posts/PostOverview';
 import PostMarker from './PostMarker';
 import { useCategory } from '../user/posts/CategoryContext';
 import { LatLng } from '../api/util/geoHelpers';
+import Selector from '../layout/Selector';
 
 export interface LocationCoordinates {
   lat: number;
@@ -68,6 +69,8 @@ const PostMapView: React.FC<PostMapViewProps> = ({
     initialLocation;
   
   useEffect(() => {
+    console.log(initialLocation)
+    console.log(averageLoc(interestRegion))
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -124,6 +127,7 @@ const PostMapView: React.FC<PostMapViewProps> = ({
   const displayedPosts = showGenericFeed ? genericFeed : posts;
 
   return (
+    <>
       <APIProvider
         apiKey={apiKey}
         onLoad={() => console.log('APIProvider loaded')}
@@ -136,17 +140,19 @@ const PostMapView: React.FC<PostMapViewProps> = ({
             zoomControl={true}
             scrollwheel={true}
             defaultZoom={13}
-            gestureHandling="cooperative"
-            defaultCenter={initialLocation}
+            gestureHandling="greedy"
             mapId="a2bc871f26d67c06e4448720"
             style={{ width: '100%', height: '100vh' }}
             mapTypeControl={false}
+            defaultCenter={initialLocation}
           >
-            {posts.filter(post => category == 'None' || category == post.category).
+            {displayedPosts.filter(post => category == 'None' || category == post.category).
               map(post => <PostMarker setter={setFocusedPost} key={post.id} post={post}/>)}
+            <RegionPolygon region={interestRegion}/>
           </Map>
         </div>
       </APIProvider>
+    </>
   );
 };
 

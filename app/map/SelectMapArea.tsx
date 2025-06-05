@@ -49,30 +49,31 @@ const SelectMapArea: React.FC<SelectMapAreaProps> = ({
           console.error('APIProvider error:', error);
         }}
       >
-        <div style={{ marginBottom: '1rem', justifyContent: 'center' }}>
-          <button
-            onClick={() => { setIsDrawing((prev) => !prev);
-                             // remove old polygon if exists
-                             if (polygon) {
-                               polygon.setMap(null); 
-                               setPolygon(null);
-                             }
-            }}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: isDrawing ? '#00c853' : '#4285f4',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-            }}
-          >
-            {isDrawing ? 'Reset Area' : 'Draw Area'}
-          </button>
-        </div>
+
+      <div style={{ marginBottom: '1rem', justifyContent: "center" }}>
+                <button
+                  onClick={() => { setIsDrawing((prev) => !prev);
+                                  // remove old polygon if exists
+                                  if (polygon) {
+                                    polygon.setMap(null); 
+                                    setPolygon(null);
+                                  }
+                  }}
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: isDrawing ? '#00c853' : '#4285f4',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {isDrawing ? 'Reset Area' : 'Draw Area'}
+                </button>
+              </div>
 
         
-        <div style={{ height: '400px', width: '100%', marginBottom: '20px' }}>
+        <div style={{ height: '100vh', width: '100%'}}>
           <Map
             zoomControl={true}
             scrollwheel={true}

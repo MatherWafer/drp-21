@@ -29,28 +29,11 @@ const SelectRoiPage = () => {
   };
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-zinc-900 text-white p-8 space-y-6">
-      <h1 className="text-3xl font-bold">Select the areas you care about</h1>
-      <p className="text-gray-400 mb-4 max-w-xl text-center">
-        Use the map below to select a region. Once done, click "Submit Region" to save your selection.
-      </p>
-      <div className="w-full max-w-screen-lg h-[400px] border-2 border-zinc-700 rounded-2xl overflow-hidden shadow-lg">
+    <main className="text-center bg-white text-teal m-0">
+      <div className='bg-black'>
+        <button onClick={submitPoly}>oiewgN</button>
+      </div>
         <SelectMapArea apiKey={GOOGLE_MAPS_API_KEY} onPolyComplete={handlePolyComplete} />
-      </div>
-      <div className="flex space-x-4 mt-6">
-        <button
-          onClick={submitPoly}
-          className="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-xl font-semibold shadow-lg"
-        >
-          Submit Region
-        </button>
-        <button
-          onClick={() => router.push('/')}
-          className="px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-xl font-semibold shadow-lg"
-        >
-          Later
-        </button>
-      </div>
     </main>
   );
 };

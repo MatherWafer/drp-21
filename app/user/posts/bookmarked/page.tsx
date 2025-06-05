@@ -1,21 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { RedirectType, redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { parseCookies, setCookie, destroyCookie } from 'nookies';
-import PostOverview, { PostInfo } from '../PostOverview';
+import{ PostInfo } from '../PostOverview';
 import PostStream from '../PostStream';
 
 export default function Home() {
   const [posts,setPosts] = useState<PostInfo[]>([])
-  const uuid = parseCookies().uuid
   const getPosts = async () => {
     fetch("/api/posts/bookmarked", {
       method: "GET",
-      headers: {
-        "x-user-id": uuid
-      }
     })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch posts");
