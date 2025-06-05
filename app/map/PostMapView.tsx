@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
 import PostOverview, { PostInfo } from '../user/posts/PostOverview';
 import PostMarker from './PostMarker';
-import { useCategory } from '../user/posts/CategoryContext';
+import { useFiltered } from '../user/posts/FilterContext';
 import { LatLng } from '../api/util/geoHelpers';
 import Selector from '../layout/Selector';
 import { RoiData, useUser } from '../context/userContext';
@@ -59,13 +59,11 @@ const PostMapView: React.FC<PostMapViewProps> = ({
   posts,
   interestRegion
 }) => {
-  const { category } = useCategory();
+  const { category, filtered } = useFiltered();
   const [focusedPost, setFocusedPost] = useState<PostInfo>();
   const [genericFeed, setGenericFeed] = useState<PostInfo[]>([]);
-  const [showGenericFeed, setShowGenericFeed] = useState(false);
   const [userLocation, setUserLocation] = useState<LocationCoordinates | null>(null);
   const {interestRegion:{center}} = useUser()
-
   useEffect(() => {
 
     console.log(center)
@@ -88,10 +86,10 @@ const PostMapView: React.FC<PostMapViewProps> = ({
   }, []);
 
   useEffect(() => {
-    if (showGenericFeed && genericFeed.length === 0) {
+    if (filtered && genericFeed.length === 0) {
       getGenericFeed();
     }
-  }, [showGenericFeed]);
+  }, [filtered]);
 
   const getGenericFeed = async () => {
     fetch("/api/posts/feed", {
@@ -122,7 +120,7 @@ const PostMapView: React.FC<PostMapViewProps> = ({
     }
   }, [onLocationSelect]);
 
-  const displayedPosts = showGenericFeed ? genericFeed : posts;
+  const displayedPosts = filtered ? posts : genericFeed;
 
   return (
     <>

@@ -1,14 +1,13 @@
 'use client';
 
-import { useCategory } from "../user/posts/CategoryContext";
 import { usePathname } from 'next/navigation';
 import CategoryDropdown from "../user/posts/CategoryDropdown";
+import RegionToggle from "../user/posts/RegionToggle";
 type SelectorProps = {
   className?: string;
 };
 
 export default function Selector({ className }: SelectorProps) {
-  const { category, setCategory } = useCategory();
   const pathname = usePathname();
 
   // If URL contains 'create', render nothing (empty div)
@@ -19,6 +18,7 @@ export default function Selector({ className }: SelectorProps) {
   // Otherwise, render your usual stuff
   return (
     <div className={`bg-blue flex items-center justify-center w-full-center ${className}`}>
+      <RegionToggle />
       <CategoryDropdown/>
     </div>
   );

@@ -1,7 +1,7 @@
-import { useCategory } from "./CategoryContext";
+import { useFiltered } from "./FilterContext";
 
 export default function CategoryDropdown() {
-  const { category, setCategory } = useCategory();
+  const { category, setCategory } = useFiltered();
 
   return (
     <div className="bg-[#d9ebff] rounded-lg p-1">

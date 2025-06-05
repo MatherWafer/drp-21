@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCategory } from "../user/posts/CategoryContext";
 
 export default function Footer() {
 

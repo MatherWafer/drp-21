@@ -8,17 +8,19 @@ import PostStream from '../user/posts/PostStream';
 import { PostInfo } from '../user/posts/PostOverview';
 import PostMapView from '../map/PostMapView';
 import { useUser } from '../context/userContext';
+import Selector from '../layout/Selector';
+import { useFiltered } from '../user/posts/FilterContext';
 
 export default function Feed() {
-  const { displayName, loadProfile } = useUser();
-  const [uuid, setUuid] = useState<string>('');
   const [posts, setPosts] = useState<PostInfo[]>([]);
-  const [showMap, setShowMap] = useState<boolean>(false);
-  const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
+  const {filtered} = useFiltered()
   const getPosts = async () => {
     const cookies = parseCookies();
     fetch("/api/posts/feed", {
       method: "GET",
+      headers:{
+        "x-filter-roi":filtered.toString()
+      }
     })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch posts");
@@ -37,18 +39,22 @@ export default function Feed() {
   useEffect(() => {
     getPosts();
     // if(!displayName){loadProfile &&  loadProfile()};
-  }, []);
+  }, [filtered]);
 
 
   return (
     <main className="p-4 text-center min-h-screen rounded-lg text-white">
       <div className="flex flex-col">
-        {/* Conditional Content */}
         <div className="w-full max-w-screen-lg mx-auto">
             <>
-              <h1 className="text-black mb-4 text-lg">Latest posts:</h1>
-              <PostStream posts={posts}/>
-            </>
+                    <div className="w-full max-w-2xl sticky top-0 bg-white z-10 pb-4">
+                      <h1 className="text-2xl mb-3 text-black text-center justify-center flex">Latest Posts:</h1>
+                      <Selector />
+                    </div>
+                      <div className="w-full max-w-2xl overflow-y-auto flex-1">
+                      <PostStream posts={posts} />
+                    </div>
+                    </>
         </div>
 
       </div>

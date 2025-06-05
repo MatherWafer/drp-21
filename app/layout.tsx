@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import { UserProvider } from './context/userContext';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import { CategoryProvider } from './user/posts/CategoryContext';
+import { CategoryProvider } from './user/posts/FilterContext';
 import Footer from './layout/Footer';
 import Header from './layout/Header';
 import Selector from './layout/Selector';
@@ -91,8 +91,6 @@ export default function RootLayout({
               {/* Fixed header at the top */}
               <div className="flex-none">
                 <Header />
-                {/* Only show selector below header on root page */}
-                {pathname === '/' && <Selector />}
               </div>
 
               {/* Main content scrolls between header and footer */}

@@ -1,8 +1,8 @@
-import { useCategory } from "./CategoryContext";
+import { useFiltered } from "./FilterContext";
 import PostOverview, { PostInfo } from "./PostOverview";
 
 export default function PostStream(props:{posts: PostInfo[]}) {
-  const { category } = useCategory();
+  const { category } = useFiltered();
     return <div className="flex flex-col items-center w-full">
       <div className="max-w-2xl w-full">
         {props.posts && props.posts

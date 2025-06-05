@@ -95,6 +95,7 @@ const SelectMapArea: React.FC<SelectMapAreaProps> = ({
           defaultCenter={initialLocation}
           mapId="a2bc871f26d67c06e4448720"
           style={{ width: '100%', height: '100%' }}
+          mapTypeControl={false}
         >
           {/* Map content goes here */}
         </Map>
