@@ -17,7 +17,7 @@ export async function login(formData: FormData) {
   }
   const { error } = await supabase.auth.signInWithPassword(data)
   if (error) {
-    redirect('/error')
+    redirect('/login')
   }
   revalidatePath('/', 'layout')
   redirect('/')
@@ -26,8 +26,6 @@ export async function login(formData: FormData) {
 export async function signup(formData: FormData) {
   const supabase = await createClient()
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
   const data: SignUpWithPasswordCredentials = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
@@ -42,7 +40,7 @@ export async function signup(formData: FormData) {
   const error = res.error
   const user = res.data.user
   if (error) {
-    redirect('/error')
+    redirect('/login')
   }
   const prisma = new PrismaClient()
   console.log(res.data)
@@ -50,7 +48,6 @@ export async function signup(formData: FormData) {
   console.log(user)
   
   if(user) {
-      // Only create profile if signup was successful
     try {
       await prisma.profile.create({
         data: {

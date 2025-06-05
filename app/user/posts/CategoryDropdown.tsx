@@ -1,23 +1,21 @@
-import { useCategory } from "./CategoryContext";
+import { useFiltered } from "./FilterContext";
 
 export default function CategoryDropdown() {
-  const { category, setCategory } = useCategory();
+  const { category, setCategory } = useFiltered();
 
   return (
-    <div className="mb-8">
-      <label>Filter by category: </label>
+    <div className="bg-[#d9ebff] rounded-xl p-2 flex flex-row items-center space-x-2 w-full h-10 shadow-md">
+      <label htmlFor="category" className="text-black font-medium text-sm whitespace-nowrap">
+        Category:
+      </label>
       <select
         id="category"
-        className="w-half p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="h-full text-black bg-white w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
         value={category}
         onChange={(e) => setCategory(e.target.value)}
       >
         {["None", "Cycling", "Roadworks", "Parks", "Other"].map((option) => (
-          <option
-            key={option}
-            value={option}
-            style={{ backgroundColor: "black", color: "white" }}
-          >
+          <option key={option} value={option}>
             {option}
           </option>
         ))}

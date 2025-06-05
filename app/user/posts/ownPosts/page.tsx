@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { parseCookies, setCookie, destroyCookie } from 'nookies';
 import PostOverview, { PostInfo } from '../PostOverview';
 import PostStream from '../PostStream';
-import CategoryDropdown from '../CategoryDropdown';
+import Selector from '../../../layout/Selector';
 
 export default function Home() {
   const [posts,setPosts] = useState<PostInfo[]>([])
@@ -36,18 +36,25 @@ export default function Home() {
     getPosts()
   },[])
   return (
-    <main className="min-h-screen p-8 flex flex-col items-center">
-      <h1 className="text-3xl mb-8">Your Posts:</h1>
+    <main className="min-h-screen px-8 py-4 flex flex-col items-center">
         {
-          posts ? 
-        <div>
-          <CategoryDropdown/>
+          posts.length != 0 ? 
+        <>
+        <div className="w-full max-w-2xl sticky top-0 bg-white z-10 pb-4">
+          <h1 className="text-2xl mb-3 text-black text-center justify-center flex">Your Posts:</h1>
+          <Selector />
+        </div>
+          <div className="w-full max-w-2xl overflow-y-auto flex-1">
           <PostStream posts={posts} />
         </div>
+        </>
         : 
-        <a>No posts...</a>
+        <div className="flex flex-col items-center justify-center text-center h-full">
+          <a className="text-black">You don't have any posts yet. </a>
+          <br></br>
+          <a className="text-black">Get your voice out!</a>
+        </div>
         }
     </main>
   );
-
 }
