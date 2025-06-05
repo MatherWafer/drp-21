@@ -23,7 +23,6 @@ export default function Home() {
       })
       .then((data) => { 
         setPosts(data.posts);
-        console.log(data.posts);
       })
       .catch((err) => {
         console.error("Error fetching posts:", err);
@@ -34,6 +33,7 @@ export default function Home() {
   useEffect(() => {
     getPosts();
     if(!displayName){loadProfile &&  loadProfile()};
+    console.log(interestRegion)
   }, []);
 
 

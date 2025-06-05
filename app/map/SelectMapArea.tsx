@@ -12,86 +12,97 @@ interface SelectMapAreaProps {
   onPolyComplete: (poly: google.maps.Polygon) => void;
   initialLocation?: LocationCoordinates;
   apiKey: string;
+  containerStyle?: React.CSSProperties;
 }
 
 const SelectMapArea: React.FC<SelectMapAreaProps> = ({
   onPolyComplete,
   initialLocation = { lat: 51.512409, lng: -0.125146 },
   apiKey,
+  containerStyle = { height: '100%', width: '100%' }
 }) => {
-  const [userLocation, setUserLocation] = useState<LocationCoordinates | null>(null); // For live location
-  const [polygon, setPolygon] = useState<google.maps.Polygon | null>(null); // For Selected Area
-  const [isDrawing, setIsDrawing] = useState(false); // For Polygon Drawing  
-    useEffect(() => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const coords = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            };
-            setUserLocation(coords);
-          },
-        );
-      } else {
-        console.warn('Geolocation not supported by this browser.');
-      }
-    }, []);
+  const [userLocation, setUserLocation] = useState<LocationCoordinates | null>(null);
+  const [polygon, setPolygon] = useState<google.maps.Polygon | null>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
 
-
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const coords = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          setUserLocation(coords);
+        },
+      );
+    } else {
+      console.warn('Geolocation not supported by this browser.');
+    }
+  }, []);
 
   return (
-      <APIProvider
-        apiKey={apiKey}
-        libraries={['drawing']}
-        onLoad={() => console.log('APIProvider loaded')}
-        onError={(error) => {
-          console.error('APIProvider error:', error);
-        }}
-      >
-
-      <div style={{ marginBottom: '1rem', justifyContent: "center" }}>
-                <button
-                  onClick={() => { setIsDrawing((prev) => !prev);
-                                  // remove old polygon if exists
-                                  if (polygon) {
-                                    polygon.setMap(null); 
-                                    setPolygon(null);
-                                  }
-                  }}
-                  style={{
-                    padding: '8px 16px',
-                    backgroundColor: isDrawing ? '#00c853' : '#4285f4',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {isDrawing ? 'Reset Area' : 'Draw Area'}
-                </button>
-              </div>
-
-        
-        <div style={{ height: '100vh', width: '100%'}}>
-          <Map
-            zoomControl={true}
-            scrollwheel={true}
-            defaultZoom={13}
-            gestureHandling="cooperative"
-            defaultCenter={initialLocation}
-            mapId="a2bc871f26d67c06e4448720"
-            style={{ width: '100%', height: '100%' }}
+    <APIProvider
+      apiKey={apiKey}
+      libraries={['drawing']}
+      onLoad={() => console.log('APIProvider loaded')}
+      onError={(error) => {
+        console.error('APIProvider error:', error);
+      }}
+    >
+      <div style={{ ...containerStyle, position: 'relative' }}>
+        {/* Centered button positioned absolutely over the map */}
+        <div style={{ 
+          position: 'absolute',
+          top: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 1,
+          display: 'flex',
+          justifyContent: 'center'
+        }}>
+          <button
+            onClick={() => { 
+              setIsDrawing((prev) => !prev);
+              if (polygon) {
+                polygon.setMap(null); 
+                setPolygon(null);
+              }
+            }}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: isDrawing ? '#00c853' : '#4285f4',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+              transition: 'all 0.3s ease',
+      
+            }}
           >
-          
-          </Map>
+            {isDrawing ? 'Reset Area' : 'Draw Area'}
+          </button>
         </div>
+
+        <Map
+          zoomControl={true}
+          scrollwheel={true}
+          defaultZoom={13}
+          gestureHandling="cooperative"
+          defaultCenter={initialLocation}
+          mapId="a2bc871f26d67c06e4448720"
+          style={{ width: '100%', height: '100%' }}
+        >
+          {/* Map content goes here */}
+        </Map>
 
         <PolygonDrawer
           isDrawing={isDrawing}
           onPolygonComplete={(poly) => {
             if (polygon) {
-              // remove old
               polygon.setMap(null); 
             }
             onPolyComplete(poly)
@@ -99,12 +110,11 @@ const SelectMapArea: React.FC<SelectMapAreaProps> = ({
             setIsDrawing(false);
           }}
         />
-      </APIProvider>
+      </div>
+    </APIProvider>
   );
 };
 
-
-// Map out area
 const PolygonDrawer: React.FC<{
   isDrawing: boolean;
   onPolygonComplete: (polygon: google.maps.Polygon) => void;
@@ -139,9 +149,6 @@ const PolygonDrawer: React.FC<{
         if (event.type === google.maps.drawing.OverlayType.POLYGON) {
           const polygon = event.overlay as google.maps.Polygon;
           drawingManager.setDrawingMode(null);
-
-          console.log("Logging from polyogn drawer")
-          console.log(polygon)
           onPolygonComplete(polygon);
         }
       }
@@ -155,6 +162,5 @@ const PolygonDrawer: React.FC<{
 
   return null;
 };
-
 
 export default SelectMapArea;

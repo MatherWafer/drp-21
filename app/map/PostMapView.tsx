@@ -5,6 +5,7 @@ import PostMarker from './PostMarker';
 import { useCategory } from '../user/posts/CategoryContext';
 import { LatLng } from '../api/util/geoHelpers';
 import Selector from '../layout/Selector';
+import { RoiData, useUser } from '../context/userContext';
 
 export interface LocationCoordinates {
   lat: number;
@@ -48,7 +49,7 @@ interface PostMapViewProps {
   initialLocation?: LocationCoordinates;
   apiKey: string;
   posts: PostInfo[]
-  interestRegion: LatLng[]
+  interestRegion: RoiData
 }
 
 const PostMapView: React.FC<PostMapViewProps> = ({
@@ -63,14 +64,11 @@ const PostMapView: React.FC<PostMapViewProps> = ({
   const [genericFeed, setGenericFeed] = useState<PostInfo[]>([]);
   const [showGenericFeed, setShowGenericFeed] = useState(false);
   const [userLocation, setUserLocation] = useState<LocationCoordinates | null>(null);
-  
-  initialLocation = interestRegion ? 
-    averageLoc(interestRegion) : 
-    initialLocation;
-  
+  const {interestRegion:{center}} = useUser()
+
   useEffect(() => {
-    console.log(initialLocation)
-    console.log(averageLoc(interestRegion))
+
+    console.log(center)
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -144,11 +142,11 @@ const PostMapView: React.FC<PostMapViewProps> = ({
             mapId="a2bc871f26d67c06e4448720"
             style={{ width: '100%', height: '100vh' }}
             mapTypeControl={false}
-            defaultCenter={initialLocation}
+            defaultCenter={center}
           >
             {displayedPosts.filter(post => category == 'None' || category == post.category).
               map(post => <PostMarker setter={setFocusedPost} key={post.id} post={post}/>)}
-            <RegionPolygon region={interestRegion}/>
+            <RegionPolygon region={interestRegion.perimeter}/>
           </Map>
         </div>
       </APIProvider>
@@ -156,19 +154,6 @@ const PostMapView: React.FC<PostMapViewProps> = ({
   );
 };
 
-function averageLoc(interestRegion: LatLng[]): LocationCoordinates {
-  const { lat, lng } = interestRegion.reduce(
-    (acc, { lat, lng }) => ({
-      lat: acc.lat + lat,
-      lng: acc.lng + lng
-    }),
-    { lat: 0, lng: 0 }
-  );
 
-  return {
-    lat: lat / interestRegion.length,
-    lng: lng / interestRegion.length
-  };
-}
 
 export default PostMapView;

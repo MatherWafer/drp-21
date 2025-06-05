@@ -12,7 +12,7 @@ export default function Header() {
   const userOptions: UserOption[] = [
     { url: '/user/posts/bookmarked', icon: '/bookmarks.svg' },
     { url: '/user/posts/ownPosts', icon: '/file.svg' },
-    { url: '/select-roi', icon: '/person.svg' },
+    { url: '/user/profile', icon: '/person.svg' },
   ];
 
   const pathname = usePathname();
