@@ -5,6 +5,7 @@ import PostMarker from './PostMarker';
 import { useCategory } from '../user/posts/CategoryContext';
 import { LatLng } from '../api/util/geoHelpers';
 import Selector from '../layout/Selector';
+import { RoiData } from '../context/userContext';
 
 export interface LocationCoordinates {
   lat: number;
@@ -48,7 +49,7 @@ interface PostMapViewProps {
   initialLocation?: LocationCoordinates;
   apiKey: string;
   posts: PostInfo[]
-  interestRegion: LatLng[]
+  interestRegion: RoiData
 }
 
 const PostMapView: React.FC<PostMapViewProps> = ({
@@ -64,13 +65,12 @@ const PostMapView: React.FC<PostMapViewProps> = ({
   const [showGenericFeed, setShowGenericFeed] = useState(false);
   const [userLocation, setUserLocation] = useState<LocationCoordinates | null>(null);
   
-  initialLocation = interestRegion ? 
-    averageLoc(interestRegion) : 
+
+  useEffect(() => {
+    initialLocation = interestRegion ? 
+    (interestRegion.center) : 
     initialLocation;
   
-  useEffect(() => {
-    console.log(initialLocation)
-    console.log(averageLoc(interestRegion))
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -148,7 +148,7 @@ const PostMapView: React.FC<PostMapViewProps> = ({
           >
             {displayedPosts.filter(post => category == 'None' || category == post.category).
               map(post => <PostMarker setter={setFocusedPost} key={post.id} post={post}/>)}
-            <RegionPolygon region={interestRegion}/>
+            <RegionPolygon region={interestRegion.perimeter}/>
           </Map>
         </div>
       </APIProvider>
@@ -156,19 +156,6 @@ const PostMapView: React.FC<PostMapViewProps> = ({
   );
 };
 
-function averageLoc(interestRegion: LatLng[]): LocationCoordinates {
-  const { lat, lng } = interestRegion.reduce(
-    (acc, { lat, lng }) => ({
-      lat: acc.lat + lat,
-      lng: acc.lng + lng
-    }),
-    { lat: 0, lng: 0 }
-  );
 
-  return {
-    lat: lat / interestRegion.length,
-    lng: lng / interestRegion.length
-  };
-}
 
 export default PostMapView;

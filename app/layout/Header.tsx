@@ -12,7 +12,7 @@ export default function Header() {
   const userOptions: UserOption[] = [
     { url: '/user/posts/ownPosts', description: 'My Posts' },
     { url: '/user/posts/bookmarked', description: 'Bookmarked' },
-    { url: '/select-roi', description: 'My profile' },
+    { url: '/user/profile', description: 'My profile' },
   ];
 
   const pathname = usePathname();
