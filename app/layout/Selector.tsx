@@ -3,8 +3,11 @@
 import { useCategory } from "../user/posts/CategoryContext";
 import { usePathname } from 'next/navigation';
 import CategoryDropdown from "../user/posts/CategoryDropdown";
+type SelectorProps = {
+  className?: string;
+};
 
-export default function Selector() {
+export default function Selector({ className }: SelectorProps) {
   const { category, setCategory } = useCategory();
   const pathname = usePathname();
 
@@ -15,7 +18,7 @@ export default function Selector() {
 
   // Otherwise, render your usual stuff
   return (
-    <div className="bg-blue flex items-center justify-center w-full-center">
+    <div className={`bg-blue flex items-center justify-center w-full-center ${className}`}>
       <CategoryDropdown/>
     </div>
   );

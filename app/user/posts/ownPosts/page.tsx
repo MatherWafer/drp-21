@@ -35,15 +35,19 @@ export default function Home() {
     getPosts()
   },[])
   return (
-    <main className="bg-teal-800 rounded-lg min-h-screen p-8 flex flex-col items-center">
-      <h1 className="text-3xl mb-8">Your Posts:</h1>
+    <main className="mt-2 min-h-screen p-8 flex flex-col items-center">
+      <h1 className="text-3xl mb-8 text-black">Your Posts:</h1>
         {
           posts.length != 0 ? 
         <div>
           <PostStream posts={posts} />
         </div>
         : 
-        <a>You don't have any posts yet. Get your voice out!</a>
+        <div className="flex flex-col items-center justify-center text-center h-full">
+          <a className="text-black">You don't have any posts yet. </a>
+          <br></br>
+          <a className="text-black">Get your voice out!</a>
+        </div>
         }
     </main>
   );

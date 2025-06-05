@@ -1,21 +1,21 @@
 'use client';
 export const dynamic = 'force-dynamic'	
-import { RedirectType, redirect, useRouter } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState } from 'react';
-import PostStream from './user/posts/PostStream';
 import { PostInfo } from './user/posts/PostOverview';
-import PostMapView from './map/MapPostView';
+import PostMapView from './map/PostMapView';
 import { useUser } from './context/userContext';
+import Selector from './layout/Selector';
 
 export default function Home() {
-  const { displayName, loadProfile } = useUser();
+  const { displayName, interestRegion, loadProfile } = useUser();
   const [posts, setPosts] = useState<PostInfo[]>([]);
-  const [showMap, setShowMap] = useState<boolean>(false);
   const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
   const getPosts = async () => {
     fetch("/api/posts/feed", {
       method: "GET",
+      headers: {
+        "x-filter-roi": "true"
+      }
     })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch posts");
@@ -38,19 +38,10 @@ export default function Home() {
 
 
   return (
-    <main className="text-center min-h-screen bg-white text-teal">
-      <div className="flex flex-col">
-        {/* Conditional Content */}
-        <div className="w-full max-w-screen-lg mx-auto">
-            <>
-              <h1 className="text-3xl text-teal mb-8">Where people have ideas:</h1>
-              <div className="w-full h-full">
-                <PostMapView apiKey={GOOGLE_MAPS_API_KEY} posts={posts} />
-              </div>
-            </>
-        </div>
-
-      </div>
-    </main>
+    <>
+      <main className="text-center bg-white text-teal m-0">
+          <PostMapView apiKey={GOOGLE_MAPS_API_KEY} interestRegion={interestRegion} posts={posts} />
+      </main>
+    </>
   );
 }

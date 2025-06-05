@@ -16,10 +16,6 @@ export default function Ask() {
   const router = useRouter()
   const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
   const makePost = async () => {
-    console.log(title)
-    console.log(latitude)
-    console.log(longitude)
-
     if(!(title && latitude && longitude)){
       alert("Your post needs a title and location")
       return
@@ -88,6 +84,7 @@ export default function Ask() {
         <LocationPicker
           apiKey={GOOGLE_MAPS_API_KEY}
           onLocationSelect={(loc) => {setLatitude(loc.lat);setLongitude(loc.lng)}}
+          height={'300px'}
         />
           </div>
           <button
