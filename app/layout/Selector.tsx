@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import CategoryDropdown from "../user/posts/CategoryDropdown";
-import RegionToggle from "../user/posts/RegionToggle";
+import FilterToggle from "../user/posts/RegionToggle";
 type SelectorProps = {
   className?: string;
 };
@@ -17,9 +17,15 @@ export default function Selector({ className }: SelectorProps) {
 
   // Otherwise, render your usual stuff
   return (
-    <div className={`bg-blue flex items-center justify-center w-full-center ${className}`}>
-      { !pathname.includes('ownPosts') && <RegionToggle /> }
-      <CategoryDropdown/>
+  <div className={`bg-blue flex items-center gap-2 w-full ${className}`}>
+    {!pathname.includes('ownPosts') && (
+      <div className="flex-1 h-10">
+        <FilterToggle />
+      </div>
+    )}
+    <div className="flex-1 h-10">
+      <CategoryDropdown />
     </div>
+  </div>
   );
 }
