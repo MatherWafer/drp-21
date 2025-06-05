@@ -6,13 +6,13 @@ import { usePathname } from "next/navigation";
 export default function Header() {
   type UserOption = {
     url: string;
-    description: string;
+    icon: string;
   };
 
   const userOptions: UserOption[] = [
-    { url: '/user/posts/ownPosts', description: 'My Posts' },
-    { url: '/user/posts/bookmarked', description: 'Bookmarked' },
-    { url: '/select-roi', description: 'My profile' },
+    { url: '/user/posts/ownPosts', icon: '/file.svg' },
+    { url: '/user/posts/bookmarked', icon: '/bookmarks.svg' },
+    { url: '/select-roi', icon: '/person.svg' },
   ];
 
   const pathname = usePathname();
@@ -23,16 +23,16 @@ export default function Header() {
     return (
       <Link
         href={uo.url}
-        className={`px-6 py-4 rounded-2xl shadow-lg transition-all duration-300 transform flex items-center justify-center text-lg font-semibold w-48 text-center border
+        className={`py-2 shadow-lg transition-all duration-300 transform flex items-center justify-center text-lg font-semibold w-48 text-center border
           ${isActive ? 'bg-teal-600 border-teal-400 scale-105' : 'bg-teal-800 hover:bg-teal-700 border-teal-700'} text-white`}
       >
-        {uo.description}
+        <img src={uo.icon} alt="" className="w-6 h-6 filter invert brightness-0" />
       </Link>
     );
   }
 
   return (
-    <div className="flex flex-nowrap px-2 justify-center gap-2 mb-4 pt-4">
+    <div className="flex flex-nowrap justify-center">
       {userOptions.map((uo) => (
         <UserOptionTab uo={uo} key={uo.url} />
       ))}

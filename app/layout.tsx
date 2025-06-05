@@ -96,7 +96,7 @@ export default function RootLayout({
               </div>
 
               {/* Main content scrolls between header and footer */}
-              <main className="flex-1 overflow-y-auto px-2">
+              <main className="flex-1 overflow-y-auto">
                 {children}
               </main>
 

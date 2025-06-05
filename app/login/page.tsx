@@ -32,9 +32,9 @@ export default function AuthForm({
   };
 
   return (
-    <div className="bg-[#d9ebff] p-8 rounded-2xl shadow-lg max-w-md mx-auto mt-12 border border-teal-700">
-      <h2 className="text-2xl font-bold mb-4 text-center">
-        {isLogin ? 'Welcome Back!' : 'Join Us!'}
+    <div className="bg-teal-800 p-8 rounded-2xl shadow-lg max-w-md mx-auto mt-12 border border-teal-700">
+      <h2 className="text-2xl font-bold mb-4 text-center text-teal-500">
+        {isLogin ? 'Welcome To Reform London!' : 'Join Us!'}
       </h2>
 
       {emailSent && (
