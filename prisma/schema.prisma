@@ -11,12 +11,19 @@ datasource db {
 }
 
 model Profile {
-  id             String           @id @db.Uuid
-  name           String
-  Favourites     Favourite[]
-  Likes          Like[]
-  Posts          Post[]
-  InterestRegion InterestRegion?
+  id              String            @id @db.Uuid
+  name            String
+  Favourites      Favourite[]
+  Likes           Like[]
+  Posts           Post[]
+  InterestRegion  InterestRegion?
+  FavouriteTopics FavouriteTopics?
+}
+
+model FavouriteTopics {
+  profileId String  @id @db.Uuid
+  topics    Json    @default("{}")
+  creator   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
 model Post {
