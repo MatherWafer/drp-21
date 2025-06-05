@@ -23,6 +23,7 @@ export default function PostOverview({ post }: { post: PostInfo }) {
   const [liked, setLiked] = useState(post.hasLiked);
   const [currentLikeCount, setCurrentLikeCount] = useState(post.likeCount);
   const [favourited, setFavourited] = useState(post.hasFavourited);
+  const [collapsed, setCollapsed] = useState(true);
   const [currentFavouriteCount, setCurrentFavouriteCount] = useState(post.favouriteCount);
 
   const handleLike = async () => {
@@ -70,8 +71,19 @@ export default function PostOverview({ post }: { post: PostInfo }) {
       </div>
       
       <p className="text-left text-blue-300 mb-3">{post.category}</p>
-      <p className="text-left text-gray-600 mb-3">{post.description}</p>
-      
+      {
+        (collapsed && post.description.length > 50)
+        ? 
+        <p className="cursor-pointer text-left text-gray-600 mb-3" onClick={() => setCollapsed(!collapsed)}>
+            {(() => {
+              const sliced = post.description.slice(0, 50).trimEnd();
+              const clean = sliced.lastIndexOf(' ') !== -1 ? sliced.slice(0, sliced.lastIndexOf(' ')) : sliced;
+              return clean + '...';
+            })()}
+        </p>
+        :
+        <p className="text-left text-gray-600 mb-3" onClick={() => setCollapsed(!collapsed)}>{post.description}</p>
+      }
       <div className="flex justify-between items-center">
         <div className="flex items-center text-xs text-gray-500">
           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -36,7 +36,7 @@ export default function Home() {
   },[])
   return (
     <main className="mt-2 min-h-screen p-8 flex flex-col items-center">
-      <h1 className="text-3xl mb-8 text-black">Your Posts:</h1>
+      <h1 className="text-2xl mb-8 text-black">Your Posts:</h1>
         {
           posts.length != 0 ? 
         <div>

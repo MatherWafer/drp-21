@@ -35,8 +35,8 @@ export default function Ask() {
   };
 
   return (
-    <main className="bg-teal-700 min-h-screen p-6">
-      <div className="max-w-2xl space-y-6">
+    <main className="bg-teal-700 min-h-screen p-6 flex items-center justify-center">
+      <div className="max-w-2xl space-y-6 w-full">
         <h1 className="text-3xl font-bold text-center">Make a Post</h1>
         <div className="space-y-2 items-center">
           <label htmlFor="title" className="block text-sm font-medium text-[#cccccc]-700">
