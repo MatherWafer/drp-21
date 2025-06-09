@@ -6,6 +6,7 @@ import { getUserId } from '../../util/backendUtils';
 import { latLngEquals,
  } from '@vis.gl/react-google-maps';
 import { LatLng, isInside } from '../../util/geoHelpers';
+import { FetchedPost, postSelectOptions, transformPosts } from '../util/post_util';
 
 const prisma = new PrismaClient();
 
@@ -21,49 +22,11 @@ export async function GET(req: NextRequest) {
 
   const filterPolygon = (req.headers.get('x-filter-roi') ?? '').toLowerCase() === 'true';
 
-  const posts = await prisma.post.findMany({
-    select: {
-      id: true,
-      profileId: true,
-      title: true,
-      latitude: true,
-      longitude: true,
-      category: true,
-      description: true,
-      creator: true,
-      locationText:true,
-      _count: {
-        select: {
-          Likes: true,
-          Favourites: true
-        }
-      },
-      Likes: {
-        where: {
-          profileId: userId
-        },
-        select: {
-          postId:true
-        }
-      },
-      Favourites: {
-        where: {
-          profileId: userId
-        },
-        select: {
-          postId:true
-        }
-      }
-    }
-  });
+  let posts: FetchedPost[] = await prisma.post.findMany(postSelectOptions(userId));
 
-  const transformedPosts = posts.map(post => ({
-    ...post,
-    likeCount: post._count.Likes,
-    hasLiked: post.Likes.length > 0,
-    favouriteCount: post._count.Favourites,
-    hasFavourited: post.Favourites.length > 0
-  }));
+  if (!filterPolygon) {
+    return NextResponse.json({ posts: transformPosts(posts) });
+  }
 
   const region = ((await prisma.interestRegion.findFirst({
     where: {
@@ -71,16 +34,14 @@ export async function GET(req: NextRequest) {
     },
     select: {
       region: true
-    }
-  }))?.region ?? []) as LatLng[]
-
-  if (region.length === 0 || !filterPolygon) {
-    return NextResponse.json({ posts: transformedPosts });
+  }}))?.region ?? []) as LatLng[]
+  
+  if (region.length === 0 ) {
+    return NextResponse.json({ posts: transformPosts(posts) });
   }
   
-  const filtered = transformedPosts.filter(p =>
-    isInside({lat:p.latitude, lng:p.longitude},region)
-  );
-
-  return NextResponse.json({ posts: filtered });
+  posts = posts.filter (
+    ({latitude,longitude}) => 
+    isInside({lat:latitude, lng:longitude},region));
+  return NextResponse.json({ posts: transformPosts(posts) });
 }
