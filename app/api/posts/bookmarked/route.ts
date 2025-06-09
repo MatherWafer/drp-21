@@ -2,7 +2,7 @@
 import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserId } from '../../util/backendUtils';
-import { FetchedPost, postSelectOptions, transformPosts } from '../util/post_util';
+import { FetchedPost, filterByLocation, postSelectOptions, transformPosts } from '../util/post_util';
 
 const prisma = new PrismaClient();
 
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const posts: FetchedPost[] = (await prisma.favourite.findMany({
+  let posts: FetchedPost[] = (await prisma.favourite.findMany({
     where: {
       profileId: userId
     },
@@ -24,7 +24,10 @@ export async function GET(req: NextRequest) {
      }
     }
   )).map(fp => fp.post)
+  const filterPolygon = (req.headers.get('x-filter-roi') ?? '').toLowerCase() === 'true';
 
-
+  if(filterPolygon){
+    posts = await filterByLocation(posts,userId,prisma)
+  }
   return NextResponse.json({ posts: transformPosts(posts) });
 }

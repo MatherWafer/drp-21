@@ -6,7 +6,7 @@ import { getUserId } from '../../util/backendUtils';
 import { latLngEquals,
  } from '@vis.gl/react-google-maps';
 import { LatLng, isInside } from '../../util/geoHelpers';
-import { FetchedPost, postSelectOptions, transformPosts } from '../util/post_util';
+import { FetchedPost, filterByLocation, postSelectOptions, transformPosts } from '../util/post_util';
 
 const prisma = new PrismaClient();
 
@@ -19,29 +19,11 @@ export async function GET(req: NextRequest) {
       { status: 401 }
     );
   }
-
   const filterPolygon = (req.headers.get('x-filter-roi') ?? '').toLowerCase() === 'true';
-
   let posts: FetchedPost[] = await prisma.post.findMany(postSelectOptions(userId));
-
   if (!filterPolygon) {
     return NextResponse.json({ posts: transformPosts(posts) });
   }
-
-  const region = ((await prisma.interestRegion.findFirst({
-    where: {
-      profileId: userId
-    },
-    select: {
-      region: true
-  }}))?.region ?? []) as LatLng[]
-  
-  if (region.length === 0 ) {
-    return NextResponse.json({ posts: transformPosts(posts) });
-  }
-  
-  posts = posts.filter (
-    ({latitude,longitude}) => 
-    isInside({lat:latitude, lng:longitude},region));
+  posts = await filterByLocation(posts,userId,prisma)
   return NextResponse.json({ posts: transformPosts(posts) });
 }

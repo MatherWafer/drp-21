@@ -1,3 +1,7 @@
+import { Prisma, PrismaClient } from "@prisma/client";
+import { DefaultArgs } from "@prisma/client/runtime/client";
+import { LatLng, isInside } from "../../util/geoHelpers";
+import { NextResponse } from "next/server";
 
 export type FetchedPost = {
   id: string;
@@ -66,3 +70,21 @@ export const transformPosts = (posts:FetchedPost[]) => posts.map(post => ({
     favouriteCount: post._count.Favourites,
     hasFavourited: post.Favourites.length > 0
   }));
+
+
+export const filterByLocation = async (posts:FetchedPost[], userId: string, prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>) => {
+  const region = ((await prisma.interestRegion.findFirst({
+    where: {
+      profileId: userId
+    },
+    select: {
+      region: true
+  }}))?.region ?? []) as LatLng[]
+  
+  if (region.length === 0 ) {
+    return posts
+  }
+  return posts.filter (
+    ({latitude,longitude}) => 
+    isInside({lat:latitude, lng:longitude},region));
+}
