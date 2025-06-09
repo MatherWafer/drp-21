@@ -9,7 +9,6 @@ const ProfileConfigurationPage = () => {
       
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Other Settings</h2>
-        {/* Placeholder for other configuration options */}
         <div className="p-4 border border-gray-200 rounded-lg mb-4">
           <p className="text-gray-600">Other profile settings will go here</p>
         </div>
