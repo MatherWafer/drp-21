@@ -29,8 +29,8 @@ export const PostFeed: React.FC<PostFeedProps> =  ({
 }) => {
   const {filtered} = useFiltered()
   const { data, error, isLoading } = useSWR(
-    ['/api/posts/feed', filtered],
-    ([url, filtered]) => fetcher(feedUrl, filtered)
+    [feedUrl, filtered],
+    ([url, filtered]) => fetcher(url, filtered)
   );
 
   return (
