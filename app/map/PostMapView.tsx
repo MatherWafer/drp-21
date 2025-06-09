@@ -102,10 +102,9 @@ const PostMapView: React.FC<PostMapViewProps> = ({
 
 useEffect(() => {
   function handleClickOutside(event: MouseEvent) {
-    if (!focusedPost) return; // only run if focusedPost is set
+    if (!focusedPost) return; 
 
     if (alertRef.current && !alertRef.current.contains(event.target as Node)) {
-      // optionally check here if click is inside map or marker elements and ignore
       setFocusedPost(undefined);
     }
   }

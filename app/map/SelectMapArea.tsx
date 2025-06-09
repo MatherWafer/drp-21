@@ -97,7 +97,6 @@ const SelectMapArea: React.FC<SelectMapAreaProps> = ({
           style={{ width: '100%', height: '100%' }}
           mapTypeControl={false}
         >
-          {/* Map content goes here */}
         </Map>
 
         <PolygonDrawer
