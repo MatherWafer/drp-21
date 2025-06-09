@@ -3,13 +3,13 @@
 import React, { useState } from 'react';
 import { redirect, useRouter } from 'next/navigation';
 import SelectMapArea from '../app/map/SelectMapArea';
-import { useUser } from '../app/context/userContext';
+import { getRoiData, useUser } from '../app/context/userContext';
 
 const SelectRoiPage = () => {
   const [poly, setPoly] = useState<google.maps.MVCArray<google.maps.LatLng>>();
   const router = useRouter();
   const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
-  const { loadProfile } = useUser();
+  const { loadProfile, setInterestRegion } = useUser();
 
   const handlePolyComplete = (p: google.maps.Polygon) => {
     setPoly(p.getPath());
@@ -26,6 +26,7 @@ const SelectRoiPage = () => {
     });
     if (res.ok) {
       loadProfile && (await loadProfile());
+      setInterestRegion(getRoiData(poly.getArray().map(ll => ll.toJSON()) ))
       router.push("/");
     }
   };

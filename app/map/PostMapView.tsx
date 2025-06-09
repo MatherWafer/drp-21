@@ -53,7 +53,6 @@ interface PostMapViewProps {
 
 const PostMapView: React.FC<PostMapViewProps> = ({
   onLocationSelect,
-  initialLocation = { lat: 51.512409, lng: -0.125146 },
   apiKey,
   posts,
   interestRegion,
@@ -62,7 +61,6 @@ const PostMapView: React.FC<PostMapViewProps> = ({
   const [focusedPost, setFocusedPost] = useState<PostInfo>();
   const [genericFeed, setGenericFeed] = useState<PostInfo[]>([]);
   const [userLocation, setUserLocation] = useState<LocationCoordinates | null>(null);
-  const { interestRegion: { center } } = useUser();
   const alertRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -166,7 +164,10 @@ useEffect(() => {
             mapId="a2bc871f26d67c06e4448720"
             style={{ width: '100%', height: '100vh' }}
             mapTypeControl={false}
-            defaultCenter={center}
+            defaultCenter={interestRegion.center}
+            onCenterChanged={(e) => {
+              console.log(e.detail)
+            }}
             onClick={handleMapClick}
           >
             {displayedPosts.length > 0 && displayedPosts

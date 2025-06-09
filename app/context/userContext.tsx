@@ -57,13 +57,22 @@ const UserContext = createContext<
   displayName: string | null,
   interestRegion: RoiData
   loadProfile:  (() => Promise<void> )| null
+  setInterestRegion: Dispatch<SetStateAction<RoiData>>
 }
 >({
   userLoaded: false,
   displayName: null,
   interestRegion: defaultRoiData,
-  loadProfile: null
+  loadProfile: null,
+  setInterestRegion: () => {}
 });
+
+export const getRoiData = (interestRegion: LatLng[]): RoiData => { 
+    const perimeter = interestRegion
+    const center = averageLoc(perimeter)
+    const radius = Math.max(...perimeter.map((ll:LatLng) => getDistance(center,ll)))
+    return {perimeter,radius,center}
+  }
 
 const loadProfile = async (
   setDisplayName: Dispatch<SetStateAction<string | null>>, 
@@ -100,7 +109,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <UserContext.Provider value={{ userLoaded, displayName, interestRegion:interestRegion, loadProfile:() => loadProfile(setDisplayName, setInterestRegion, setUserLoaded)}}>
+    <UserContext.Provider value={{ userLoaded, setInterestRegion, displayName, interestRegion:interestRegion, loadProfile:() => loadProfile(setDisplayName, setInterestRegion, setUserLoaded)}}>
       {children}
     </UserContext.Provider>
   );
