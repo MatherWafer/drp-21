@@ -169,7 +169,7 @@ useEffect(() => {
             defaultCenter={center}
             onClick={handleMapClick}
           >
-            {displayedPosts
+            {displayedPosts.length > 0 && displayedPosts
               .filter((post) => category === 'None' || category === post.category)
               .map((post) => (
                 <PostMarker setter={setFocusedPost} key={post.id} post={post} />

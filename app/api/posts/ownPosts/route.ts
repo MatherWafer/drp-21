@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '../../../../utils/supabase/server';
 import { getUserId } from '../../util/backendUtils';
-import { FetchedPost, postSelectOptions, transformPosts } from '../util/post_util';
+import { FetchedPost, filterByLocation, postSelectOptions, transformPosts } from '../util/post_util';
 
 const prisma = new PrismaClient();
 
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
       { status: 401 }
     );
   }
-  const posts:FetchedPost[] = await prisma.post.findMany({
+  let posts:FetchedPost[] = await prisma.post.findMany({
     ...postSelectOptions(userId),
     where: {
       profileId: userId

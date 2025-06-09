@@ -20,7 +20,9 @@ export async function GET(req: NextRequest) {
     );
   }
   const filterPolygon = (req.headers.get('x-filter-roi') ?? '').toLowerCase() === 'true';
-  let posts: FetchedPost[] = await prisma.post.findMany(postSelectOptions(userId));
+  let posts: FetchedPost[] = await prisma.post.findMany(
+    postSelectOptions(userId)
+    );
   if (!filterPolygon) {
     return NextResponse.json({ posts: transformPosts(posts) });
   }

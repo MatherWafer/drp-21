@@ -12,7 +12,7 @@ export type RoiData = {
   center:    LatLng
 }
 
-const defaultRoiData: RoiData = 
+export const defaultRoiData: RoiData = 
 {
 perimeter: [],
 radius:3,
@@ -53,18 +53,22 @@ const getDistance = (p1: LatLng, p2: LatLng) => {
 }
 const UserContext = createContext<
 {
+  userLoaded: boolean
   displayName: string | null,
   interestRegion: RoiData
   loadProfile:  (() => Promise<void> )| null
 }
 >({
+  userLoaded: false,
   displayName: null,
   interestRegion: defaultRoiData,
   loadProfile: null
 });
 
-const loadProfile = async (setDisplayName: Dispatch<SetStateAction<string | null>>, 
-  setInterestRegion: Dispatch<SetStateAction<RoiData>>
+const loadProfile = async (
+  setDisplayName: Dispatch<SetStateAction<string | null>>, 
+  setInterestRegion: Dispatch<SetStateAction<RoiData>>,
+  setUserLoaded: Dispatch<SetStateAction<boolean>>,
   ) => {
   console.log("Starting to load!")
   const supabase = createClientComponentClient();
@@ -79,23 +83,24 @@ const loadProfile = async (setDisplayName: Dispatch<SetStateAction<string | null
     const center = averageLoc(perimeter)
     const radius = Math.max(...perimeter.map((ll:LatLng) => getDistance(center,ll)))
     regionData = {perimeter,radius,center}
-    console.log(regionData)
   }
   if(res){
-    setDisplayName(body.name);
     body.interestRegion && setInterestRegion(regionData)
+    console.log("User Loaded")
+    setUserLoaded(true)
   }
 }
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [interestRegion, setInterestRegion] = useState<RoiData>(defaultRoiData)
+  const [userLoaded, setUserLoaded] = useState<boolean>(false);
   useEffect(() => {
     console.log("Starting to load!")
-    loadProfile(setDisplayName, setInterestRegion);
+    loadProfile(setDisplayName, setInterestRegion, setUserLoaded);
   }, []);
 
   return (
-    <UserContext.Provider value={{ displayName, interestRegion:interestRegion, loadProfile:() => loadProfile(setDisplayName, setInterestRegion)}}>
+    <UserContext.Provider value={{ userLoaded, displayName, interestRegion:interestRegion, loadProfile:() => loadProfile(setDisplayName, setInterestRegion, setUserLoaded)}}>
       {children}
     </UserContext.Provider>
   );
