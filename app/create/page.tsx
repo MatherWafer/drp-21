@@ -3,7 +3,13 @@ import { useRouter } from "next/navigation";
 import { parseCookies } from "nookies";
 import { SetStateAction, useEffect, useState } from "react";
 import { cursorTo } from "readline";
+import { v4 as uuid } from "uuid"; 
 import LocationPicker, { LocationCoordinates } from "../map/LocPicker";
+import { createClient } from '../../utils/supabase/client';
+
+const supabase = createClient(); 
+
+
 export default function Ask() {
   const [description, setDescription] = useState("");
   const [postSuccess, setPostSuccess] = useState(false);
@@ -12,18 +18,56 @@ export default function Ask() {
   const [latitude, setLatitude] = useState(0)
   const [longitude, setLongitude] = useState(0)
   const [namespace, setNamespace] = useState("");
-  const [blobs,setBlobs] = useState<string[]>([])    
+  const [blobs,setBlobs] = useState<string[]>([]); 
+  const [files, setFiles] = useState<File[]>([]); 
+  const [isUploading, setUploading] = useState(false);  
   const router = useRouter()
   const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
+
+    async function uploadImages() {
+    const urls: string[] = [];
+    for (const file of files) {
+      const path = `posts/${uuid()}-${file.name}`;
+      const { error } = await supabase
+        .storage
+        .from("post-images")
+        .upload(path, file, { cacheControl: "3600", upsert: false });
+
+      if (error) throw error;
+
+      const { data } = supabase
+        .storage
+        .from("post-images")
+        .getPublicUrl(path);
+
+      urls.push(data.publicUrl);
+    }
+    return urls;
+  }
+
   const makePost = async () => {
     if(!(title && latitude && longitude)){
       alert("Your post needs a title and location")
       return
     }
+
+        let imageUrls: string[] = [];
+    if (files.length) {
+      try {
+        setUploading(true);
+        imageUrls = await uploadImages();
+        setUploading(false);
+      } catch (err) {
+        alert("Image upload failed");
+        console.error(err);
+        return;
+      }
+    }
+
     setDescription("")
     const res = await fetch("/api/create", {
       method: "POST",
-      body: JSON.stringify({title,latitude,longitude,category,description}),
+      body: JSON.stringify({title,latitude,longitude,category,description, imageUrls}),
     });
     if(res.ok){
       alert("Post success!")
@@ -87,11 +131,38 @@ export default function Ask() {
           height={'300px'}
         />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-[#cccccc]-700">
+              Photos
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={e => setFiles(e.target.files ? Array.from(e.target.files) : [])}
+              className="w-full p-3 border border-gray-300 rounded-lg"
+            />
+
+            {files.length > 0 && (
+              <ul className="flex gap-2 overflow-x-auto py-2">
+                {files.map(file => (
+                  <li key={file.name} className="w-20 h-20 shrink-0">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={file.name}
+                      className="object-cover w-full h-full rounded"
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
           <button
             onClick={makePost}
+            disabled={isUploading}
             className="block mx-auto px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
           >
-            Submit
+            {isUploading ? "Uploading…" : "Submit"}
           </button>
         </div>
         {postSuccess && (
