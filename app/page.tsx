@@ -1,7 +1,7 @@
 'use client';
 export const dynamic = 'force-dynamic';
 import PostMapView from './map/PostMapView';
-import { defaultRoiData, useUser } from './context/userContext';
+import { useUser } from './context/userContext';
 import useSWR from 'swr';
 import { useFiltered } from './user/posts/FilterContext';
 
@@ -14,10 +14,10 @@ const fetcher = (url: string, filtered: boolean) =>
   }).then((res) => res.json());
 
 export default function Home() {
-  const { displayName, interestRegion, userLoaded } = useUser();
+  const {interestRegions, userLoaded } = useUser();
   const { filtered } = useFiltered();
   const GOOGLE_MAPS_API_KEY = 'AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY';
-  const { data, error, isLoading } = useSWR(
+  const { data, isLoading } = useSWR(
     userLoaded ? ['/api/posts/feed', filtered, userLoaded] : null, // Only fetch when userLoaded is true
     ([url, filtered]) => fetcher(url, filtered)
   );
@@ -35,7 +35,7 @@ export default function Home() {
     <main className="text-center bg-white text-teal m-0">
       <PostMapView
         apiKey={GOOGLE_MAPS_API_KEY}
-        interestRegion={interestRegion}
+        interestRegion={interestRegions}
         posts={data?.posts || []}
       />
     </main>
