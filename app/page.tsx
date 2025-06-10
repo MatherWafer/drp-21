@@ -1,4 +1,4 @@
-'use client';
+'use client' 
 export const dynamic = 'force-dynamic';
 import PostMapView from './map/PostMapView';
 import { defaultRoiData, useUser } from './context/userContext';
@@ -32,12 +32,15 @@ export default function Home() {
   }
 
   return (
-    <main className="text-center bg-white text-teal m-0">
-      <PostMapView
-        apiKey={GOOGLE_MAPS_API_KEY}
-        interestRegion={interestRegion}
-        posts={data?.posts || []}
-      />
-    </main>
-  );
+  <main className="text-center bg-white text-teal m-0">
+    <h1 className="fixed top-0 left-1/2 transform -translate-x-1/2 z-10 p-4 px-10 text-xl font-bold bg-white/70 rounded-xl text-black">
+      Roadable
+    </h1>
+    <PostMapView
+      apiKey={GOOGLE_MAPS_API_KEY}
+      interestRegion={interestRegion}
+      posts={data?.posts || []}
+    />
+  </main>
+);
 }
