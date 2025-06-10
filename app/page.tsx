@@ -22,6 +22,8 @@ export default function Home() {
     ([url, filtered]) => fetcher(url, filtered)
   );
 
+  console.log(data?.posts)
+
   if (!userLoaded || isLoading) {
     return (
         <div className="flex justify-center items-center h-full flex-col">

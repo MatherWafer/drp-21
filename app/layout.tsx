@@ -81,31 +81,29 @@ export default function RootLayout({
 
   // 📄 OTHER PAGES — normal header/footer
   return (
-    <html lang="en" className="dark h-full">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-teal-900 text-white h-full`}
-      >
-        <UserProvider>
-          <CategoryProvider>
-            <div className="flex flex-col h-screen">
-              {/* Fixed header at the top */}
-              <div className="flex-none">
-                <Header />
-              </div>
+  <html lang="en" className="dark h-full">
+    <body
+      className={`${geistSans.variable} ${geistMono.variable} antialiased bg-teal-900 text-white h-full relative overflow-hidden`} // Added 'relative'
+    >
+      <UserProvider>
+        <CategoryProvider>
+          {/* Make header absolute and remove from flex flow */}
+          <div className="absolute top-0 right-0 z-50 w-fit">
+            <Header />
+          </div>
 
-              {/* Main content scrolls between header and footer */}
-              <main className="flex-1 overflow-y-auto">
-                {children}
-              </main>
-
-              {/* Fixed footer at the bottom */}
-              <div className="flex-none">
-                <Footer />
-              </div>
+          {/* Main content takes full height */}
+          <div className="flex flex-col h-full pt-0"> {/* Removed padding-top */}
+            <main className="flex-1 overflow-y-auto">
+              {children}
+            </main>
+            <div className="flex-none">
+              <Footer />
             </div>
-          </CategoryProvider>
-        </UserProvider>
-      </body>
-    </html>
-  );
+          </div>
+        </CategoryProvider>
+      </UserProvider>
+    </body>
+  </html>
+);
 }

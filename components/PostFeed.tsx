@@ -35,6 +35,8 @@ export const PostFeed: React.FC<PostFeedProps> =  ({
   );
   const pathname = usePathname();
 
+  console.log(data?.posts)
+
   return (
     <main className="min-h-screen px-8 py-4 flex flex-col items-center">
       <div className="w-full max-w-2xl sticky top-0 bg-white z-10 pt-2 pb-4">

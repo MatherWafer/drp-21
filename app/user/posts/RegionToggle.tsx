@@ -9,7 +9,7 @@ export default function FilterToggle() {
         ${filtered ? 'bg-[#b8d6f5] hover:bg-[#a5c6ea]' : 'bg-[#d9ebff] hover:bg-[#c2defc]'}`}
       onClick={() => setFiltered(!filtered)}
     >
-      {!filtered ? "Just my region" : "All posts"}
+      {filtered ? "Just my region" : "All posts"}
     </button>
   );
 }

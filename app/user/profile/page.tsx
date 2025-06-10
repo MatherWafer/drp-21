@@ -7,18 +7,6 @@ import { PostFeed, PostFeedProps } from '../../../components/PostFeed';
 const ProfileConfigurationPage = () => {
   const [activeFeed, setActiveFeed] = useState<'bookmarked' | 'ownPosts'>('bookmarked');
 
-  const bookmarkedProps: PostFeedProps = {
-    feedUrl: '/api/posts/bookmarked',
-    feedTitle: 'Your bookmarked posts:',
-    showOnlyCategorySelector: true
-  };
-
-  const ownPostsProps: PostFeedProps = {
-    feedUrl: '/api/posts/ownPosts',
-    feedTitle: 'Your Posts:',
-    showOnlyCategorySelector: true
-  };
-
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Profile Configuration</h1>
@@ -27,27 +15,21 @@ const ProfileConfigurationPage = () => {
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Your Content</h2>
         
         {/* Feed Toggle */}
-        <div className="flex border-b border-gray-200 mb-6">
-          <button
-            className={`flex-1 py-2 font-medium ${activeFeed === 'bookmarked' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-            onClick={() => setActiveFeed('bookmarked')}
+        <div className="flex gap-4 mb-6">
+          <a
+            href="/user/posts/bookmarked"
+            className='px-4 py-2 rounded-md font-medium transition-colors bg-gray-100 text-gray-700 hover:bg-gray-200'
           >
             Bookmarked Posts
-          </button>
-          <button
-            className={`flex-1 py-2 font-medium ${activeFeed === 'ownPosts' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-            onClick={() => setActiveFeed('ownPosts')}
+          </a>
+          <a
+            href="/user/posts/ownPosts"
+            className='px-4 py-2 rounded-md font-medium transition-colors bg-gray-100 text-gray-700 hover:bg-gray-200'
           >
             Your Posts
-          </button>
+          </a>
         </div>
         
-        {/* Feed Content */}
-        {activeFeed === 'bookmarked' ? (
-          <PostFeed {...bookmarkedProps} />
-        ) : (
-          <PostFeed {...ownPostsProps} />
-        )}
       </div>
 
       <div className="mb-8">
