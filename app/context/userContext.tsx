@@ -2,8 +2,8 @@
 
 import { Dispatch, SetStateAction, createContext, useContext, useEffect, useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { PrismaClient } from '@prisma/client';
 import { LatLng } from '../api/util/geoHelpers';
+import { ROIRepsonse } from '../api/util/backendUtils';
 
 
 export type RoiData = {
@@ -55,16 +55,16 @@ const UserContext = createContext<
 {
   userLoaded: boolean
   displayName: string | null,
-  interestRegion: RoiData
+  interestRegions: RoiData[]
   loadProfile:  (() => Promise<void> )| null
-  setInterestRegion: Dispatch<SetStateAction<RoiData>>
+  setInterestRegions: Dispatch<SetStateAction<RoiData[]>>
 }
 >({
   userLoaded: false,
   displayName: null,
-  interestRegion: defaultRoiData,
+  interestRegions: [defaultRoiData],
   loadProfile: null,
-  setInterestRegion: () => {}
+  setInterestRegions: () => {}
 });
 
 export const getRoiData = (interestRegion: LatLng[]): RoiData => { 
@@ -76,7 +76,7 @@ export const getRoiData = (interestRegion: LatLng[]): RoiData => {
 
 const loadProfile = async (
   setDisplayName: Dispatch<SetStateAction<string | null>>, 
-  setInterestRegion: Dispatch<SetStateAction<RoiData>>,
+  setInterestRegion: Dispatch<SetStateAction<RoiData[]>>,
   setUserLoaded: Dispatch<SetStateAction<boolean>>,
   ) => {
   console.log("Starting to load!")
@@ -86,30 +86,27 @@ const loadProfile = async (
   if (!session) return;
   const res = await fetch("/api/context", { method: "GET" });
   const body = await res.json()
-  let regionData = defaultRoiData
+  let regionDatas = [defaultRoiData]
   if(body.interestRegion) {
-    const perimeter = body.interestRegion as LatLng[]
-    const center = averageLoc(perimeter)
-    const radius = Math.max(...perimeter.map((ll:LatLng) => getDistance(center,ll)))
-    regionData = {perimeter,radius,center}
+    
+    regionDatas = (body.interestRegion as ROIRepsonse[]).map(rd => getRoiData(rd.region as LatLng[]))
   }
   if(res){
-    body.interestRegion && setInterestRegion(regionData)
-    console.log("User Loaded")
+    body.interestRegion && setInterestRegion(regionDatas)
     setUserLoaded(true)
   }
 }
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [displayName, setDisplayName] = useState<string | null>(null);
-  const [interestRegion, setInterestRegion] = useState<RoiData>(defaultRoiData)
+  const [interestRegions, setInterestRegions] = useState<RoiData[]>([defaultRoiData])
   const [userLoaded, setUserLoaded] = useState<boolean>(false);
   useEffect(() => {
     console.log("Starting to load!")
-    loadProfile(setDisplayName, setInterestRegion, setUserLoaded);
+    loadProfile(setDisplayName, setInterestRegions, setUserLoaded);
   }, []);
 
   return (
-    <UserContext.Provider value={{ userLoaded, setInterestRegion, displayName, interestRegion:interestRegion, loadProfile:() => loadProfile(setDisplayName, setInterestRegion, setUserLoaded)}}>
+    <UserContext.Provider value={{ userLoaded, setInterestRegions, displayName, interestRegions:interestRegions, loadProfile:() => loadProfile(setDisplayName, setInterestRegions, setUserLoaded)}}>
       {children}
     </UserContext.Provider>
   );

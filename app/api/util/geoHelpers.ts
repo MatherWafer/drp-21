@@ -17,11 +17,42 @@ export function isInside(
 ): boolean {
   if (region.length < 3) throw new Error("Polygon needs ≥ 3 vertices");
 
-  // GeoJSON uses [lng, lat] order ➜ convert once
   region.push(region[0])
   const ring = region.map(({ lat, lng }) => [lng, lat]) as [number, number][];
-  const poly   = polygon([ring]);                     // { type: 'Polygon', ... }
-  const pt     = point([target.lng, target.lat]);     // { type: 'Point', ... }
+  const poly   = polygon([ring]);                     
+  const pt     = point([target.lng, target.lat]);     
 
   return booleanPointInPolygon(pt, poly);
+}
+
+export const geocodeLocation = async (latitude:number,longitude:number) => {
+  const geocodeUrl = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`;
+  const geocodeResponse = await fetch(geocodeUrl, {
+    headers: {
+      'User-Agent': 'Change.ldn/1.0 (ayaanmather@hotmail.com)', 
+    },
+  });
+
+  let location = 'Unknown location';
+  if (geocodeResponse.ok) {
+    const geocodeData = await geocodeResponse.json();
+    console.log(geocodeData)
+    location = ""
+    if(geocodeData.address.road){
+      location += geocodeData.address.road
+    }
+    if(geocodeData.address.neighbourhood){
+      location += ", " + geocodeData.address.neighbourhood
+    }
+    if(geocodeData.address.suburb){
+      location += ", " + geocodeData.address.suburb
+    }
+    if(geocodeData.address.city){
+      location += ", " + geocodeData.address.city
+    }
+    console.log(location)
+  } else {
+    console.error('Geocoding failed:', geocodeResponse.status);
+  }
+  return location
 }
