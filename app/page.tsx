@@ -1,47 +1,43 @@
 'use client';
-export const dynamic = 'force-dynamic'	
-import { useEffect, useState } from 'react';
-import { PostInfo } from './user/posts/PostOverview';
+export const dynamic = 'force-dynamic';
 import PostMapView from './map/PostMapView';
-import { useUser } from './context/userContext';
-import Selector from './layout/Selector';
+import { defaultRoiData, useUser } from './context/userContext';
+import useSWR from 'swr';
+import { useFiltered } from './user/posts/FilterContext';
+
+const fetcher = (url: string, filtered: boolean) =>
+  fetch(url, {
+    method: 'GET',
+    headers: {
+      'x-filter-roi': filtered.toString(),
+    },
+  }).then((res) => res.json());
 
 export default function Home() {
-  const { displayName, interestRegion, loadProfile } = useUser();
-  const [posts, setPosts] = useState<PostInfo[]>([]);
-  const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
-  const getPosts = async () => {
-    fetch("/api/posts/feed", {
-      method: "GET",
-      headers: {
-        "x-filter-roi": "true"
-      }
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch posts");
-        return res.json();
-      })
-      .then((data) => { 
-        setPosts(data.posts);
-      })
-      .catch((err) => {
-        console.error("Error fetching posts:", err);
-      });
-  };
+  const { displayName, interestRegion, userLoaded } = useUser();
+  const { filtered } = useFiltered();
+  const GOOGLE_MAPS_API_KEY = 'AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY';
+  const { data, error, isLoading } = useSWR(
+    userLoaded ? ['/api/posts/feed', filtered, userLoaded] : null, // Only fetch when userLoaded is true
+    ([url, filtered]) => fetcher(url, filtered)
+  );
 
-
-  useEffect(() => {
-    getPosts();
-    if(!displayName){loadProfile &&  loadProfile()};
-    console.log(interestRegion)
-  }, []);
-
+  if (!userLoaded || isLoading) {
+    return (
+        <div className="flex justify-center items-center h-full flex-col">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-opacity-75 mb-4"></div>
+            <p className="text-blue-500 font-semibold">Loading...</p>
+          </div>     
+    );
+  }
 
   return (
-    <>
-      <main className="text-center bg-white text-teal m-0">
-          <PostMapView apiKey={GOOGLE_MAPS_API_KEY} interestRegion={interestRegion} posts={posts} />
-      </main>
-    </>
+    <main className="text-center bg-white text-teal m-0">
+      <PostMapView
+        apiKey={GOOGLE_MAPS_API_KEY}
+        interestRegion={interestRegion}
+        posts={data?.posts || []}
+      />
+    </main>
   );
 }

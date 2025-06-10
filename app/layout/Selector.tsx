@@ -10,12 +10,8 @@ type SelectorProps = {
 export default function Selector({ className }: SelectorProps) {
   const pathname = usePathname();
 
-  // If URL contains 'create', render nothing (empty div)
-  if (pathname.includes('create')) {
-    return <div></div>; // or return null; either is fine
-  }
 
-  // Otherwise, render your usual stuff
+
   return (
   <div className={`bg-blue flex items-center gap-2 w-full ${className}`}>
     {!pathname.includes('ownPosts') && (

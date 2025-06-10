@@ -3,8 +3,11 @@ import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '../../../../utils/supabase/server';
 import { getUserId } from '../../util/backendUtils';
+import { FetchedPost, filterByLocation, postSelectOptions, transformPosts } from '../util/post_util';
 
 const prisma = new PrismaClient();
+
+
 
 export async function GET(req: NextRequest) {
   const userId = await getUserId()
@@ -14,52 +17,12 @@ export async function GET(req: NextRequest) {
       { status: 401 }
     );
   }
-
-  const posts = await prisma.post.findMany({
+  let posts:FetchedPost[] = await prisma.post.findMany({
+    ...postSelectOptions(userId),
     where: {
       profileId: userId
-    },
-    select: {
-      id: true,
-      profileId: true,
-      title: true,
-      latitude: true,
-      longitude: true,
-      locationText:true,
-      category: true,
-      description: true,
-      creator: true,
-      _count: {
-        select: {
-          Likes: true,
-          Favourites: true
-        }
-      },
-      Likes: {
-        where: {
-          profileId: userId
-        },
-        select: {
-          postId:true
-        }
-      },
-      Favourites: {
-        where: {
-          profileId: userId
-        },
-        select: {
-          postId:true
-        }
-      }
     }
-  });
-  const transformedPosts = posts.map(post => ({
-    ...post,
-    likeCount: post._count.Likes,
-    hasLiked: post.Likes.length > 0,
-    favouriteCount: post._count.Favourites,
-    hasFavourited: post.Favourites.length > 0
-  }));
-
-  return NextResponse.json({ posts: transformedPosts });
+  }
+  )
+  return NextResponse.json({ posts: transformPosts(posts) });
 }

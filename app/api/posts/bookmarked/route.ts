@@ -2,6 +2,7 @@
 import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserId } from '../../util/backendUtils';
+import { FetchedPost, filterByLocation, postSelectOptions, transformPosts } from '../util/post_util';
 
 const prisma = new PrismaClient();
 
@@ -14,56 +15,19 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const posts = await prisma.favourite.findMany({
+  let posts: FetchedPost[] = (await prisma.favourite.findMany({
     where: {
       profileId: userId
     },
     include: {
-        post: {
-        select: {
-          id: true,
-          profileId: true,
-          title: true,
-          latitude: true,
-          longitude: true,
-          category: true,
-          description: true,
-          locationText: true,
-          creator: true,
-          _count: {
-            select: {
-              Likes: true,
-              Favourites: true
-            }
-          },
-          Likes: {
-            where: {
-              profileId: userId
-            },
-            select: {
-              postId:true
-            }
-          },
-          Favourites: {
-            where: {
-              profileId: userId
-            },
-            select: {
-              postId:true
-            }
-          }
-        }
-      }
+        post: postSelectOptions(userId)
      }
     }
-  )
-  const transformedPosts = posts.map(post => ({
-    ...post.post,
-    likeCount: post.post._count.Likes,
-    hasLiked: post.post.Likes.length > 0,
-    favouriteCount: post.post._count.Favourites,
-    hasFavourited: post.post.Favourites.length > 0
-  }));
+  )).map(fp => fp.post)
+  const filterPolygon = (req.headers.get('x-filter-roi') ?? '').toLowerCase() === 'true';
 
-  return NextResponse.json({ posts: transformedPosts });
+  if(filterPolygon){
+    posts = await filterByLocation(posts,userId,prisma)
+  }
+  return NextResponse.json({ posts: transformPosts(posts) });
 }

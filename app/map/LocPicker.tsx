@@ -20,58 +20,8 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   height
 }) => {
   const [selectedLocation, setSelectedLocation] = useState<LocationCoordinates>(initialLocation);
-  const [locationName, setLocationName] = useState<string>('');
-  const [isGeocoding, setIsGeocoding] = useState(false);
-  const [apiError, setApiError] = useState<string | null>(null);
-  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
 
-  // Function to perform geocoding via HTTP API
-  const geocodeViaHttp = async (location: LocationCoordinates) => {
-    try {
-      setIsGeocoding(true);
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.lat},${location.lng}&key=${apiKey}`
-      );
-      const data = await response.json();
-      setIsGeocoding(false);
-      if (data.status === 'OK' && data.results?.[0]) {
-        setLocationName(data.results[0].formatted_address.split(',')[0]);
-        setApiError(null);
-      } else {
-        setLocationName('Unknown location');
-        setApiError(`Geocoding failed: ${data.status}`);
-        console.error('Geocoding error:', data.status, data.error_message);
-      }
-    } catch (error) {
-      setIsGeocoding(false);
-      setLocationName('Unknown location');
-      setApiError('Geocoding API request failed');
-      console.error('Geocoding API error:', error);
-    }
-  };
 
-  // Perform initial geocoding for default location
-  // useEffect(() => {
-  //   geocodeViaHttp(initialLocation);
-  // }, [initialLocation, apiKey]);
-
-  // Debounced geocoding for selected location
-  // useEffect(() => {
-  //   if (debounceTimer.current) {
-  //     clearTimeout(debounceTimer.current);
-  //   }
-
-  //   setIsGeocoding(true);
-  //   debounceTimer.current = setTimeout(() => {
-  //     geocodeViaHttp(selectedLocation);
-  //   }, 300);
-
-  //   return () => {
-  //     if (debounceTimer.current) {
-  //       clearTimeout(debounceTimer.current);
-  //     }
-  //   };
-  // }, [selectedLocation, apiKey]);
 
   const handleMapClick = useCallback((event: any) => {
     if (event.detail?.latLng) {
@@ -90,7 +40,6 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
         onLoad={() => console.log('APIProvider loaded')}
         onError={(error) => {
           console.error('APIProvider error:', error);
-          setApiError(`Failed to load Google Maps API: ${error}`);
         }}
       >
         <div style={{ height, width: '100%'}}>
