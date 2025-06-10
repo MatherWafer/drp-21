@@ -3,6 +3,7 @@
 import { Dispatch, SetStateAction, createContext, useContext, useEffect, useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { LatLng } from '../api/util/geoHelpers';
+import { ROIRepsonse } from '../api/util/backendUtils';
 
 
 export type RoiData = {
@@ -88,7 +89,7 @@ const loadProfile = async (
   let regionDatas = [defaultRoiData]
   if(body.interestRegion) {
     
-    regionDatas = (body.interestRegion as LatLng[]).map(rd => getRoiData(rd.region))
+    regionDatas = (body.interestRegion as ROIRepsonse[]).map(rd => getRoiData(rd.region as LatLng[]))
   }
   if(res){
     body.interestRegion && setInterestRegion(regionDatas)
