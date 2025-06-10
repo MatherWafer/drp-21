@@ -11,12 +11,12 @@ datasource db {
 }
 
 model Profile {
-  id             String           @id @db.Uuid
-  name           String
-  Favourites     Favourite[]
-  Likes          Like[]
-  Posts          Post[]
+  id              String           @id @db.Uuid
+  name            String
+  Favourites      Favourite[]
   InterestRegions InterestRegion[]
+  Likes           Like[]
+  Posts           Post[]
 }
 
 model Post {
@@ -26,8 +26,8 @@ model Post {
   latitude     Float
   longitude    Float
   locationText String
-  category     String      @default("Other")
   description  String
+  category     String      @default("Other")
   imageUrl     String?
   Favourites   Favourite[]
   Likes        Like[]
@@ -44,11 +44,11 @@ model Like {
 }
 
 model InterestRegion {
-  id            String  @id @default(uuid())
-  profileId     String  @db.Uuid 
-  region        Json
-  name          String?
-  user          Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId String  @db.Uuid
+  region    Json
+  id        String  @id @default(uuid())
+  name      String?
+  user      Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
 model Favourite {

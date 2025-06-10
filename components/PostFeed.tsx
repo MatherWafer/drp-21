@@ -6,6 +6,7 @@ import Selector from '../app/layout/Selector';
 import PostStream from '../app/user/posts/PostStream';
 import { PostInfo } from '../app/user/posts/PostOverview';
 import CategoryDropdown from '../app/user/posts/CategoryDropdown';
+import { usePathname } from 'next/navigation';
 
 const fetcher = (url: string, filtered: boolean) =>
   fetch(url, {
@@ -32,11 +33,14 @@ export const PostFeed: React.FC<PostFeedProps> =  ({
     [feedUrl, filtered],
     ([url, filtered]) => fetcher(url, filtered)
   );
+  const pathname = usePathname();
+
+  console.log(data?.posts)
 
   return (
     <main className="min-h-screen px-8 py-4 flex flex-col items-center">
       <div className="w-full max-w-2xl sticky top-0 bg-white z-10 pt-2 pb-4">
-        <h1 className="text-2xl mb-4 text-black text-center">{feedTitle}</h1>
+        {!pathname.includes("profile") && <h1 className="text-2xl mb-4 text-black text-center">{feedTitle}</h1> }
         { showOnlyCategorySelector ?
            <CategoryDropdown/>
            :
