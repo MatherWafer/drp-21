@@ -24,7 +24,7 @@ export default function Ask() {
   const router = useRouter()
   const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
 
-    async function uploadImages() {
+  async function uploadImages() {
     const urls: string[] = [];
     for (const file of files) {
       const path = `posts/${uuid()}-${file.name}`;
