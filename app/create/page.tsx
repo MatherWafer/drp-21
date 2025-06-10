@@ -19,30 +19,30 @@ export default function Ask() {
   const [longitude, setLongitude] = useState(0)
   const [namespace, setNamespace] = useState("");
   const [blobs,setBlobs] = useState<string[]>([]); 
-  const [files, setFiles] = useState<File[]>([]); 
+  const [file, setFile] = useState<File | null>(null); 
   const [isUploading, setUploading] = useState(false);  
   const router = useRouter()
   const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
 
   async function uploadImages() {
-    const urls: string[] = [];
-    for (const file of files) {
-      const path = `posts/${uuid()}-${file.name}`;
-      const { error } = await supabase
-        .storage
-        .from("post-images")
-        .upload(path, file, { cacheControl: "3600", upsert: false });
+    console.log("Uploading image:", file);
+    if (!file) return null;
+    const path = `posts/${uuid()}-${file.name}`;
+    console.log("Uploading image to:", path);
+    const { error } = await supabase
+      .storage
+      .from("post-images")
+      .upload(path, file, { cacheControl: "3600", upsert: false });
+    
+    if (error) {console.log(error); throw error};
 
-      if (error) throw error;
+    const { data } = supabase
+      .storage
+      .from("post-images")
+      .getPublicUrl(path);
+    console.log("Image uploaded to:", data);
 
-      const { data } = supabase
-        .storage
-        .from("post-images")
-        .getPublicUrl(path);
-
-      urls.push(data.publicUrl);
-    }
-    return urls;
+    return data.publicUrl;
   }
 
   const makePost = async () => {
@@ -50,12 +50,13 @@ export default function Ask() {
       alert("Your post needs a title and location")
       return
     }
-
-        let imageUrls: string[] = [];
-    if (files.length) {
+    console.log("file:", file);
+    let imageUrl: string | null = null;
+    if (file) {
       try {
+        console.log("Starting image upload...");
         setUploading(true);
-        imageUrls = await uploadImages();
+        imageUrl = await uploadImages();
         setUploading(false);
       } catch (err) {
         alert("Image upload failed");
@@ -67,7 +68,7 @@ export default function Ask() {
     setDescription("")
     const res = await fetch("/api/create", {
       method: "POST",
-      body: JSON.stringify({title,latitude,longitude,category,description, imageUrls}),
+      body: JSON.stringify({title,latitude,longitude,category,description, imageUrl}),
     });
     if(res.ok){
       alert("Post success!")
@@ -133,33 +134,30 @@ export default function Ask() {
           </div>
           <div>
             <label className="block text-sm font-medium text-[#cccccc]-700">
-              Photos
+              Photo <span className="opacity-60">(optional)</span>
             </label>
             <input
               type="file"
               accept="image/*"
-              multiple
-              onChange={e => setFiles(e.target.files ? Array.from(e.target.files) : [])}
+              onChange={e => setFile(e.target.files?.[0] ?? null)}
               className="w-full p-3 border border-gray-300 rounded-lg"
             />
-
-            {files.length > 0 && (
-              <ul className="flex gap-2 overflow-x-auto py-2">
-                {files.map(file => (
-                  <li key={file.name} className="w-20 h-20 shrink-0">
-                    <img
-                      src={URL.createObjectURL(file)}
-                      alt={file.name}
-                      className="object-cover w-full h-full rounded"
-                    />
-                  </li>
-                ))}
-              </ul>
+            
+            {file && (
+              <div className="w-24 h-24 my-2">
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt={file.name}
+                  className="object-cover w-full h-full rounded"
+                />
+              </div>
             )}
+
+
           </div>
           <button
             onClick={makePost}
-            disabled={isUploading}
+            // disabled={isUploading}
             className="block mx-auto px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
           >
             {isUploading ? "Uploading…" : "Submit"}

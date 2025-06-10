@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     const location = await geocodeLocation(latitude,longitude)
     const postData = {
-      ...data,XMLDocument,
+      ...data,
       profileId: userId,
       locationText:location, 
     };

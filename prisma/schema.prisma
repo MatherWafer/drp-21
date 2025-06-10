@@ -28,7 +28,7 @@ model Post {
   locationText String
   category     String      @default("Other")
   description  String
-  imageUrl     String[]
+  imageUrl     String?
   Favourites   Favourite[]
   Likes        Like[]
   creator      Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
