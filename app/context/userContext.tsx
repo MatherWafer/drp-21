@@ -88,8 +88,7 @@ const loadProfile = async (
   let regionDatas = [defaultRoiData]
   if(body.interestRegion) {
     console.log(body.interestRegion)
-    const x = (body.interestRegion).map(rd => getRoiData(rd.region))
-    console.log(x)
+    regionDatas = body.interestRegion.map(rd => getRoiData(rd.region))
   }
   if(res){
     body.interestRegion && setInterestRegion(regionDatas)
