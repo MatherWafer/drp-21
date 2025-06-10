@@ -9,7 +9,7 @@ const SelectRoiPage = () => {
   const [poly, setPoly] = useState<google.maps.MVCArray<google.maps.LatLng>>();
   const router = useRouter();
   const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
-  const { loadProfile, setInterestRegion } = useUser();
+  const { loadProfile, setInterestRegions, interestRegions } = useUser();
 
   const handlePolyComplete = (p: google.maps.Polygon) => {
     setPoly(p.getPath());
@@ -26,7 +26,8 @@ const SelectRoiPage = () => {
     });
     if (res.ok) {
       loadProfile && (await loadProfile());
-      setInterestRegion(getRoiData(poly.getArray().map(ll => ll.toJSON()) ))
+      setInterestRegions(
+        interestRegions.concat([getRoiData(poly.getArray().map(ll => ll.toJSON()))] ))
       router.push("/");
     }
   };

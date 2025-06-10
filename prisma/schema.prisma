@@ -16,7 +16,7 @@ model Profile {
   Favourites     Favourite[]
   Likes          Like[]
   Posts          Post[]
-  InterestRegion InterestRegion?
+  InterestRegions InterestRegion[]
 }
 
 model Post {
@@ -43,9 +43,11 @@ model Like {
 }
 
 model InterestRegion {
-  profileId String  @id @db.Uuid
-  region    Json
-  user      Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  id            String  @id @default(uuid())
+  profileId     String  @db.Uuid 
+  region        Json
+  name          String?
+  user          Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
 model Favourite {
