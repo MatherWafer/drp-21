@@ -81,6 +81,7 @@ export const filterByLocation = async (posts:FetchedPost[], userId: string, pris
       region: true
   }}))?.region ?? []) as LatLng[]
   
+  console.log(region)
   if (region.length === 0 ) {
     return posts
   }

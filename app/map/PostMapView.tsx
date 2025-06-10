@@ -48,7 +48,7 @@ interface PostMapViewProps {
   initialLocation?: LocationCoordinates;
   apiKey: string;
   posts: PostInfo[];
-  interestRegion: RoiData;
+  interestRegion: RoiData[];
 }
 
 const PostMapView: React.FC<PostMapViewProps> = ({
@@ -138,7 +138,9 @@ useEffect(() => {
 
         >
           <button
-          onClick={() => setFocusedPost(undefined)}
+          onClick={() => {
+            console.log(interestRegion)
+            setFocusedPost(undefined)}}
           className="absolute top-2 right-4 text-yellow-800 hover:text-yellow-600 font-bold text-xl leading-none"
           aria-label="Close"
         >
@@ -164,7 +166,7 @@ useEffect(() => {
             mapId="a2bc871f26d67c06e4448720"
             style={{ width: '100%', height: '100vh' }}
             mapTypeControl={false}
-            defaultCenter={interestRegion.center}
+            defaultCenter={interestRegion[0].center}
             onCenterChanged={(e) => {
               console.log(e.detail)
             }}
@@ -175,7 +177,11 @@ useEffect(() => {
               .map((post) => (
                 <PostMarker setter={setFocusedPost} key={post.id} post={post} />
               ))}
-            <RegionPolygon region={interestRegion.perimeter} />
+            {
+              interestRegion.map(({perimeter},index) => 
+              <RegionPolygon key={index} region={perimeter} />
+              )
+            }
           </Map>
         </div>
       </APIProvider>

@@ -1,3 +1,4 @@
+import { JsonValue } from "@prisma/client/runtime/client"
 import { createClient } from "../../../utils/supabase/server"
 
 export async function getUserId(){
@@ -20,3 +21,9 @@ export async function withProfileId<T extends object>(
     return { ...data, profileId: "" };
   }
   
+
+    
+  export type ROIRepsonse  = {
+    name: string | null;
+    region: JsonValue;
+}

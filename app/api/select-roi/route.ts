@@ -10,12 +10,8 @@ export async function POST(req: NextRequest) {
   
   // Assuming 'profileId' is the unique identifier for the interest region
   // Adjust this based on your actual unique constraint
-  const post = await prisma.interestRegion.upsert({
-    where: {
-      profileId: data.profileId // This should match your unique constraint
-    },
-    create: data,
-    update: data
+  const post = await prisma.interestRegion.create({
+  data
   });
 
   return NextResponse.json({ post }, { status: 200 });
