@@ -46,6 +46,9 @@ export async function POST(
 ) {
   try {
     const id = req.headers.get("x-id");
+    if (!id) {
+      return new NextResponse("postId missing in route params", { status: 400 });
+    }
     const { content } = (await req.json()) as { content: string };
     if (!content || content.trim().length === 0) {
       return new NextResponse("Comment content required", { status: 400 });
