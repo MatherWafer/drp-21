@@ -18,8 +18,23 @@ export default function Ask() {
   const [namespace, setNamespace] = useState("");
   const [file, setFile] = useState<File | null>(null); 
   const [isUploading, setUploading] = useState(false);  
+  const [preview, setPreview] = useState<string | null>(null);
   const router = useRouter()
   const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
+
+  useEffect(() => {
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) await supabase.auth.signInAnonymously();
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) await supabase.auth.signInAnonymously();
+    })();
+  }, []);
 
   async function uploadImages() {
     console.log("Uploading image:", file);
@@ -39,7 +54,7 @@ export default function Ask() {
       .getPublicUrl(path);
     console.log("Image uploaded to:", data);
 
-    return data.publicUrl;
+    return data.publicUrl ?? null;
   }
 
   const makePost = async () => {
@@ -54,12 +69,13 @@ export default function Ask() {
         console.log("Starting image upload...");
         setUploading(true);
         imageUrl = await uploadImages();
-        setUploading(false);
       } catch (err) {
         alert("Image upload failed");
         console.error(err);
+        setUploading(false);
         return;
       }
+      setUploading(false);
     }
 
     setDescription("")
@@ -140,11 +156,11 @@ export default function Ask() {
               className="w-full p-3 border border-gray-300 rounded-lg"
             />
             
-            {typeof window !== 'undefined' && file && (
+            {preview && (
               <div className="w-24 h-24 my-2">
                 <img
-                  src={URL.createObjectURL(file)}
-                  alt={file.name}
+                  src={preview}
+                  alt={file?.name ?? "preview"}
                   className="object-cover w-full h-full rounded"
                 />
               </div>
