@@ -12,7 +12,6 @@ export default function PostModal({ post, onClose }: { post: PostInfo, onClose: 
           className="absolute top-2 right-2 text-gray-600 hover:text-black"
           onClick={onClose}
         >
-          ✕
         </button>
         <h3 className="text-xl text-left font-bold text-black">{post.title} </h3>
         <span className="text-sm text-gray-800 mr-2">Posted by:</span>
