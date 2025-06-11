@@ -10,18 +10,22 @@ export type PostInfo = {
   description: string;
   category: string;
   creator: Profile;
-  likeCount: number;
-  hasLiked: boolean;
   favouriteCount: number;
   hasFavourited: boolean;
   locationText: string;
   latitude:number;
   longitude:number
+  likeCount: number;
+  hasLiked: boolean;
+  dislikeCount: number;
+  hasDisliked: boolean;
 };
 
 export default function PostOverview({ post }: { post: PostInfo }) {
   const [liked, setLiked] = useState(post.hasLiked);
   const [currentLikeCount, setCurrentLikeCount] = useState(post.likeCount);
+  const [disliked, setDisliked] = useState(post.hasDisliked);
+  const [currentDislikeCount, setCurrentDislikeCount] = useState(post.dislikeCount);
   const [favourited, setFavourited] = useState(post.hasFavourited);
   const [collapsed, setCollapsed] = useState(true);
   const [currentFavouriteCount, setCurrentFavouriteCount] = useState(post.favouriteCount);
@@ -41,6 +45,24 @@ export default function PostOverview({ post }: { post: PostInfo }) {
       }
     } catch (error) {
       console.error('Error updating like:', error);
+    }
+  };
+
+  const handleDislike = async () => {
+    try {
+      const response = await fetch(`/api/posts/${post.id}/dislike`, {
+        method: disliked ? 'DELETE' : 'POST',
+        body: JSON.stringify({
+          postId: post.id
+        })
+      });
+      
+      if (response.ok) {
+        setDisliked(!disliked);
+        setCurrentDislikeCount(disliked ? currentDislikeCount - 1 : currentDislikeCount + 1);
+      }
+    } catch (error) {
+      console.error('Error updating dislike:', error);
     }
   };
 
@@ -125,6 +147,30 @@ export default function PostOverview({ post }: { post: PostInfo }) {
             onClick={handleLike}
             className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${
               liked 
+                ? 'text-green-500 hover:text-green-400' 
+                : 'text-gray-600 hover:text-white'
+            }`}
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-5 w-5" 
+              fill="currentColor"
+              viewBox="0 -960 960 960" 
+            >
+              <path 
+                d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"
+              />
+            </svg>
+
+            <span className={`text-sm font-medium ${liked ? 'text-green-500' : 'text-gray-600'}`}>
+              {currentLikeCount}
+            </span>
+          </button>
+
+          <button 
+            onClick={handleDislike}
+            className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${
+              disliked 
                 ? 'text-red-500 hover:text-red-400' 
                 : 'text-gray-600 hover:text-white'
             }`}
@@ -132,19 +178,15 @@ export default function PostOverview({ post }: { post: PostInfo }) {
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
               className="h-5 w-5" 
-              fill={liked ? "currentColor" : "none"} 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
+              fill="currentColor" 
+              viewBox="0 -960 960 960" 
             >
               <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" 
+                d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z" 
               />
             </svg>
-            <span className={`text-sm font-medium ${liked ? 'text-red-500' : 'text-gray-600'}`}>
-              {currentLikeCount}
+            <span className={`text-sm font-medium ${disliked ? 'text-red-500' : 'text-gray-600'}`}>
+              {currentDislikeCount}
             </span>
           </button>
         </div>
