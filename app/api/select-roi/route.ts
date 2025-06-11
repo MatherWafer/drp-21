@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   // Assuming 'profileId' is the unique identifier for the interest region
   // Adjust this based on your actual unique constraint
   const post = await prisma.interestRegion.create({
-  data
+    data
   });
 
   return NextResponse.json({ post }, { status: 200 });
