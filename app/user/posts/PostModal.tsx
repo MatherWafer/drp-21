@@ -60,14 +60,14 @@ export default function PostModal({
     try {
       const res = await fetch(`/api/posts/${post.id}/comment`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-id': post.id},
         body: JSON.stringify({ content: trimmed }),
       });
 
       if (res.ok) {
         // Server returns the freshly‑created comment including the user relation.
         const created: CommentInfo = await res.json();
-        setComments((prev) => [...prev, created]);
+        setComments((prev) => [created, ...prev]);
         setNewComment('');
         // Keep focus so the user can type another comment straight away.
         textareaRef.current?.focus();

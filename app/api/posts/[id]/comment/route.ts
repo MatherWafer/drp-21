@@ -42,11 +42,10 @@ export async function GET(
  * client never needs to send it explicitly.
  */
 export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  req: NextRequest
 ) {
   try {
-    const {id }= await params;
+    const id = req.headers.get("x-id");
     const { content } = (await req.json()) as { content: string };
     if (!content || content.trim().length === 0) {
       return new NextResponse("Comment content required", { status: 400 });
