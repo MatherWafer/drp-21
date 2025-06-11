@@ -11,8 +11,14 @@ export interface LocationCoordinates {
   lng: number;
 }
 
-const RegionPolygon: React.FC<{ region: LatLng[] }> = ({ region }) => {
+interface RegionPolygonProps {
+  region: LatLng[];
+  onClick?: () => void;
+}
+
+export const RegionPolygon: React.FC<RegionPolygonProps> = ({ region, onClick }) => {
   const polygonRef = useRef<google.maps.Polygon | null>(null);
+  const clickListenerRef = useRef<google.maps.MapsEventListener | null>(null);
   const map = useMap();
 
   useEffect(() => {
@@ -22,7 +28,7 @@ const RegionPolygon: React.FC<{ region: LatLng[] }> = ({ region }) => {
       polygonRef.current.setMap(null);
     }
 
-    polygonRef.current = new window.google.maps.Polygon({
+    const polygon = new window.google.maps.Polygon({
       paths: region,
       strokeColor: '#FF0000',
       strokeOpacity: 0.8,
@@ -31,14 +37,23 @@ const RegionPolygon: React.FC<{ region: LatLng[] }> = ({ region }) => {
       fillOpacity: 0.1,
     });
 
-    polygonRef.current.setMap(map);
+    polygon.setMap(map);
+    polygonRef.current = polygon;
+
+    if (onClick) {
+      clickListenerRef.current = google.maps.event.addListener(polygon, 'click', (e: google.maps.MapMouseEvent) => {
+        e.domEvent?.stopPropagation(); // prevent map click propagation
+        onClick();
+      });
+    }
 
     return () => {
-      if (polygonRef.current) {
-        polygonRef.current.setMap(null);
+      polygon.setMap(null);
+      if (clickListenerRef.current) {
+        google.maps.event.removeListener(clickListenerRef.current);
       }
     };
-  }, [region, map]);
+  }, [region, map, onClick]);
 
   return null;
 };

@@ -14,7 +14,8 @@ export async function GET(req: NextRequest) {
         InterestRegions: {
           select: {
             region: true,
-            name: true
+            name: true,
+            id: true,
           }
         }
     },

@@ -3,13 +3,14 @@
 import { Dispatch, SetStateAction, createContext, useContext, useEffect, useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { LatLng } from '../api/util/geoHelpers';
-import { ROIRepsonse } from '../api/util/backendUtils';
+import { ROIResponse } from '../api/util/backendUtils';
 
 
 export type RoiData = {
   perimeter: LatLng[],
   radius:    number,
-  center:    LatLng
+  center:    LatLng,
+  id:        string
 }
 
 export const defaultRoiData: RoiData = 
@@ -18,7 +19,8 @@ perimeter: [],
 radius:3,
 center:
   {lat: 51.512409,
-  lng: -0.125146 }
+  lng: -0.125146 },
+id: '1'
 }
 function averageLoc(interestRegion: LatLng[]): LatLng {
   const { lat, lng } = interestRegion.reduce(
@@ -67,11 +69,11 @@ const UserContext = createContext<
   setInterestRegions: () => {}
 });
 
-export const getRoiData = (interestRegion: LatLng[]): RoiData => { 
+export const getRoiData = (interestRegion: LatLng[],  id: string): RoiData => { 
     const perimeter = interestRegion
     const center = averageLoc(perimeter)
     const radius = Math.max(...perimeter.map((ll:LatLng) => getDistance(center,ll)))
-    return {perimeter,radius,center}
+    return {perimeter,radius,center, id}
   }
 
 const loadProfile = async (
@@ -88,8 +90,7 @@ const loadProfile = async (
   const body = await res.json()
   let regionDatas = [defaultRoiData]
   if(body.interestRegion) {
-    
-    regionDatas = (body.interestRegion as ROIRepsonse[]).map(rd => getRoiData(rd.region as LatLng[]))
+    regionDatas = (body.interestRegion as ROIResponse[]).map(rd => getRoiData(rd.region as LatLng[], rd.id))
   }
   if(res){
     body.interestRegion && setInterestRegion(regionDatas)
