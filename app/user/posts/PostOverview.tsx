@@ -117,7 +117,10 @@ export default function PostOverview({ post }: { post: PostInfo }) {
         
         <div className="flex space-x-2">
           <button 
-            onClick={handleFavourite}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleFavourite();
+            }}
             className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${
               favourited 
                 ? 'text-yellow-500 hover:text-yellow-400' 
@@ -144,7 +147,10 @@ export default function PostOverview({ post }: { post: PostInfo }) {
           </button>
           
           <button 
-            onClick={handleLike}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleLike();
+            }}
             className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${
               liked 
                 ? 'text-green-500 hover:text-green-400' 
@@ -168,7 +174,10 @@ export default function PostOverview({ post }: { post: PostInfo }) {
           </button>
 
           <button 
-            onClick={handleDislike}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDislike();
+            }}
             className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${
               disliked 
                 ? 'text-red-500 hover:text-red-400' 
