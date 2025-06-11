@@ -23,7 +23,8 @@ export async function withProfileId<T extends object>(
   
 
     
-  export type ROIRepsonse  = {
+  export type ROIResponse  = {
     name: string | null;
     region: JsonValue;
+    id: string;
 }

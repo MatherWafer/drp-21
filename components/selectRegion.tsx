@@ -26,8 +26,6 @@ const SelectRoiPage = () => {
     });
     if (res.ok) {
       loadProfile && (await loadProfile());
-      setInterestRegions(
-        interestRegions.concat([getRoiData(poly.getArray().map(ll => ll.toJSON()))] ))
       router.push("/");
     }
   };
