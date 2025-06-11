@@ -1,8 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { parseCookies } from "nookies";
 import { SetStateAction, useEffect, useState } from "react";
-import { cursorTo } from "readline";
 import { v4 as uuid } from "uuid"; 
 import LocationPicker, { LocationCoordinates } from "../map/LocPicker";
 import { createClient } from '../../utils/supabase/client';
@@ -18,7 +16,6 @@ export default function Ask() {
   const [latitude, setLatitude] = useState(0)
   const [longitude, setLongitude] = useState(0)
   const [namespace, setNamespace] = useState("");
-  const [blobs,setBlobs] = useState<string[]>([]); 
   const [file, setFile] = useState<File | null>(null); 
   const [isUploading, setUploading] = useState(false);  
   const router = useRouter()
@@ -143,7 +140,7 @@ export default function Ask() {
               className="w-full p-3 border border-gray-300 rounded-lg"
             />
             
-            {file && (
+            {typeof window !== 'undefined' && file && (
               <div className="w-24 h-24 my-2">
                 <img
                   src={URL.createObjectURL(file)}
