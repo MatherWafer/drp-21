@@ -1,8 +1,78 @@
 'use client';
 
+import { useState, useEffect, useRef } from 'react';
 import { PostInfo } from './PostOverview';
 
-export default function PostModal({ post, onClose }: { post: PostInfo, onClose: () => void }) {
+export type CommentInfo = {
+  id: string;
+  content: string;
+  createdAt: string; // ISO string from the API
+  user: {
+    id: string;
+    name: string;
+  };
+};
+
+export default function PostModal({ 
+  post, 
+  onClose 
+}: { 
+  post: PostInfo, 
+  onClose: () => void 
+}) {
+
+  const [comments, setComments] = useState<CommentInfo[]>([]);
+  const [newComment, setNewComment] = useState('');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  /* -------------------------------------------------------------
+   * Initial fetch – grab all existing comments (incl. authors) for the post.
+   * -----------------------------------------------------------*/
+  useEffect(() => {
+    if (!post) return;
+
+
+    const fetchComments = async () => {
+      try {
+        console.log("Fetching comments for post:", post.id);
+        const res = await fetch(`/api/posts/${post.id}/comment`, { cache: 'no-store'});
+        if (res.ok) {
+          const data: CommentInfo[] = await res.json();
+          setComments(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch comments', err);
+      }
+    };
+
+    fetchComments();
+  }, [post]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    console.log("Submitting comment:", newComment);
+    e.preventDefault();
+    const trimmed = newComment.trim();
+    if (!trimmed) return;
+
+    try {
+      const res = await fetch(`/api/posts/${post.id}/comment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: trimmed }),
+      });
+
+      if (res.ok) {
+        // Server returns the freshly‑created comment including the user relation.
+        const created: CommentInfo = await res.json();
+        setComments((prev) => [...prev, created]);
+        setNewComment('');
+        // Keep focus so the user can type another comment straight away.
+        textareaRef.current?.focus();
+      }
+    } catch (err) {
+      console.error('Failed to post comment', err);
+    }
+  };
   if (!post) return null;
 
   return (
@@ -62,6 +132,48 @@ export default function PostModal({ post, onClose }: { post: PostInfo, onClose: 
             </svg>
             <span>{post.favouriteCount}</span>
           </div>
+
+        {/* Comments */}
+        <section className="mt-8">
+          <h4 className="text-lg font-semibold mb-4">
+            Comments <span className="text-gray-500">({comments.length})</span>
+          </h4>
+
+          <ul className="space-y-4">
+            {comments.length === 0 && (
+              <li className="text-sm text-gray-500">No comments yet – be the first to share your thoughts!</li>
+            )}
+
+            {comments.map((c) => (
+              <li key={c.id} className="bg-gray-100 p-3 rounded-lg shadow-inner">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-sm font-medium text-gray-800">{c.user?.name ?? 'Anonymous'}</span>
+                  <span className="text-xs text-gray-500">{new Date(c.createdAt).toLocaleString()}</span>
+                </div>
+                <p className="text-sm text-gray-700 whitespace-pre-wrap">{c.content}</p>
+              </li>
+            ))}
+          </ul>
+
+          {/* Add new comment */}
+          <form onSubmit={handleSubmit} className="mt-6">
+            <textarea
+              ref={textareaRef}
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              rows={3}
+              placeholder="Write your comment..."
+              className="w-full p-2 border rounded-lg resize-none focus:outline-none focus:ring focus:border-blue-300 mb-2"
+            />
+            <button
+              type="submit"
+              disabled={!newComment.trim()}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50"
+            >
+              Post Comment
+            </button>
+          </form>
+        </section>
         </div>
         </div>
       </div>

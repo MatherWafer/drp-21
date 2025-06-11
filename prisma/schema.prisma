@@ -18,6 +18,7 @@ model Profile {
   Likes           Like[]
   Dislikes        Dislike[]
   Posts           Post[]
+  Comments        Comment[]
 }
 
 model Post {
@@ -30,6 +31,7 @@ model Post {
   description  String
   category     String      @default("Other")
   imageUrl     String?
+  Comments    Comment[]
   Favourites   Favourite[]
   Likes        Like[]
   Dislikes     Dislike[]
@@ -52,6 +54,16 @@ model Dislike {
   user      Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@id([postId, profileId])
+}
+
+model Comment {
+  id        String  @id @default(uuid()) @db.Uuid
+  postId    String  @db.Uuid
+  profileId String  @db.Uuid
+  content   String
+  createdAt DateTime @default(now())
+  post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
 model InterestRegion {
