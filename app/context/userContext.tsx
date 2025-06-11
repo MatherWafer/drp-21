@@ -76,7 +76,7 @@ export const getRoiData = (interestRegion: LatLng[]): RoiData => {
 
 const loadProfile = async (
   setDisplayName: Dispatch<SetStateAction<string | null>>, 
-  setInterestRegion: Dispatch<SetStateAction<RoiData[]>>,
+  setInterestRegions: Dispatch<SetStateAction<RoiData[]>>,
   setUserLoaded: Dispatch<SetStateAction<boolean>>,
   ) => {
   console.log("Starting to load!")
@@ -88,11 +88,10 @@ const loadProfile = async (
   const body = await res.json()
   let regionDatas = [defaultRoiData]
   if(body.interestRegion) {
-    
-    regionDatas = (body.interestRegion as ROIRepsonse[]).map(rd => getRoiData(rd.region as LatLng[]))
+    regionDatas = (body.interestRegion as ROIRepsonse[]).map(rd => {console.log(rd.region); return getRoiData(rd.region as LatLng[])})
   }
   if(res){
-    body.interestRegion && setInterestRegion(regionDatas)
+    body.interestRegion && setInterestRegions(regionDatas)
     setUserLoaded(true)
   }
 }
