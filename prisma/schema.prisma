@@ -16,6 +16,7 @@ model Profile {
   Favourites      Favourite[]
   InterestRegions InterestRegion[]
   Likes           Like[]
+  Dislikes        Dislike[]
   Posts           Post[]
 }
 
@@ -31,10 +32,20 @@ model Post {
   imageUrl     String?
   Favourites   Favourite[]
   Likes        Like[]
+  Dislikes     Dislike[]
   creator      Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
 model Like {
+  postId    String  @db.Uuid
+  profileId String  @db.Uuid
+  post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@id([postId, profileId])
+}
+
+model Dislike {
   postId    String  @db.Uuid
   profileId String  @db.Uuid
   post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)

@@ -18,11 +18,15 @@ export type FetchedPost = {
   Likes: {
       postId: string;
   }[];
+  Dislikes: {
+      postId: string;
+  }[];
   creator: {
       
   };
   _count: {
       Likes: number,
+      Dislikes: number,
       Favourites: number
   };
 }
@@ -41,10 +45,19 @@ export const postSelectOptions = (userId:string) =>  ({
         _count: {
           select: {
             Likes: true,
+            Dislikes: true,
             Favourites: true
           }
         },
         Likes: {
+          where: {
+            profileId: userId
+          },
+          select: {
+            postId:true
+          }
+        },
+        Dislikes: {
           where: {
             profileId: userId
           },
@@ -67,6 +80,8 @@ export const transformPosts = (posts:FetchedPost[]) => posts.map(post => ({
     ...post,
     likeCount: post._count.Likes,
     hasLiked: post.Likes.length > 0,
+    dislikeCount: post._count.Dislikes,
+    hasDisliked: post.Dislikes.length > 0,
     favouriteCount: post._count.Favourites,
     hasFavourited: post.Favourites.length > 0
   }));
