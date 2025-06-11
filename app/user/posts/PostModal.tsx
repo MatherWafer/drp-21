@@ -39,8 +39,7 @@ export default function PostModal({
 
     const fetchComments = async () => {
       try {
-        console.log("Fetching comments for post:", post.id);
-        const res = await fetch(`/api/posts/${post.id}/comment`, { cache: 'no-store'});
+        const res = await fetch(`/api/posts/${post.id}/comment`, {method: 'GET', headers: {'x-id': post.id}});
         if (res.ok) {
           const data: CommentInfo[] = await res.json();
           setComments(data);
@@ -54,7 +53,6 @@ export default function PostModal({
   }, [post]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log("Submitting comment:", newComment);
     e.preventDefault();
     const trimmed = newComment.trim();
     if (!trimmed) return;

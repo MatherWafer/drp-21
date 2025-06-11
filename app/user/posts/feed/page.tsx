@@ -16,7 +16,6 @@ export default function Feed() {
       })
       .then((data) => {
       setPosts(data.posts)
-      console.log(data.posts)
       })
       .catch((err) => {
         console.error("Error Fetching posts:", err);

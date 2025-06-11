@@ -41,7 +41,6 @@ export const PostFeed: React.FC<PostFeedProps> =  ({
   const openModal = (post: PostInfo) => setSelectedPost(post);
   const closeModal = () => setSelectedPost(null);
   
-  console.log(data?.posts)
   
   return (
     <main className="min-h-screen px-8 py-4 flex flex-col items-center">

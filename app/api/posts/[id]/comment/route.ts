@@ -8,9 +8,8 @@ const prisma = new PrismaClient();
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Record<string, string> }   // <— simplest accepted type
 ) {
-  const id = params.id; 
+  const id = _request.headers.get("x-id")
   if (!id) {
     return NextResponse.json(
       { message: "postId missing in route params" },
@@ -44,10 +43,10 @@ export async function GET(
  */
 export async function POST(
   req: NextRequest,
-  { params }: { params: Record<string, string> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const id = params.id;
+    const {id }= await params;
     const { content } = (await req.json()) as { content: string };
     if (!content || content.trim().length === 0) {
       return new NextResponse("Comment content required", { status: 400 });
