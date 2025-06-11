@@ -4,15 +4,13 @@ import { withProfileId } from "../../../util/backendUtils";
 
 const prisma = new PrismaClient();
 
-type RouteParams = {
-  id: string;
-};
+
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: RouteParams }
+  { params }: { params: { id: string } }
 ) {
-  const { id } = await params;
+  const { id } = params;
   if (!id) {
     return NextResponse.json(
       { message: "postId missing in route params" },
@@ -49,7 +47,7 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
+    const { id } = params;
     const { content } = (await req.json()) as { content: string };
     if (!content || content.trim().length === 0) {
       return new NextResponse("Comment content required", { status: 400 });
