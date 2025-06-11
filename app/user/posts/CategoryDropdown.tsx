@@ -10,7 +10,7 @@ export default function CategoryDropdown() {
       </label>
       <select
         id="category"
-        className="h-full text-black bg-white w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+        className="text-black bg-white w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
         value={category}
         onChange={(e) => setCategory(e.target.value)}
       >
