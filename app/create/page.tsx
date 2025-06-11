@@ -30,11 +30,14 @@ export default function Ask() {
   }, []);
 
   useEffect(() => {
-    (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) await supabase.auth.signInAnonymously();
-    })();
-  }, []);
+    if (!file) {
+      setPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
 
   async function uploadImages() {
     console.log("Uploading image:", file);
