@@ -7,7 +7,6 @@ import { JsonValue } from '@prisma/client/runtime/client';
 const prisma = new PrismaClient()
 export async function GET(req: NextRequest) {
   const id = await getUserId()
-  console.log("ID: %s", id)
   const res = await prisma.profile.findFirst({
     select: {
         name:true,

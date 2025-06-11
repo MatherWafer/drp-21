@@ -41,10 +41,6 @@ export async function signup(formData: FormData) {
     redirect('/login')
   }
   const prisma = new PrismaClient()
-  console.log(res.data)
-  console.log("AIJENFOEFNO")
-  console.log(user)
-  
   if(user) {
     try {
       await prisma.profile.create({
@@ -53,7 +49,6 @@ export async function signup(formData: FormData) {
           name: formData.get('name') as string,
         }
       })
-      console.log("Created")
     } catch (prismaError) {
       console.log(prismaError)
       // Optional: delete the auth user if profile creation fails

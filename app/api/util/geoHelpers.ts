@@ -36,7 +36,6 @@ export const geocodeLocation = async (latitude:number,longitude:number) => {
   let location = 'Unknown location';
   if (geocodeResponse.ok) {
     const geocodeData = await geocodeResponse.json();
-    console.log(geocodeData)
     location = ""
     if(geocodeData.address.road){
       location += geocodeData.address.road
@@ -50,7 +49,6 @@ export const geocodeLocation = async (latitude:number,longitude:number) => {
     if(geocodeData.address.city){
       location += ", " + geocodeData.address.city
     }
-    console.log(location)
   } else {
     console.error('Geocoding failed:', geocodeResponse.status);
   }

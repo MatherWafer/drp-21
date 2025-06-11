@@ -12,6 +12,7 @@ export type FetchedPost = {
   locationText: string;
   category: string;
   description: string;
+  imageUrl?: string;
   Favourites: {
       postId: string;
   }[];
@@ -42,6 +43,7 @@ export const postSelectOptions = (userId:string) =>  ({
         description: true,
         locationText: true,
         creator: true,
+        imageUrl: true,
         _count: {
           select: {
             Likes: true,

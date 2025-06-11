@@ -100,6 +100,16 @@ export default function PostModal({
         <p className="text-gray-800 mb-4 whitespace-pre-wrap">{post.description}</p>
         <p className="text-xs text-gray-500 mb-4">Location: {post.locationText}</p>
 
+        {post.imageUrl && (
+          <div className="my-4">
+            <img
+              src={post.imageUrl}
+              alt={post.title}
+              className="w-full max-h-[50vh] object-contain rounded-lg shadow"
+            />
+          </div>
+        )}
+
         {/* reactions row */}
         <div className="flex space-x-6 text-sm text-gray-700 mb-8">
           {/* Like */}

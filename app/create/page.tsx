@@ -48,10 +48,8 @@ export default function Ask() {
   }, [file]);
 
   async function uploadImages() {
-    console.log("Uploading image:", file);
     if (!file || !supabase) return null;
     const path = `posts/${uuid()}-${file.name}`;
-    console.log("Uploading image to:", path);
     const { error } = await supabase
       .storage
       .from("post-images")
@@ -63,7 +61,6 @@ export default function Ask() {
       .storage
       .from("post-images")
       .getPublicUrl(path);
-    console.log("Image uploaded to:", data);
 
     return data.publicUrl ?? null;
   }
@@ -77,7 +74,6 @@ export default function Ask() {
     let imageUrl: string | null = null;
     if (file) {
       try {
-        console.log("Starting image upload...");
         setUploading(true);
         imageUrl = await uploadImages();
       } catch (err) {

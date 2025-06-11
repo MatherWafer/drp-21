@@ -83,7 +83,6 @@ const loadProfile = async (
   setInterestRegion: Dispatch<SetStateAction<RoiData[]>>,
   setUserLoaded: Dispatch<SetStateAction<boolean>>,
   ) => {
-  console.log("Starting to load!")
   const supabase = createClientComponentClient();
   const data = await supabase.auth.getUser();
   const session = data.data
@@ -104,7 +103,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [interestRegions, setInterestRegions] = useState<RoiData[]>([defaultRoiData])
   const [userLoaded, setUserLoaded] = useState<boolean>(false);
   useEffect(() => {
-    console.log("Starting to load!")
     loadProfile(setDisplayName, setInterestRegions, setUserLoaded);
   }, []);
 

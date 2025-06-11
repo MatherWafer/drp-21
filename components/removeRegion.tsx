@@ -35,7 +35,6 @@ const RemoveRegion = () => {
   if (!userLoaded || interestRegions.length === 0) return <div>Loading or no regions</div>;
 
   const center = interestRegions[0]?.center || { lat: 51.5, lng: -0.12 };
-  console.log(interestRegions);
   return (
     <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
       <Map

@@ -178,7 +178,6 @@ useEffect(() => {
         >
           <button
           onClick={() => {
-            console.log(interestRegion)
             setFocusedPost(undefined)}}
           className="absolute top-2 right-4 text-yellow-800 hover:text-yellow-600 font-bold text-xl leading-none"
           aria-label="Close"

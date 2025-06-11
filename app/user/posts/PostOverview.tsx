@@ -19,6 +19,7 @@ export type PostInfo = {
   hasLiked: boolean;
   dislikeCount: number;
   hasDisliked: boolean;
+  imageUrl?: string;
 };
 
 export default function PostOverview({ post }: { post: PostInfo }) {
