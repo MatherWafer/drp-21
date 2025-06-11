@@ -61,14 +61,14 @@ const SelectRoiPage = () => {
         Save Region
       </button>
       {showModal && (
-        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20">
-          <div className="bg-white rounded-lg p-6 w-80 shadow-lg">
-            <h2 className="text-black text-lg font-semibold mb-4">Name this region</h2>
+        <div className="absolute inset-0 bg-teal-800 bg-opacity-50 flex items-center justify-center z-20">
+          <div className="bg-teal-700 rounded-lg p-6 w-80 shadow-lg">
+            <h2 className="text-white text-lg font-semibold mb-4">Name this region</h2>
             <input
               type="text"
               value={regionName}
               onChange={(e) => setRegionName(e.target.value)}
-              className="text-black w-full px-3 py-2 border border-gray-300 rounded mb-4"
+              className="text-white w-full px-3 py-2 border border-gray-300 rounded mb-4"
               placeholder="e.g. Home Area"
             />
             <div className="flex justify-end gap-2">
