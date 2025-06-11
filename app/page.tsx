@@ -4,8 +4,9 @@ import PostMapView from './map/PostMapView';
 import { useUser } from './context/userContext';
 import useSWR from 'swr';
 import { useFiltered } from './user/posts/FilterContext';
+import { useEffect } from 'react';
 
-const fetcher = (url: string, filtered: boolean) =>
+const fetcher = ([url, filtered]: [string, boolean]) =>
   fetch(url, {
     method: 'GET',
     headers: {
@@ -17,10 +18,23 @@ export default function Home() {
   const {interestRegions, userLoaded } = useUser();
   const { filtered } = useFiltered();
   const GOOGLE_MAPS_API_KEY = 'AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY';
-  const { data, isLoading } = useSWR(
-    userLoaded ? ['/api/posts/feed', filtered, userLoaded] : null, // Only fetch when userLoaded is true
-    ([url, filtered]) => fetcher(url, filtered)
+  
+  const { data, isLoading, mutate } = useSWR(
+    userLoaded ? ['/api/posts/feed', filtered] : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      shouldRetryOnError: true,
+      fallbackData: { posts: [] },
+    }
   );
+
+  // Force fetch when userLoaded becomes true
+  useEffect(() => {
+    if (userLoaded) {
+      mutate();
+    }
+  }, [userLoaded, mutate, filtered]);
 
   console.log(data?.posts)
 
