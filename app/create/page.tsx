@@ -1,14 +1,21 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState, useMemo } from "react";
 import { v4 as uuid } from "uuid"; 
 import LocationPicker, { LocationCoordinates } from "../map/LocPicker";
 import { createClient } from '../../utils/supabase/client';
 
-const supabase = createClient(); 
+// const supabase = createClient(); 
 
 
 export default function Ask() {
+
+  const supabase = useMemo(() => {
+    if (typeof window === "undefined") return null; // during SSR/​build
+    return createClient();
+  }, []);
+
+
   const [description, setDescription] = useState("");
   const [postSuccess, setPostSuccess] = useState(false);
   const [title, setTitle] = useState("");
@@ -18,12 +25,31 @@ export default function Ask() {
   const [namespace, setNamespace] = useState("");
   const [file, setFile] = useState<File | null>(null); 
   const [isUploading, setUploading] = useState(false);  
+  const [preview, setPreview] = useState<string | null>(null);
   const router = useRouter()
   const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
 
+  useEffect(() => {
+    (async () => {
+      if (!supabase) return; // Ensure supabase is initialized
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) await supabase.auth.signInAnonymously();
+    })();
+  }, [supabase]);
+
+  useEffect(() => {
+    if (!file) {
+      setPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+
   async function uploadImages() {
     console.log("Uploading image:", file);
-    if (!file) return null;
+    if (!file || !supabase) return null;
     const path = `posts/${uuid()}-${file.name}`;
     console.log("Uploading image to:", path);
     const { error } = await supabase
@@ -39,7 +65,7 @@ export default function Ask() {
       .getPublicUrl(path);
     console.log("Image uploaded to:", data);
 
-    return data.publicUrl;
+    return data.publicUrl ?? null;
   }
 
   const makePost = async () => {
@@ -54,12 +80,13 @@ export default function Ask() {
         console.log("Starting image upload...");
         setUploading(true);
         imageUrl = await uploadImages();
-        setUploading(false);
       } catch (err) {
         alert("Image upload failed");
         console.error(err);
+        setUploading(false);
         return;
       }
+      setUploading(false);
     }
 
     setDescription("")
@@ -140,11 +167,11 @@ export default function Ask() {
               className="w-full p-3 border border-gray-300 rounded-lg"
             />
             
-            {typeof window !== 'undefined' && file && (
+            {preview && (
               <div className="w-24 h-24 my-2">
                 <img
-                  src={URL.createObjectURL(file)}
-                  alt={file.name}
+                  src={preview}
+                  alt={file?.name ?? "preview"}
                   className="object-cover w-full h-full rounded"
                 />
               </div>
