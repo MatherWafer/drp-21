@@ -1,14 +1,21 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState, useMemo } from "react";
 import { v4 as uuid } from "uuid"; 
 import LocationPicker, { LocationCoordinates } from "../map/LocPicker";
 import { createClient } from '../../utils/supabase/client';
 
-const supabase = createClient(); 
+// const supabase = createClient(); 
 
 
 export default function Ask() {
+
+  const supabase = useMemo(() => {
+    if (typeof window === "undefined") return null; // during SSR/​build
+    return createClient();
+  }, []);
+
+
   const [description, setDescription] = useState("");
   const [postSuccess, setPostSuccess] = useState(false);
   const [title, setTitle] = useState("");
@@ -24,10 +31,11 @@ export default function Ask() {
 
   useEffect(() => {
     (async () => {
+      if (!supabase) return; // Ensure supabase is initialized
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) await supabase.auth.signInAnonymously();
     })();
-  }, []);
+  }, [supabase]);
 
   useEffect(() => {
     if (!file) {
@@ -41,7 +49,7 @@ export default function Ask() {
 
   async function uploadImages() {
     console.log("Uploading image:", file);
-    if (!file) return null;
+    if (!file || !supabase) return null;
     const path = `posts/${uuid()}-${file.name}`;
     console.log("Uploading image to:", path);
     const { error } = await supabase
