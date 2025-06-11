@@ -1,6 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  RefObject
+} from "react";
 import { PostInfo } from './PostOverview';
 
 export type CommentInfo = {
@@ -74,7 +79,7 @@ export default function PostModal({
     }
   };
   if (!post) return null;
-return (
+  return (
     <div className="fixed inset-0 bg-white/50 flex items-start justify-center z-50">
       {/* scrollable modal panel */}
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative max-h-[98vh] overflow-y-auto">
@@ -126,7 +131,7 @@ return (
         <form onSubmit={handleSubmit} className="mb-6 border border-black p-3 rounded-lg space-y-2">
           <label className="block text-sm font-semibold text-black">Post Comment</label>
           <textarea
-            ref={textareaRef as MutableRefObject<HTMLTextAreaElement | null>}
+            ref={textareaRef}
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             rows={3}
