@@ -11,8 +11,12 @@ const RemoveRegion = () => {
   const { interestRegions, userLoaded, loadProfile } = useUser();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const handleDelete = async (id: string) => {
-    const confirmed = window.confirm("Are you sure you want to delete this region?");
+  const handleDelete = async (id: string, name: string) => {
+    const confirmed = (name == "")
+            ? 
+         window.confirm(`Are you sure you want to delete this region?`)
+            :
+        window.confirm(`Are you sure you want to delete the region: ${name}?`)
     if (!confirmed) return;
     
     const res = await fetch('/api/select-roi', {
@@ -46,11 +50,12 @@ const RemoveRegion = () => {
       >
         {
         
-        interestRegions.map(({ perimeter, id }, index) => (
+        interestRegions.map(({ perimeter, id, name }, index) => (
           <RegionPolygon
             key={id}
             region={perimeter}
-            onClick={() => handleDelete(id)}
+            onClick={() => handleDelete(id, name)}
+            name={name}
           />
         ))}
       </Map>

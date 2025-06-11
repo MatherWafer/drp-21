@@ -10,7 +10,8 @@ export type RoiData = {
   perimeter: LatLng[],
   radius:    number,
   center:    LatLng,
-  id:        string
+  id:        string,
+  name:      string
 }
 
 export const defaultRoiData: RoiData = 
@@ -20,7 +21,8 @@ radius:3,
 center:
   {lat: 51.512409,
   lng: -0.125146 },
-id: '1'
+id: '1',
+name: ''
 }
 function averageLoc(interestRegion: LatLng[]): LatLng {
   const { lat, lng } = interestRegion.reduce(
@@ -69,11 +71,11 @@ const UserContext = createContext<
   setInterestRegions: () => {}
 });
 
-export const getRoiData = (interestRegion: LatLng[],  id: string): RoiData => { 
+export const getRoiData = (interestRegion: LatLng[],  id: string, name: string): RoiData => { 
     const perimeter = interestRegion
     const center = averageLoc(perimeter)
     const radius = Math.max(...perimeter.map((ll:LatLng) => getDistance(center,ll)))
-    return {perimeter,radius,center, id}
+    return {perimeter,radius,center, id, name}
   }
 
 const loadProfile = async (
@@ -90,7 +92,7 @@ const loadProfile = async (
   const body = await res.json()
   let regionDatas = [defaultRoiData]
   if(body.interestRegion) {
-    regionDatas = (body.interestRegion as ROIResponse[]).map(rd => getRoiData(rd.region as LatLng[], rd.id))
+    regionDatas = (body.interestRegion as ROIResponse[]).map(rd => getRoiData(rd.region as LatLng[], rd.id, rd.name ? rd.name : ''))
   }
   if(res){
     body.interestRegion && setInterestRegion(regionDatas)

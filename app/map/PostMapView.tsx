@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { APIProvider, Map, useMap } from '@vis.gl/react-google-maps';
+import { APIProvider, Map, Marker, useMap } from '@vis.gl/react-google-maps';
 import PostOverview, { PostInfo } from '../user/posts/PostOverview';
 import PostMarker from './PostMarker';
 import { useFiltered } from '../user/posts/FilterContext';
@@ -13,10 +13,20 @@ export interface LocationCoordinates {
 
 interface RegionPolygonProps {
   region: LatLng[];
+  name: string;
   onClick?: () => void;
 }
 
-export const RegionPolygon: React.FC<RegionPolygonProps> = ({ region, onClick }) => {
+const computeCentroid = (coords: LatLng[]): LatLng => {
+    const latSum = coords.reduce((sum, point) => sum + point.lat, 0);
+    const lngSum = coords.reduce((sum, point) => sum + point.lng, 0);
+    return {
+      lat: latSum / coords.length,
+      lng: lngSum / coords.length,
+    };
+  };
+
+export const RegionPolygon: React.FC<RegionPolygonProps> = ({ region, onClick, name }) => {
   const polygonRef = useRef<google.maps.Polygon | null>(null);
   const clickListenerRef = useRef<google.maps.MapsEventListener | null>(null);
   const map = useMap();
@@ -54,8 +64,22 @@ export const RegionPolygon: React.FC<RegionPolygonProps> = ({ region, onClick })
       }
     };
   }, [region, map, onClick]);
-
-  return null;
+  console.log(name)
+  return        <Marker
+                  position={computeCentroid(region)}
+                  label={{
+                    text: name == "" ? " " : name,
+                    color: '#FF4444',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                  }}
+                  icon={{
+                    url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=',
+                    scaledSize: new window.google.maps.Size(1, 1),
+                  }}
+                  clickable={false}
+                  zIndex={0}
+                />
 };
 
 interface PostMapViewProps {
@@ -193,8 +217,8 @@ useEffect(() => {
                 <PostMarker setter={setFocusedPost} key={post.id} post={post} />
               ))}
             {
-              interestRegion.map(({perimeter},index) => 
-              <RegionPolygon key={index} region={perimeter} />
+              interestRegion.map(({perimeter, name},index) =>       
+                <RegionPolygon key={index} region={perimeter} name={name} />
               )
             }
           </Map>
