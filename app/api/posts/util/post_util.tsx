@@ -12,7 +12,7 @@ export type FetchedPost = {
   locationText: string;
   category: string;
   description: string;
-  imageUrl?: string;
+  imageUrl?: string | null;
   Favourites: {
       postId: string;
   }[];
