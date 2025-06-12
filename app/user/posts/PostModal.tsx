@@ -7,6 +7,7 @@ import React, {
   RefObject
 } from "react";
 import { PostInfo } from './PostOverview';
+import useSWR from "swr";
 
 export type CommentInfo = {
   id: string;
@@ -19,24 +20,62 @@ export type CommentInfo = {
 };
 
 export default function PostModal({ 
-  post, 
+  postId, 
   onClose 
 }: { 
-  post: PostInfo, 
+  postId: String, 
   onClose: () => void 
 }) {
+  const fetcher = (url: string) => fetch(url).then((res) => res.json());
+  const { data: post, isLoading } = useSWR<PostInfo>(`/api/posts/${postId}`, fetcher);
 
+  
   const [comments, setComments] = useState<CommentInfo[]>([]);
   const [newComment, setNewComment] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  
+  const [liked, setLiked] = useState(false);
+  const [disliked, setDisliked] = useState(false);
+  const [favourited, setFavourited] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [dislikeCount, setDislikeCount] = useState(0);
+  const [favouriteCount, setFavouriteCount] = useState(0);
 
-  const [liked, setLiked] = useState(post.hasLiked);
-  const [disliked, setDisliked] = useState(post.hasDisliked);
-  const [favourited, setFavourited] = useState(post.hasFavourited);
-  const [likeCount, setLikeCount] = useState(post.likeCount);
-  const [dislikeCount, setDislikeCount] = useState(post.dislikeCount);
-  const [favouriteCount, setFavouriteCount] = useState(post.favouriteCount);
+  useEffect(() => {
+    if (!post) return;
+    setLiked(post.hasLiked);
+    setDisliked(post.hasDisliked);
+    setFavourited(post.hasFavourited);
+    setLikeCount(post.likeCount);
+    setDislikeCount(post.dislikeCount);
+    setFavouriteCount(post.favouriteCount);
+  }, [post]);
 
+  
+  /* -------------------------------------------------------------
+  * Initial fetch – grab all existing comments (incl. authors) for the post.
+  * -----------------------------------------------------------*/
+ useEffect(() => {
+   if (!post) return;
+   
+   
+   const fetchComments = async () => {
+     try {
+       const res = await fetch(`/api/posts/${post.id}/comment`, {method: 'GET', headers: {'x-id': post.id}});
+       if (res.ok) {
+         const data: CommentInfo[] = await res.json();
+         setComments(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch comments', err);
+      }
+    };
+    
+    fetchComments();
+  }, [post]);
+  
+  if (isLoading || !post) return null;
+  
   const handleToggle = async (
     type: 'like' | 'dislike' | 'favourite',
     isActive: boolean,
@@ -57,29 +96,7 @@ export default function PostModal({
       console.error(`Error toggling ${type}:`, error);
     }
   };
-
-  /* -------------------------------------------------------------
-   * Initial fetch – grab all existing comments (incl. authors) for the post.
-   * -----------------------------------------------------------*/
-  useEffect(() => {
-    if (!post) return;
-
-
-    const fetchComments = async () => {
-      try {
-        const res = await fetch(`/api/posts/${post.id}/comment`, {method: 'GET', headers: {'x-id': post.id}});
-        if (res.ok) {
-          const data: CommentInfo[] = await res.json();
-          setComments(data);
-        }
-      } catch (err) {
-        console.error('Failed to fetch comments', err);
-      }
-    };
-
-    fetchComments();
-  }, [post]);
-
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = newComment.trim();
