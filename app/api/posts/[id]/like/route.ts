@@ -9,7 +9,14 @@ const prisma = new PrismaClient();
 export async function POST(req: NextRequest) {
   const data = await req.json() 
   const data_dash = await withProfileId(data)
-  const post = await prisma.like.create({data:data_dash})
+  const post = await prisma.like.upsert({
+  where: {
+    postId_profileId: data_dash, // your unique composite key object
+  },
+  update: {}, // no changes, or if you want to update a timestamp, add here
+  create: data_dash,
+})
+
   return new NextResponse();
 }
 

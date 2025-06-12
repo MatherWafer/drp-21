@@ -34,7 +34,7 @@ export async function GET(
   }
 }
 /**
- * POST /api/posts/[postId]/comments
+ * POST /api/posts/[postId]/comment
  * ---------------------------------
  * Creates a new comment on the post. The request body should be JSON with a
  * single `content` field. The helper `withProfileId` augments the data with the

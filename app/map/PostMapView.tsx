@@ -5,6 +5,7 @@ import PostMarker from './PostMarker';
 import { useFiltered } from '../user/posts/FilterContext';
 import { LatLng } from '../api/util/geoHelpers';
 import { RoiData, useUser } from '../context/userContext';
+import PostModal from '../user/posts/PostModal';
 
 export interface LocationCoordinates {
   lat: number;
@@ -173,20 +174,19 @@ useEffect(() => {
       {focusedPost && (
         <div
           ref={alertRef}
-         className="fixed top-50 z-50 w-full px-3 py-2"
-
+          className="fixed top-50 z-50 w-full px-3 py-2"
         >
           <button
-          onClick={() => {
-            setFocusedPost(undefined)}}
-          className="absolute top-2 right-4 text-yellow-800 hover:text-yellow-600 font-bold text-xl leading-none"
-          aria-label="Close"
-        >
-          &times;
-        </button>
-          <PostOverview key={focusedPost.id} post={focusedPost} />
+            onClick={() => setFocusedPost(undefined)}
+            className="absolute top-2 right-4 text-yellow-800 hover:text-yellow-600 font-bold text-xl leading-none"
+            aria-label="Close"
+          >
+            &times;
+          </button>
+          <PostModal key={focusedPost.id} post={focusedPost} onClose={() => setFocusedPost(undefined)} />
         </div>
       )}
+
 
       <APIProvider
         apiKey={apiKey}
