@@ -30,6 +30,34 @@ export default function PostModal({
   const [newComment, setNewComment] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const [liked, setLiked] = useState(post.hasLiked);
+  const [disliked, setDisliked] = useState(post.hasDisliked);
+  const [favourited, setFavourited] = useState(post.hasFavourited);
+  const [likeCount, setLikeCount] = useState(post.likeCount);
+  const [dislikeCount, setDislikeCount] = useState(post.dislikeCount);
+  const [favouriteCount, setFavouriteCount] = useState(post.favouriteCount);
+
+  const handleToggle = async (
+    type: 'like' | 'dislike' | 'favourite',
+    isActive: boolean,
+    setActive: (b: boolean) => void,
+    setCount: (n: number) => void,
+    count: number
+  ) => {
+    try {
+      const response = await fetch(`/api/posts/${post.id}/${type}`, {
+        method: isActive ? 'DELETE' : 'POST',
+        body: JSON.stringify({ postId: post.id }),
+      });
+      if (response.ok) {
+        setActive(!isActive);
+        setCount(isActive ? count - 1 : count + 1);
+      }
+    } catch (error) {
+      console.error(`Error toggling ${type}:`, error);
+    }
+  };
+
   /* -------------------------------------------------------------
    * Initial fetch – grab all existing comments (incl. authors) for the post.
    * -----------------------------------------------------------*/
@@ -111,26 +139,53 @@ export default function PostModal({
         {/* reactions row */}
         <div className="flex space-x-6 text-sm text-gray-700 mb-8">
           {/* Favourite */}
-          <div className="flex items-center space-x-1 text-yellow-500">
+          <button 
+              onClick={() =>
+                handleToggle('favourite', favourited, setFavourited, setFavouriteCount, favouriteCount)
+              }
+              className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${
+                favourited 
+                  ? 'text-yellow-500 hover:text-yellow-400' 
+                  : 'text-gray-600'
+              }`}
+            >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
               <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
             </svg>
             <span>{post.favouriteCount}</span>
-          </div>
+          </button>
           {/* Like */}
-          <div className="flex items-center space-x-1 text-red-500">
+          <button 
+              onClick={() =>
+                handleToggle('like', liked, setLiked, setLikeCount, likeCount)
+              }
+              className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${
+                liked 
+                  ? 'text-green-500 hover:text-green-400' 
+                  : 'text-gray-600'
+              }`}
+            >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor" className="h-5 w-5">
               <path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z" />
             </svg>
             <span>{post.likeCount}</span>
-          </div>
+          </button>
           {/* Dislike */}
-          <div className="flex items-center space-x-1 text-blue-500">
+          <button 
+              onClick={() =>
+                handleToggle('dislike', disliked, setDisliked, setDislikeCount, dislikeCount)
+              }
+              className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${
+                disliked 
+                  ? 'text-red-500 hover:text-red-400' 
+                  : 'text-gray-600'
+              }`}
+            >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor" className="h-5 w-5">
               <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z" />
             </svg>
             <span>{post.dislikeCount}</span>
-          </div>
+          </button>
         </div>
 
         {/* ───────────────────────────────────────── */}
