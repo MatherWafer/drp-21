@@ -9,6 +9,7 @@ import { PostInfo } from '../app/user/posts/PostOverview';
 import CategoryDropdown from '../app/user/posts/CategoryDropdown';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import SortDropdown from './SortDropDown';
 
 export function parsePostInfo(data: any): PostInfo {
   return {
@@ -17,31 +18,31 @@ export function parsePostInfo(data: any): PostInfo {
   };
 }
 
-export function parsePostsResponse(data: any): PostInfo[]{
-  return (data?.posts || [] as any[]).map(parsePostInfo)
+export function parsePostsResponse(data: any): PostInfo[] {
+  return (data?.posts || []).map(parsePostInfo);
 }
 
 const fetcher = (url: string, filtered: boolean, sort: string) =>
   fetch(`${url}`, {
-    method: "GET",
+    method: 'GET',
     headers: {
-      "x-filter-roi": filtered.toString(),
-      "x-sort-type": sort
-    }
-  }).then(res => res.json());
+      'x-filter-roi': filtered.toString(),
+      'x-sort-type': sort,
+    },
+  }).then((res) => res.json());
 
 export type PostFeedProps = {
-    feedUrl: string, 
-    showOnlyCategorySelector: boolean, 
-    feedTitle: string
-}
+  feedUrl: string;
+  showOnlyCategorySelector: boolean;
+  feedTitle: string;
+};
 
-export const PostFeed: React.FC<PostFeedProps> =  ({
-    feedUrl,
-    showOnlyCategorySelector,
-    feedTitle
+export const PostFeed: React.FC<PostFeedProps> = ({
+  feedUrl,
+  showOnlyCategorySelector,
+  feedTitle,
 }) => {
-  const {filtered} = useFiltered()
+  const { filtered } = useFiltered();
   const [sortOption, setSortOption] = useState('most_recent');
   const { data, error, isLoading } = useSWR(
     [feedUrl, filtered, sortOption],
@@ -52,51 +53,31 @@ export const PostFeed: React.FC<PostFeedProps> =  ({
   const [selectedPostInfo, setSelectedPostInfo] = useState<PostInfo | null>(null);
   const openModal = (post: PostInfo) => setSelectedPostInfo(post);
   const closeModal = () => setSelectedPostInfo(null);
-  
+  const sortOptions = [
+    { value: 'most_recent', label: 'Most Recent' },
+    { value: 'most_liked', label: 'Most Liked' },
+    { value: 'most_comments', label: 'Most Comments' },
+  ];
+
   return (
     <main className="min-h-screen px-8 py-4 flex flex-col items-center">
       <div className="w-full max-w-2xl sticky top-0 bg-white z-10 pt-2 pb-4 flex flex-col items-center">
-        {!pathname.includes("profile") && <h1 className="text-2xl mb-4 text-black text-center">{feedTitle}</h1> }
-        <div className="flex w-full justify-center gap-4">
-          { showOnlyCategorySelector ? (
-            <CategoryDropdown/>
-          ) : (
-            <Selector/>
-          )}
-          <div className="flex w-full max-w-[200px] sm:max-w-[240px] rounded-full bg-teal-800/80 p-1 backdrop-blur-sm items-center">
-            <label
-              htmlFor="sort"
-              className="flex items-center gap-1.5 text-xs font-medium text-teal-100 whitespace-nowrap pl-3"
-            >
-              <svg
-                className="w-3.5 h-3.5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3 4h18v2l-6 6v5l-6 3v-8l-6-6V4z"
-                />
-              </svg>
-              Sort
-            </label>
-            <select
-              id="sort"
-              className="flex-1 text-xs font-medium text-white bg-teal-600/50 rounded-full py-1.5 px-3 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-200 ease-out"
-              value={sortOption}
-              onChange={(e) => setSortOption(e.target.value)}
-            >
-              <option value="most_recent" className="text-white bg-teal-700">Most Recent</option>
-              <option value="most_liked" className="text-white bg-teal-700">Most Liked</option>
-              <option value="most_comments" className="text-white bg-teal-700">Most Comments</option>
-            </select>
+        <div className="w-full">
+          <div className="max-w-2xl mx-auto flex flex-col sm:flex-row gap-2 p-2 bg-teal-900/50 rounded-lg">
+            {showOnlyCategorySelector ? (
+              <CategoryDropdown />
+            ) : (
+              <Selector />
+            )}
+            <SortDropdown
+              sortOptions={sortOptions}
+              sortOption={sortOption}
+              setSortOption={setSortOption}
+            />
           </div>
         </div>
       </div>
-      <div className="w-full max-w-2xl overflow-y-auto flex-1">
+      <div className="w-full max-w-2xl overflow-y-auto flex-1 mt-2">
         {isLoading ? (
           <div className="flex justify-center items-center h-full flex-col">
             <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-opacity-75 mb-4"></div>
@@ -106,13 +87,11 @@ export const PostFeed: React.FC<PostFeedProps> =  ({
           <p>Error loading posts...</p>
         ) : (
           <>
-            <PostStream
-              posts={parsePostsResponse(data)}
-              onPostClick={openModal} />
+            <PostStream posts={parsePostsResponse(data)} onPostClick={openModal} />
             {selectedPostInfo && <PostModal info={selectedPostInfo} onClose={closeModal} />}
           </>
         )}
       </div>
     </main>
   );
-}
+};

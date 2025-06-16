@@ -52,7 +52,6 @@ export default function RootLayout({
             <CategoryProvider>
               {/* Header and Selector */}
               <div className="w-full z-50">
-                <Header />
                 {/* Apply fixed positioning to Selector */}
                 <div className="fixed top-[header-height] left-0 w-full z-50">
                   <Selector />
@@ -89,10 +88,6 @@ export default function RootLayout({
         <UserProvider>
           <CategoryProvider>
             {/* Header */}
-            <div className="w-full flex justify-end z-50">
-              <Header />
-            </div>
-
             {/* Main content */}
             <main className="flex-1 overflow-y-auto">
               {children}
