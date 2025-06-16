@@ -106,9 +106,7 @@ export const PostFeed: React.FC<PostFeedProps> = ({
         <div className="w-full relative" ref={filterRef}>
           {!pathname.includes('ownPosts') && (
             <div className="max-w-2xl mx-auto mb-3">
-              <label className="block text-xs font-semibold text-teal-100 mb-1">
-                Region Filter
-              </label>
+
               <FilterToggle />
             </div>
           )}
