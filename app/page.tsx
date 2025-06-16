@@ -23,10 +23,11 @@ export default function Home() {
     userLoaded ? ['/api/posts/feed', filtered, userLoaded] : null, // Only fetch when userLoaded is true
     ([url, filtered]) => fetcher(url, filtered)
   );
-
-  useEffect( () => {
-    console.log(parsePostsResponse(data))
-  },[data])
+  const posts = data ? parsePostsResponse(data) : [];
+  useEffect(() => {
+    console.log('Raw data:', data);
+    console.log('Parsed posts:', parsePostsResponse(data));
+  }, [data]);
 
   if (!userLoaded || isLoading) {
     return (
@@ -42,7 +43,7 @@ export default function Home() {
     <PostMapView
       apiKey={GOOGLE_MAPS_API_KEY}
       interestRegion={interestRegions}
-      posts={parsePostsResponse(data)}
+      posts={posts}
     />
   </main>
 );

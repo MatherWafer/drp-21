@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState } from "react";
+import { useUser } from "../../context/userContext";
 
 type FilterContextType = {
   category: string;
@@ -12,8 +13,9 @@ type FilterContextType = {
 const FilterContext = createContext<FilterContextType | undefined>(undefined);
 
 export const CategoryProvider = ({ children }: { children: React.ReactNode }) => {
+  const {interestRegions} = useUser()
   const [category, setCategory] = useState<string>("None");
-  const [filtered, setFiltered] = useState<boolean>(true);
+  const [filtered, setFiltered] = useState<boolean>(interestRegions.length != 0);
 
   return (
     <FilterContext.Provider value={{ category, setCategory, filtered, setFiltered }}>

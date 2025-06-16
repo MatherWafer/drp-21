@@ -99,7 +99,6 @@ const PostMapView: React.FC<PostMapViewProps> = ({
 }) => {
   const { category, filtered } = useFiltered();
   const [focusedPost, setFocusedPost] = useState<PostInfo>();
-  const [genericFeed, setGenericFeed] = useState<PostInfo[]>([]);
   const [userLocation, setUserLocation] = useState<LocationCoordinates | null>(null);
   const alertRef = useRef<HTMLDivElement>(null);
 
@@ -121,22 +120,6 @@ const PostMapView: React.FC<PostMapViewProps> = ({
     }
   }, []);
 
-  useEffect(() => {
-    if (filtered && genericFeed.length === 0) {
-      getGenericFeed();
-    }
-  }, [filtered]);
-
-  const getGenericFeed = async () => {
-    try {
-      const res = await fetch('/api/posts/feed', { method: 'GET', headers: { 'x-filter-roi': 'false' } });
-      if (!res.ok) throw new Error('Failed to fetch posts');
-      const data = await res.json();
-      setGenericFeed(parsePostsResponse(data));
-    } catch (err) {
-      console.error('Error fetching posts:', err);
-    }
-  };
 
 useEffect(() => {
   function handleClickOutside(event: MouseEvent) {
@@ -154,7 +137,6 @@ useEffect(() => {
   };
 }, [focusedPost]);
 
-  const displayedPosts = filtered ? posts : genericFeed;
 
   const handleMapClick = useCallback(
     (event: any) => {
@@ -211,7 +193,7 @@ useEffect(() => {
             }}
             onClick={handleMapClick}
           >
-            {displayedPosts.length > 0 && displayedPosts
+            {posts
               .filter((post) => category === 'None' || category === post.category)
               .map((post) => (
                 <PostMarker setter={setFocusedPost} key={post.id} post={post} />
