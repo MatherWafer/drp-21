@@ -4,45 +4,51 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export default function Footer() {
+  type UserOption = {
+    url: string;
+    icon: string; // path to icon
+    description: string; // Full description for alt text
+    label: string; // One-word label for display
+  };
 
-type UserOption = {
-  url: string;
-  icon: string; // path to icon
-  description: string;
-};
+  const userOptions: UserOption[] = [
+    { url: '/feed', icon: '/home.svg', description: 'Feed', label: 'Feed' },
+    { url: '/', icon: '/pin.svg', description: 'Map View', label: 'Map' },
+    { url: '/create', icon: '/loudspeaker.svg', description: 'Create Post', label: 'Create' },
+  ];
 
-const userOptions: UserOption[] = [
-  { url: '/feed', icon: '/home.svg', description: 'Feed'},
-  { url: '/', icon: '/pin.svg', description: 'Map View'},
-  { url: '/create', icon: '/loudspeaker.svg', description: 'Create Post' },
-];
+  const pathname = usePathname();
 
-const pathname = usePathname();
+  function UserOptionTab({ uo }: { uo: UserOption }) {
+    const isActive = pathname === uo.url;
 
-function UserOptionTab({ uo }: { uo: UserOption }) {
-  const isActive = pathname === uo.url;
+    return (
+      <Link
+        href={uo.url}
+        className={`flex flex-col items-center justify-center rounded-none transition-all duration-200 transform flex-1
+          ${isActive
+            ? 'bg-teal-600/90 text-white scale-105 shadow-sm border-y border-teal-500/50'
+            : 'bg-teal-800/70 text-gray-100 hover:bg-teal-700/80 hover:shadow-sm border-y border-teal-900/30'
+          } backdrop-blur-sm`}
+        aria-label={uo.description}
+      >
+        <img
+          src={uo.icon}
+          alt={`${uo.description} icon`}
+          className="w-5 h-5 mb-1 filter invert brightness-0"
+        />
+        <span className="text-xs font-medium">{uo.label}</span>
+      </Link>
+    );
+  }
 
   return (
-    <Link
-      href={uo.url}
-      className={`py-2 shadow-lg transition-all duration-300 transform flex items-center justify-center text-lg font-semibold w-full text-center border
-        ${isActive ? 'bg-teal-600 border-teal-500 scale-105' : 'bg-teal-800 hover:bg-teal-700 border-teal-700'} text-white`}
-    >
-      <img
-        src={uo.icon}
-        alt=""
-        className="hidden md:block w-6 h-6 filter invert brightness-0"
-      />
-      &nbsp; {uo.description}
-    </Link>
-  );
-}
-
-  return (
-    <div className="flex flex-nowrap justify-center w-full rounded-lg">
-          {userOptions.map((uo) => (
-            <UserOptionTab uo={uo} key={uo.icon} />
-          ))}
+    <div className="flex w-full bg-teal-900/20 backdrop-blur-md shadow-md">
+      <div className="flex w-full">
+        {userOptions.map((uo) => (
+          <UserOptionTab uo={uo} key={uo.icon} />
+        ))}
+      </div>
     </div>
   );
 }

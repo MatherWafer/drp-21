@@ -42,8 +42,6 @@ export default function RootLayout({
       </html>
     );
   }
-
-  // 🗺️ ROOT PAGE — fixed header/footer layout
   if (pathname === '/') {
     return (
       <html lang="en" className="dark h-full">
@@ -52,21 +50,27 @@ export default function RootLayout({
         >
           <UserProvider>
             <CategoryProvider>
-              {/* Header */}
-              <div className="w-full z-20">
+              {/* Header and Selector */}
+              <div className="w-full z-50">
                 <Header />
-                <Selector />
+                {/* Apply fixed positioning to Selector */}
+                <div className="fixed top-[header-height] left-0 w-full z-50">
+                  <Selector />
+                </div>
               </div>
-
+  
               {/* Main content */}
               <main className="flex-1 overflow-y-auto">
                 {children}
               </main>
-
-              {/* Footer - stays fixed at bottom */}
-              <div className="w-full pb-4" style={{
-                paddingBottom: 'calc(env(safe-area-inset-bottom, 0px))'
-              }}>
+  
+              {/* Footer - stays visible above bottom nav bars */}
+              <div
+                className="w-full pb-4"
+                style={{
+                  paddingBottom: 'calc(env(safe-area-inset-bottom, 0px))',
+                }}
+              >
                 <Footer />
               </div>
             </CategoryProvider>
