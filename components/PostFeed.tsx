@@ -22,10 +22,11 @@ export function parsePostsResponse(data: any): PostInfo[]{
 }
 
 const fetcher = (url: string, filtered: boolean, sort: string) =>
-  fetch(`${url}?sort=${sort}`, {
+  fetch(`${url}`, {
     method: "GET",
     headers: {
-      "x-filter-roi": filtered.toString()
+      "x-filter-roi": filtered.toString(),
+      "x-sort-type": sort
     }
   }).then(res => res.json());
 
