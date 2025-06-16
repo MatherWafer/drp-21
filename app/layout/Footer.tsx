@@ -15,6 +15,7 @@ export default function Footer() {
     { url: '/feed', icon: '/home.svg', description: 'Feed', label: 'Feed' },
     { url: '/', icon: '/pin.svg', description: 'Map View', label: 'Map' },
     { url: '/create', icon: '/loudspeaker.svg', description: 'Create Post', label: 'Create' },
+    {url: '/user/profile', icon: '/person.svg', description: 'My profile', label: 'Me'}
   ];
 
   const pathname = usePathname();

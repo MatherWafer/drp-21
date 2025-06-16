@@ -4,6 +4,8 @@ import PostMapView from './map/PostMapView';
 import { useUser } from './context/userContext';
 import useSWR from 'swr';
 import { useFiltered } from './user/posts/FilterContext';
+import { parsePostsResponse } from '../components/PostFeed';
+import { useEffect } from 'react';
 
 const fetcher = (url: string, filtered: boolean) =>
   fetch(url, {
@@ -22,6 +24,9 @@ export default function Home() {
     ([url, filtered]) => fetcher(url, filtered)
   );
 
+  useEffect( () => {
+    console.log(parsePostsResponse(data))
+  },[data])
 
   if (!userLoaded || isLoading) {
     return (
@@ -34,13 +39,10 @@ export default function Home() {
 
   return (
   <main className="text-center bg-white text-teal m-0">
-    <h1 className="fixed top-0 left-1/2 transform -translate-x-1/2 z-10 p-4 px-10 text-xl font-bold bg-white/70 rounded-xl text-black">
-      Roadable
-    </h1>
     <PostMapView
       apiKey={GOOGLE_MAPS_API_KEY}
       interestRegion={interestRegions}
-      posts={data?.posts || []}
+      posts={parsePostsResponse(data)}
     />
   </main>
 );

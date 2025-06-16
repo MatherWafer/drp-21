@@ -1,24 +1,18 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
 import CategoryDropdown from '../user/posts/CategoryDropdown';
-import FilterToggle from '../user/posts/RegionToggle';
 
 type SelectorProps = {
   className?: string;
 };
 
 export default function Selector({ className }: SelectorProps) {
-  const pathname = usePathname();
-
   return (
-    <div className={`flex items-center gap-1 w-full ${className}`}>
-      {!pathname.includes('ownPosts') && (
-        <div className="flex-1 h-10">
-          <FilterToggle />
-        </div>
-      )}
-      <div className="flex-1 h-10">
+    <div className={`flex flex-col gap-4 w-full ${className}`}>
+      <div>
+        <label htmlFor="category" className="block text-xs font-semibold text-teal-100 mb-1">
+          Category
+        </label>
         <CategoryDropdown />
       </div>
     </div>

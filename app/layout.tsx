@@ -8,6 +8,8 @@ import { CategoryProvider } from './user/posts/FilterContext';
 import Footer from './layout/Footer';
 import Header from './layout/Header';
 import Selector from './layout/Selector';
+import FilterToggle from './user/posts/FilterToggle';
+import CategoryDropdown from './user/posts/CategoryDropdown';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -42,6 +44,7 @@ export default function RootLayout({
       </html>
     );
   }
+
   if (pathname === '/') {
     return (
       <html lang="en" className="dark h-full">
@@ -50,21 +53,25 @@ export default function RootLayout({
         >
           <UserProvider>
             <CategoryProvider>
-              {/* Header and Selector */}
+              {/* Header and Filters */}
               <div className="w-full z-50">
-                <Header />
-                {/* Apply fixed positioning to Selector */}
-                <div className="fixed top-[header-height] left-0 w-full z-50">
-                  <Selector />
+                {/* Floating Filters in Lozenge */}
+                <div className="fixed top-4 left-1/2 -translate-x-1/2 w-full md:w-auto bg-teal-900/95 backdrop-blur-sm rounded-full p-2 flex flex-row gap-2 shadow-lg z-50 overflow-visible">
+                  <div className="w-1/2 md:w-44">
+                    <FilterToggle />
+                  </div>
+                  <div className="w-1/2 md:w-44">
+                    <CategoryDropdown />
+                  </div>
                 </div>
               </div>
-  
+
               {/* Main content */}
               <main className="flex-1 overflow-y-auto">
                 {children}
               </main>
-  
-              {/* Footer - stays visible above bottom nav bars */}
+
+              {/* Footer */}
               <div
                 className="w-full pb-4"
                 style={{
@@ -79,7 +86,6 @@ export default function RootLayout({
       </html>
     );
   }
-
   // 📄 OTHER PAGES — standard layout
   return (
     <html lang="en" className="dark h-full">
@@ -89,10 +95,6 @@ export default function RootLayout({
         <UserProvider>
           <CategoryProvider>
             {/* Header */}
-            <div className="w-full flex justify-end z-50">
-              <Header />
-            </div>
-
             {/* Main content */}
             <main className="flex-1 overflow-y-auto">
               {children}

@@ -22,9 +22,9 @@ export async function withProfileId<T extends object>(
   }
   
 
-    
-  export type ROIResponse  = {
-    name: string | null;
-    region: JsonValue;
-    id: string;
-}
+export const sortMapping = {
+    most_recent: { orderBy: { postedOn: 'desc' } },
+    most_liked: { orderBy: [{ Likes: { _count: 'desc' } }] }, // Array syntax for multiple orderBy
+    most_comments: { orderBy: [{ Comments: { _count: 'desc' } }] }, // Array syntax for multiple orderBy
+  };
+  
