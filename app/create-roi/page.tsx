@@ -12,11 +12,20 @@ const WelcomeRoiPage = () => {
   const router = useRouter();
 
   // Redirect to root if interestRegions is non-empty
+  /*
+
+  !interestRegions || (
+  interestRegions.length == 1 && interestRegions[0].id === '1')
+  )
+  */
   useEffect(() => {
-    if (interestRegions && interestRegions.length > 0) {
-      router.push('/');
+    if(interestRegions?.length > 0){
+      if((interestRegions[0]?.id ?? "") !== '1'){
+        router.push("/")
+      }
     }
-  }, [interestRegions, router]);
+    }
+  , [interestRegions, router]);
 
   return (
     <div className="min-h-screen bg-teal-900 text-white flex flex-col items-center justify-center p-6">
