@@ -10,8 +10,19 @@ import CategoryDropdown from '../app/user/posts/CategoryDropdown';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
-const fetcher = (url: string, filtered: boolean) =>
-  fetch(url, {
+export function parsePostInfo(data: any): PostInfo {
+  return {
+    ...data,
+    postedOn: new Date(data?.postedOn ?? Date.now()),
+  };
+}
+
+export function parsePostsResponse(data: any): PostInfo[]{
+  return (data?.posts || [] as any[]).map(parsePostInfo)
+}
+
+const fetcher = (url: string, filtered: boolean, sort: string) =>
+  fetch(`${url}?sort=${sort}`, {
     method: "GET",
     headers: {
       "x-filter-roi": filtered.toString()
@@ -24,16 +35,16 @@ export type PostFeedProps = {
     feedTitle: string
 }
 
-
 export const PostFeed: React.FC<PostFeedProps> =  ({
     feedUrl,
     showOnlyCategorySelector,
     feedTitle
 }) => {
   const {filtered} = useFiltered()
+  const [sortOption, setSortOption] = useState('most_recent');
   const { data, error, isLoading } = useSWR(
-    [feedUrl, filtered],
-    ([url, filtered]) => fetcher(url, filtered)
+    [feedUrl, filtered, sortOption],
+    ([url, filtered, sort]) => fetcher(url, filtered, sort)
   );
   const pathname = usePathname();
 
@@ -41,16 +52,48 @@ export const PostFeed: React.FC<PostFeedProps> =  ({
   const openModal = (post: PostInfo) => setSelectedPostInfo(post);
   const closeModal = () => setSelectedPostInfo(null);
   
-  
   return (
     <main className="min-h-screen px-8 py-4 flex flex-col items-center">
-      <div className="w-full max-w-2xl sticky top-0 bg-white z-10 pt-2 pb-4">
+      <div className="w-full max-w-2xl sticky top-0 bg-white z-10 pt-2 pb-4 flex flex-col items-center">
         {!pathname.includes("profile") && <h1 className="text-2xl mb-4 text-black text-center">{feedTitle}</h1> }
-        { showOnlyCategorySelector ?
-           <CategoryDropdown/>
-           :
-          <Selector/>
-        }
+        <div className="flex w-full justify-center gap-4">
+          { showOnlyCategorySelector ? (
+            <CategoryDropdown/>
+          ) : (
+            <Selector/>
+          )}
+          <div className="flex w-full max-w-[200px] sm:max-w-[240px] rounded-full bg-teal-800/80 p-1 backdrop-blur-sm items-center">
+            <label
+              htmlFor="sort"
+              className="flex items-center gap-1.5 text-xs font-medium text-teal-100 whitespace-nowrap pl-3"
+            >
+              <svg
+                className="w-3.5 h-3.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 4h18v2l-6 6v5l-6 3v-8l-6-6V4z"
+                />
+              </svg>
+              Sort
+            </label>
+            <select
+              id="sort"
+              className="flex-1 text-xs font-medium text-white bg-teal-600/50 rounded-full py-1.5 px-3 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-200 ease-out"
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+            >
+              <option value="most_recent" className="text-white bg-teal-700">Most Recent</option>
+              <option value="most_liked" className="text-white bg-teal-700">Most Liked</option>
+              <option value="most_comments" className="text-white bg-teal-700">Most Comments</option>
+            </select>
+          </div>
+        </div>
       </div>
       <div className="w-full max-w-2xl overflow-y-auto flex-1">
         {isLoading ? (
@@ -62,12 +105,13 @@ export const PostFeed: React.FC<PostFeedProps> =  ({
           <p>Error loading posts...</p>
         ) : (
           <>
-            <PostStream posts={data.posts as PostInfo[]} onPostClick={openModal} />
+            <PostStream
+              posts={parsePostsResponse(data)}
+              onPostClick={openModal} />
             {selectedPostInfo && <PostModal info={selectedPostInfo} onClose={closeModal} />}
           </>
         )}
       </div>
     </main>
   );
-
 }

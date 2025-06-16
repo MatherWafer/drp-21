@@ -4,6 +4,8 @@ import PostMapView from './map/PostMapView';
 import { useUser } from './context/userContext';
 import useSWR from 'swr';
 import { useFiltered } from './user/posts/FilterContext';
+import { parsePostsResponse } from '../components/PostFeed';
+import { useEffect } from 'react';
 
 const fetcher = (url: string, filtered: boolean) =>
   fetch(url, {
@@ -22,6 +24,9 @@ export default function Home() {
     ([url, filtered]) => fetcher(url, filtered)
   );
 
+  useEffect( () => {
+    console.log(parsePostsResponse(data))
+  },[data])
 
   if (!userLoaded || isLoading) {
     return (
@@ -40,7 +45,7 @@ export default function Home() {
     <PostMapView
       apiKey={GOOGLE_MAPS_API_KEY}
       interestRegion={interestRegions}
-      posts={data?.posts || []}
+      posts={parsePostsResponse(data)}
     />
   </main>
 );

@@ -5,6 +5,7 @@ import PostMarker from './PostMarker';
 import { useFiltered } from '../user/posts/FilterContext';
 import { LatLng } from '../api/util/geoHelpers';
 import { RoiData, useUser } from '../context/userContext';
+import { parsePostsResponse } from '../../components/PostFeed';
 
 export interface LocationCoordinates {
   lat: number;
@@ -131,7 +132,7 @@ const PostMapView: React.FC<PostMapViewProps> = ({
       const res = await fetch('/api/posts/feed', { method: 'GET', headers: { 'x-filter-roi': 'false' } });
       if (!res.ok) throw new Error('Failed to fetch posts');
       const data = await res.json();
-      setGenericFeed(data.posts);
+      setGenericFeed(parsePostsResponse(data));
     } catch (err) {
       console.error('Error fetching posts:', err);
     }

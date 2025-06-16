@@ -31,7 +31,8 @@ model Post {
   description  String
   category     String      @default("Other")
   imageUrl     String?
-  Comments    Comment[]
+  postedOn     DateTime?   @default(now())
+  Comments     Comment[]
   Favourites   Favourite[]
   Likes        Like[]
   Dislikes     Dislike[]

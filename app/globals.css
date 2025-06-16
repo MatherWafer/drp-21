@@ -10,3 +10,11 @@ body {
   @apply bg-white text-white font-sans m-0;
 }
 
+@layer base {
+  .bg-custom-pale-green {
+    background-color: #d0f4d4;
+  }
+  .border-custom-pale-green {
+    border-color: #c0e4c4; /* Slightly darker for borders */
+  }
+}
