@@ -27,9 +27,8 @@ export type PostInfo = {
 };
 
 function formatSmartDate(date: Date): string {
-  const base = format(date, 'EEEE do MMMM'); // e.g., "Monday 16th June"
-  const year = format(date, ', yyyy');       // ", 2025"
-
+  const base = format(date, 'EEEE do MMMM');
+  const year = format(date, ', yyyy');
   return isThisYear(date) ? base : base + year;
 }
 
@@ -39,7 +38,7 @@ export default function PostOverview({ post }: { post: PostInfo }) {
   const [disliked, setDisliked] = useState(post.hasDisliked);
   const [currentDislikeCount, setCurrentDislikeCount] = useState(post.dislikeCount);
   const [favourited, setFavourited] = useState(post.hasFavourited);
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
   const [currentFavouriteCount, setCurrentFavouriteCount] = useState(post.favouriteCount);
 
   const handleLike = async () => {
@@ -114,28 +113,16 @@ export default function PostOverview({ post }: { post: PostInfo }) {
       <p className="text-base font-medium text-emerald-800 mb-4 bg-emerald-50 p-1 rounded shadow-sm">
         {post.category}
       </p>
-      {collapsed && post.description.length > 50 ? (
+
         <p
-          className="cursor-pointer text-sm text-emerald-900 mb-4 p-1 rounded hover:bg-emerald-50 transition-colors"
-          onClick={() => setCollapsed(!collapsed)}
-        >
-          {(() => {
-            const sliced = post.description.slice(0, 50).trimEnd();
-            const clean = sliced.lastIndexOf(' ') !== -1 ? sliced.slice(0, sliced.lastIndexOf(' ')) : sliced;
-            return clean + 'read more...';
-          })()}
-        </p>
-      ) : (
-        <p
-          className="text-sm text-emerald-900 mb-4 p-1 rounded hover:bg-emerald-50 transition-colors"
-          onClick={() => setCollapsed(!collapsed)}
+          className="text-sm text-emerald-900 mb-4 p-1 rounded hover:bg-emerald-50 transition-colors cursor-pointer"
         >
           {post.description}
         </p>
-      )}
+
       <div className="flex justify-between items-center mb-2 border-t border-emerald-300 pt-2">
-        <div className="flex items-center text-xs font-medium text-gray-700 bg-white p-1 rounded shadow-sm">
-          <svg className="w-4 h-4 mr-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex items-center text-sm sm:text-base font-medium text-gray-700 bg-white p-2 sm:p-1 rounded shadow-sm">
+          <svg className="w-4 h-4 mr-2 sm:mr-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
