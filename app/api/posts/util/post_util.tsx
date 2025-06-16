@@ -43,6 +43,7 @@ export const postSelectOptions = (userId:string) =>  ({
         category: true,
         description: true,
         locationText: true,
+        postedOn: true,
         creator: true,
         imageUrl: true,
         _count: {
