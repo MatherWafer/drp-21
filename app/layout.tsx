@@ -43,34 +43,31 @@ export default function RootLayout({
     );
   }
 
-  // 🗺️ ROOT PAGE — floating header/footer, selector below header
+  // 🗺️ ROOT PAGE — fixed header/footer layout
   if (pathname === '/') {
     return (
       <html lang="en" className="dark h-full">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-teal-900 text-white h-full`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-teal-900 text-white h-full flex flex-col`}
         >
           <UserProvider>
             <CategoryProvider>
-              <div className="relative h-screen overflow-hidden">
-                {/* Floating Header */}
-                <div className="absolute top-0 left-0 w-full z-20">
-                  <Header />
-                  <Selector />
+              {/* Header */}
+              <div className="w-full z-20">
+                <Header />
+                <Selector />
+              </div>
 
-                </div>
+              {/* Main content */}
+              <main className="flex-1 overflow-y-auto">
+                {children}
+              </main>
 
-          
-
-                {/* Main content below everything */}
-                <main className="h-full overflow-y-auto">
-                  {children}
-                </main>
-
-                {/* Floating Footer */}
-                <div className="absolute bottom-0 left-0 w-full z-20">
-                  <Footer />
-                </div>
+              {/* Footer - stays fixed at bottom */}
+              <div className="w-full pb-4" style={{
+                paddingBottom: 'calc(env(safe-area-inset-bottom, 0px))'
+              }}>
+                <Footer />
               </div>
             </CategoryProvider>
           </UserProvider>
@@ -79,31 +76,33 @@ export default function RootLayout({
     );
   }
 
-  // 📄 OTHER PAGES — normal header/footer
+  // 📄 OTHER PAGES — standard layout
   return (
-  <html lang="en" className="dark h-full">
-    <body
-      className={`${geistSans.variable} ${geistMono.variable} antialiased bg-teal-900 text-white h-full relative overflow-hidden`} // Added 'relative'
-    >
-      <UserProvider>
-        <CategoryProvider>
-          {/* Make header absolute and remove from flex flow */}
-          <div className="absolute top-0 right-0 z-50 w-fit">
-            <Header />
-          </div>
+    <html lang="en" className="dark h-full">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-teal-900 text-white h-full flex flex-col`}
+      >
+        <UserProvider>
+          <CategoryProvider>
+            {/* Header */}
+            <div className="w-full flex justify-end z-50">
+              <Header />
+            </div>
 
-          {/* Main content takes full height */}
-          <div className="flex flex-col h-full pt-0"> {/* Removed padding-top */}
+            {/* Main content */}
             <main className="flex-1 overflow-y-auto">
               {children}
             </main>
-            <div className="flex-none">
+            
+            {/* Footer */}
+            <div className="w-full pb-4" style={{
+              paddingBottom: 'calc(env(safe-area-inset-bottom, 0px))'
+            }}>
               <Footer />
             </div>
-          </div>
-        </CategoryProvider>
-      </UserProvider>
-    </body>
-  </html>
-);
+          </CategoryProvider>
+        </UserProvider>
+      </body>
+    </html>
+  );
 }
