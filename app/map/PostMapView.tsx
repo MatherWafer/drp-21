@@ -204,7 +204,7 @@ useEffect(() => {
             mapId="a2bc871f26d67c06e4448720"
             style={{ width: '100%', height: '100vh' }}
             mapTypeControl={false}
-            defaultCenter={interestRegion[0].center}
+            defaultCenter={interestRegion[0]?.center ?? { lat: 51.5074, lng: -0.1278 }}
             onCenterChanged={(e) => {
               console.log(e.detail)
             }}
@@ -216,7 +216,7 @@ useEffect(() => {
                 <PostMarker setter={setFocusedPost} key={post.id} post={post} />
               ))}
             {
-              interestRegion.map(({perimeter, name},index) =>       
+              interestRegion && interestRegion.map(({perimeter, name},index) =>       
                 <RegionPolygon key={index} region={perimeter} name={name} />
               )
             }

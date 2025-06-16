@@ -27,7 +27,6 @@ export default function PostModal({
   onClose: () => void 
 }) {
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
-  const { data: post, isLoading } = useSWR<PostInfo>(`/api/posts/${info.id}`, fetcher);
 
   
   const [comments, setComments] = useState<CommentInfo[]>([]);
@@ -43,15 +42,15 @@ export default function PostModal({
 
 
   /* -------------------------------------------------------------
-  * Initial fetch – grab all existing comments (incl. authors) for the post.
+  * Initial fetch – grab all existing comments (incl. authors) for the info.
   * -----------------------------------------------------------*/
  useEffect(() => {
-   if (!post) return;
+   if (!info) return;
    
    
    const fetchComments = async () => {
      try {
-       const res = await fetch(`/api/posts/${post.id}/comment`, {method: 'GET', headers: {'x-id': post.id}});
+       const res = await fetch(`/api/posts/${info.id}/comment`, {method: 'GET', headers: {'x-id': info.id}});
        if (res.ok) {
          const data: CommentInfo[] = await res.json();
          setComments(data);
@@ -62,9 +61,8 @@ export default function PostModal({
     };
     
     fetchComments();
-  }, [post]);
+  }, [info]);
   
-  if (isLoading || !post) return null;
   
   const handleToggle = async (
     type: 'like' | 'dislike' | 'favourite',
@@ -74,9 +72,9 @@ export default function PostModal({
     count: number
   ) => {
     try {
-      const response = await fetch(`/api/posts/${post.id}/${type}`, {
+      const response = await fetch(`/api/posts/${info.id}/${type}`, {
         method: isActive ? 'DELETE' : 'POST',
-        body: JSON.stringify({ postId: post.id }),
+        body: JSON.stringify({ postId: info.id }),
       });
 
       if (type == 'like') {
@@ -105,30 +103,26 @@ export default function PostModal({
     if (!trimmed) return;
 
     try {
-      const res = await fetch(`/api/posts/${post.id}/comment`, {
+      const res = await fetch(`/api/posts/${info.id}/comment`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-id': post.id},
+        headers: { 'Content-Type': 'application/json', 'x-id': info.id},
         body: JSON.stringify({ content: trimmed }),
       });
 
       if (res.ok) {
-        // Server returns the freshly‑created comment including the user relation.
         const created: CommentInfo = await res.json();
         setComments((prev) => [created, ...prev]);
         setNewComment('');
-        // Keep focus so the user can type another comment straight away.
         textareaRef.current?.focus();
       }
     } catch (err) {
-      console.error('Failed to post comment', err);
+      console.error('Failed to info comment', err);
     }
   };
-  if (!post) return null;
+  if (!info) return null;
   return (
     <div className="fixed inset-0 bg-white/50 flex items-start justify-center z-50">
-      {/* scrollable modal panel */}
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative max-h-[98vh] overflow-y-auto">
-        {/* close button */}
         <button
           className="absolute top-2 right-2 text-gray-600 hover:text-black"
           onClick={onClose}
@@ -136,28 +130,25 @@ export default function PostModal({
           ✕
         </button>
 
-        {/* post details */}
-        <h3 className="text-xl font-bold text-black mb-1">{post.title}</h3>
+        <h3 className="text-xl font-bold text-black mb-1">{info.title}</h3>
         <p className="text-sm text-gray-800 mb-1">
-          Posted by <span className="font-medium text-gray-500">{post.creator.name}</span>
+          Posted by <span className="font-medium text-gray-500">{info.creator.name}</span>
         </p>
-        <p className="text-blue-500 mb-3">{post.category}</p>
-        <p className="text-gray-800 mb-4 whitespace-pre-wrap">{post.description}</p>
-        <p className="text-xs text-gray-500 mb-4">Location: {post.locationText}</p>
+        <p className="text-blue-500 mb-3">{info.category}</p>
+        <p className="text-gray-800 mb-4 whitespace-pre-wrap">{info.description}</p>
+        <p className="text-xs text-gray-500 mb-4">Location: {info.locationText}</p>
 
-        {post.imageUrl && (
+        {info.imageUrl && (
           <div className="my-4">
             <img
-              src={post.imageUrl}
-              alt={post.title}
+              src={info.imageUrl}
+              alt={info.title}
               className="w-full max-h-[50vh] object-contain rounded-lg shadow"
             />
           </div>
         )}
 
-        {/* reactions row */}
         <div className="flex space-x-6 text-sm text-gray-700 mb-8">
-          {/* Favourite */}
           <button 
               onClick={() =>
                 handleToggle('favourite', favourited, setFavourited, setFavouriteCount, favouriteCount)
@@ -173,7 +164,6 @@ export default function PostModal({
             </svg>
             <span>{favouriteCount}</span>
           </button>
-          {/* Like */}
           <button 
               onClick={() =>
                 handleToggle('like', liked, setLiked, setLikeCount, likeCount)
@@ -207,9 +197,6 @@ export default function PostModal({
           </button>
         </div>
 
-        {/* ───────────────────────────────────────── */}
-        {/* Comment form */}
-        {/* ───────────────────────────────────────── */}
         <form onSubmit={handleSubmit} className="mb-6 border border-black p-3 rounded-lg space-y-2">
           <label className="block text-sm font-semibold text-black">Post Comment</label>
           <textarea
