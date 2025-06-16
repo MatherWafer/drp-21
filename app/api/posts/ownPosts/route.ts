@@ -2,8 +2,9 @@
 import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '../../../../utils/supabase/server';
-import { getUserId, sortMapping } from '../../util/backendUtils';
+import { SortType, getUserId, sortMapping } from '../../util/backendUtils';
 import { FetchedPost, filterByLocation, postSelectOptions, transformPosts } from '../util/post_util';
+import { PrismaPost } from '../feed/route';
 
 const prisma = new PrismaClient();
 
@@ -43,13 +44,13 @@ export async function GET(req: NextRequest) {
       { status: 401 }
     );
   }
-  let posts:FetchedPost[] = await prisma.post.findMany({
+  let posts = await prisma.post.findMany({
     ...postSelectOptions(userId),
-    ...sortMapping[sortType],
+    ...sortMapping[sortType as SortType],
     where: {
       profileId: userId
     }
   }
-  )
+  ) as PrismaPost[]
   return NextResponse.json({ posts: transformPosts(posts) });
 }

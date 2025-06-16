@@ -13,23 +13,28 @@ export type FetchedPost = {
   category: string;
   description: string;
   postedOn: Date;
-  imageUrl?: string | null;
+  imageUrl: string | null;
   Favourites: {
       postId: string;
   }[];
   Likes: {
       postId: string;
   }[];
+  Comments: {
+    postId: string;
+  }[];
   Dislikes: {
       postId: string;
   }[];
   creator: {
-      
+      name:string,
+      id:string
   };
   _count: {
       Likes: number,
       Dislikes: number,
-      Favourites: number
+      Favourites: number,
+      Comments: number
   };
 }
 

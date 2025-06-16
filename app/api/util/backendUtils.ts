@@ -22,9 +22,19 @@ export async function withProfileId<T extends object>(
   }
   
 
-export const sortMapping = {
-    most_recent: { orderBy: { postedOn: 'desc' } },
-    most_liked: { orderBy: [{ Likes: { _count: 'desc' } }] }, // Array syntax for multiple orderBy
-    most_comments: { orderBy: [{ Comments: { _count: 'desc' } }] }, // Array syntax for multiple orderBy
-  };
-  
+// backendUtils.ts
+import { Prisma } from '@prisma/client';
+
+export type SortType = 'most_recent' | 'most_liked' | 'most_comments';
+
+export const sortMapping: Record<SortType, { orderBy: Prisma.PostOrderByWithRelationInput | Prisma.PostOrderByWithRelationInput[] }> = {
+  most_recent: { orderBy: { postedOn: 'desc' } },
+  most_liked: { orderBy: [{ Likes: { _count: 'desc' } }] },
+  most_comments: { orderBy: [{ Comments: { _count: 'desc' } }] },
+};
+
+  export type ROIResponse  = {
+    name: string | null;
+    region: JsonValue;
+    id: string
+}

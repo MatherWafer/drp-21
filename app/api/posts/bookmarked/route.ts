@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserId, sortMapping } from '../../util/backendUtils';
 import { FetchedPost, filterByLocation, postSelectOptions, transformPosts } from '../util/post_util';
+import { PrismaPost } from '../feed/route';
 
 const prisma = new PrismaClient();
 
@@ -48,8 +49,7 @@ export async function GET(req: NextRequest) {
         default:
           return 0;
       }
-    });
-
+    }) as PrismaPost[];
   if (!filterPolygon) {
     return NextResponse.json({ posts: transformPosts(posts) });
   }

@@ -1,13 +1,20 @@
-import { PrismaClient } from '@prisma/client';
+import { Post, PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '../../../../utils/supabase/server';
-import { getUserId, sortMapping } from '../../util/backendUtils';
+import { SortType, getUserId, sortMapping } from '../../util/backendUtils';
 import { latLngEquals, } from '@vis.gl/react-google-maps';
 import { LatLng, isInside } from '../../util/geoHelpers';
 import { FetchedPost, filterByLocation, postSelectOptions, transformPosts } from '../util/post_util';
 
 const prisma = new PrismaClient();
-
+export type PrismaPost = Post & {
+  creator: { id: string; name: string };
+  _count: { Likes: number; Dislikes: number; Favourites: number; Comments: number };
+  Likes: { postId: string }[];
+  Comments: { postId: string }[];
+  Dislikes: { postId: string }[];
+  Favourites: { postId: string }[];
+};
 // New parameter in header, x-filter-polygon
 export async function GET(req: NextRequest) {
   const userId = await getUserId();
@@ -29,11 +36,10 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  let posts: FetchedPost[] = await prisma.post.findMany({
+  let posts = await prisma.post.findMany({
     ...postSelectOptions(userId),
-    ...sortMapping[sortType],
-  });
-
+    ...sortMapping[sortType as SortType],
+  }) as PrismaPost[]
   if (!filterPolygon) {
     return NextResponse.json({ posts: transformPosts(posts) });
   }

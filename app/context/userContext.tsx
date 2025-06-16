@@ -5,7 +5,6 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { LatLng } from '../api/util/geoHelpers';
 import { ROIResponse } from '../api/util/backendUtils';
 
-
 export type RoiData = {
   perimeter: LatLng[],
   radius:    number,
