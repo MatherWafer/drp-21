@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
-import PostOverview, { PostInfo } from '../user/posts/PostOverview';
-import PostMarker from './PostMarker';
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { APIProvider, Map, useMap } from '@vis.gl/react-google-maps';
 
 export interface LocationCoordinates {
   lat: number;
@@ -24,20 +24,19 @@ const SelectMapArea: React.FC<SelectMapAreaProps> = ({
   const [userLocation, setUserLocation] = useState<LocationCoordinates | null>(null);
   const [polygon, setPolygon] = useState<google.maps.Polygon | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [showHint, setShowHint] = useState(true);
 
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const coords = {
+          setUserLocation({
             lat: position.coords.latitude,
             lng: position.coords.longitude,
-          };
-          setUserLocation(coords);
+          });
         },
+        () => console.warn('Geolocation permission denied')
       );
-    } else {
-      console.warn('Geolocation not supported by this browser.');
     }
   }, []);
 
@@ -45,16 +44,37 @@ const SelectMapArea: React.FC<SelectMapAreaProps> = ({
     <APIProvider
       apiKey={apiKey}
       libraries={['drawing']}
-      onLoad={() => console.log('APIProvider loaded')}
-      onError={(error) => {
-        console.error('APIProvider error:', error);
-      }}
+      onLoad={() => setIsDrawing(true)}
     >
       <div style={{ ...containerStyle, position: 'relative' }}>
-        {/* Centered button positioned absolutely over the map */}
+        {/* Improved Hint Box */}
+        {isDrawing && showHint && (
+          <div style={{
+            position: 'absolute',
+            top: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 1,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            color: 'white',
+            padding: '12px 24px',
+            borderRadius: '8px',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
+            textAlign: 'center',
+            maxWidth: '90%',
+            fontSize: '14px',
+            backdropFilter: 'blur(2px)'
+          }}>
+            <p style={{ margin: 0 }}>
+              Press to place points outlining your region. Join it up to complete.
+            </p>
+          </div>
+        )}
+
+        {/* Control Button */}
         <div style={{ 
           position: 'absolute',
-          top: '20px',
+          top: '90px',
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 1,
@@ -64,6 +84,7 @@ const SelectMapArea: React.FC<SelectMapAreaProps> = ({
           <button
             onClick={() => { 
               setIsDrawing((prev) => !prev);
+              setShowHint(true);
               if (polygon) {
                 polygon.setMap(null); 
                 setPolygon(null);
@@ -80,10 +101,9 @@ const SelectMapArea: React.FC<SelectMapAreaProps> = ({
               fontWeight: '500',
               boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
               transition: 'all 0.3s ease',
-      
             }}
           >
-            {isDrawing ? 'Reset Area' : 'Draw Area'}
+            {isDrawing ? 'Reset Area' : 'Redraw Area'}
           </button>
         </div>
 
@@ -108,7 +128,9 @@ const SelectMapArea: React.FC<SelectMapAreaProps> = ({
             onPolyComplete(poly)
             setPolygon(poly);
             setIsDrawing(false);
+            setShowHint(false);
           }}
+          onPointAdded={() => setShowHint(false)}
         />
       </div>
     </APIProvider>
@@ -118,13 +140,25 @@ const SelectMapArea: React.FC<SelectMapAreaProps> = ({
 const PolygonDrawer: React.FC<{
   isDrawing: boolean;
   onPolygonComplete: (polygon: google.maps.Polygon) => void;
-}> = ({ isDrawing, onPolygonComplete }) => {
+  onPointAdded: () => void;
+}> = ({ isDrawing, onPolygonComplete, onPointAdded }) => {
   const map = useMap();
   const drawingManagerRef = useRef<google.maps.drawing.DrawingManager | null>(null);
+  const markersRef = useRef<google.maps.Marker[]>([]);
+  const pathListenerRef = useRef<google.maps.MapsEventListener | null>(null);
 
   useEffect(() => {
-    if (!map || !isDrawing) return;
-    
+    if (!map || !isDrawing) {
+      // Clear existing markers when not drawing
+      markersRef.current.forEach((marker) => marker.setMap(null));
+      markersRef.current = [];
+      if (pathListenerRef.current) {
+        google.maps.event.removeListener(pathListenerRef.current);
+        pathListenerRef.current = null;
+      }
+      return;
+    }
+
     const drawingManager = new google.maps.drawing.DrawingManager({
       drawingMode: google.maps.drawing.OverlayType.POLYGON,
       drawingControl: false,
@@ -134,9 +168,9 @@ const PolygonDrawer: React.FC<{
         strokeColor: '#00acc1',
         strokeWeight: 4,
         clickable: false,
-        editable: false,
+        editable: true, // Ensure editable for path listening
         zIndex: 1,
-      }
+      },
     });
 
     drawingManager.setMap(map);
@@ -150,17 +184,64 @@ const PolygonDrawer: React.FC<{
           const polygon = event.overlay as google.maps.Polygon;
           drawingManager.setDrawingMode(null);
           onPolygonComplete(polygon);
+          // Clear all markers when polygon is complete
+          markersRef.current.forEach((marker) => marker.setMap(null));
+          markersRef.current = [];
+          if (pathListenerRef.current) {
+            google.maps.event.removeListener(pathListenerRef.current);
+            pathListenerRef.current = null;
+          }
         }
       }
     );
 
+    // Listen for new vertices added to the polygon
+    google.maps.event.addListener(
+      drawingManager,
+      'polygoncomplete',
+      (polygon: google.maps.Polygon) => {
+        const path = polygon.getPath();
+        pathListenerRef.current = google.maps.event.addListener(
+          path,
+          'insert_at',
+          (index: number) => {
+            const position = path.getAt(index);
+            // Add marker at the new vertex
+            const marker = new google.maps.Marker({
+              position,
+              map: map,
+              icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 6,
+                fillColor: '#00acc1',
+                fillOpacity: 0.8,
+                strokeColor: '#ffffff',
+                strokeWeight: 2,
+              },
+            });
+            markersRef.current.push(marker);
+            onPointAdded();
+          }
+        );
+      }
+    );
+
     return () => {
-      google.maps.event.removeListener(completeListener);
-      drawingManager.setMap(null);
+      if (completeListener) {
+        google.maps.event.removeListener(completeListener);
+      }
+      if (pathListenerRef.current) {
+        google.maps.event.removeListener(pathListenerRef.current);
+      }
+      if (drawingManagerRef.current) {
+        drawingManagerRef.current.setMap(null);
+      }
+      // Clear markers on cleanup
+      markersRef.current.forEach((marker) => marker.setMap(null));
+      markersRef.current = [];
     };
-  }, [map, isDrawing, onPolygonComplete]);
+  }, [map, isDrawing, onPolygonComplete, onPointAdded]);
 
   return null;
 };
-
 export default SelectMapArea;
