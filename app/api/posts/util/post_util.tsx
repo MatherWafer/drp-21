@@ -50,7 +50,8 @@ export const postSelectOptions = (userId:string) =>  ({
           select: {
             Likes: true,
             Dislikes: true,
-            Favourites: true
+            Favourites: true,
+            Comments: true
           }
         },
         Likes: {
