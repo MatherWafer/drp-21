@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -19,7 +20,7 @@ const SelectMapArea: React.FC<SelectMapAreaProps> = ({
   onPolyComplete,
   initialLocation = { lat: 51.512409, lng: -0.125146 },
   apiKey,
-  containerStyle = { height: '100%', width: '100%' }
+  containerStyle = { height: '100%', width: '100%' },
 }) => {
   const [userLocation, setUserLocation] = useState<LocationCoordinates | null>(null);
   const [polygon, setPolygon] = useState<google.maps.Polygon | null>(null);
@@ -46,92 +47,61 @@ const SelectMapArea: React.FC<SelectMapAreaProps> = ({
       libraries={['drawing']}
       onLoad={() => setIsDrawing(true)}
     >
-      <div style={{ ...containerStyle, position: 'relative' }}>
-        {/* Improved Hint Box */}
+      <div className="flex flex-col w-full h-full">
         {isDrawing && showHint && (
-          <div style={{
-            position: 'absolute',
-            top: '20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 1,
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            color: 'white',
-            padding: '12px 24px',
-            borderRadius: '8px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
-            textAlign: 'center',
-            maxWidth: '90%',
-            fontSize: '14px',
-            backdropFilter: 'blur(2px)'
-          }}>
-            <p style={{ margin: 0 }}>
+          <div    className="z-10 px-4 py-4 bg-teal-600 text-white rounded  text-center">
+            <p className="text-sm sm:text-base m-0">
               Press to place points outlining your region. Join it up to complete.
             </p>
           </div>
         )}
 
-        {/* Control Button */}
-        <div style={{ 
-          position: 'absolute',
-          top: '90px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 1,
-          display: 'flex',
-          justifyContent: 'center'
-        }}>
-          <button
-            onClick={() => { 
-              setIsDrawing((prev) => !prev);
-              setShowHint(true);
-              if (polygon) {
-                polygon.setMap(null); 
-                setPolygon(null);
-              }
-            }}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: isDrawing ? '#00c853' : '#4285f4',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '500',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
-              transition: 'all 0.3s ease',
-            }}
+        {/* Map Container */}
+        <div style={{ ...containerStyle, position: 'relative' }}>
+          {/* Control Button */}
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 flex justify-center">
+            <button
+              onClick={() => {
+                setIsDrawing((prev) => !prev);
+                setShowHint(true);
+                if (polygon) {
+                  polygon.setMap(null);
+                  setPolygon(null);
+                }
+              }}
+              className={`px-5 py-2 text-white rounded-lg shadow-md text-sm font-medium transition-all duration-300 ${
+                isDrawing ? 'bg-green-500 hover:bg-green-400' : 'bg-blue-500 hover:bg-blue-400'
+              }`}
+            >
+              {isDrawing ? 'Reset Area' : 'Redraw Area'}
+            </button>
+          </div>
+
+          <Map
+            zoomControl={true}
+            scrollwheel={true}
+            defaultZoom={13}
+            gestureHandling="greedy"
+            defaultCenter={initialLocation}
+            mapId="a2bc871f26d67c06e4448720"
+            style={{ width: '100%', height: '100%' }}
+            mapTypeControl={false}
           >
-            {isDrawing ? 'Reset Area' : 'Redraw Area'}
-          </button>
+            <PolygonDrawer
+              isDrawing={isDrawing}
+              onPolygonComplete={(poly) => {
+                if (polygon) {
+                  polygon.setMap(null);
+                }
+                onPolyComplete(poly);
+                setPolygon(poly);
+                setIsDrawing(false);
+                setShowHint(false);
+              }}
+              onPointAdded={() => setShowHint(false)}
+            />
+          </Map>
         </div>
-
-        <Map
-          zoomControl={true}
-          scrollwheel={true}
-          defaultZoom={13}
-          gestureHandling="greedy"
-          defaultCenter={initialLocation}
-          mapId="a2bc871f26d67c06e4448720"
-          style={{ width: '100%', height: '100%' }}
-          mapTypeControl={false}
-        >
-        </Map>
-
-        <PolygonDrawer
-          isDrawing={isDrawing}
-          onPolygonComplete={(poly) => {
-            if (polygon) {
-              polygon.setMap(null); 
-            }
-            onPolyComplete(poly)
-            setPolygon(poly);
-            setIsDrawing(false);
-            setShowHint(false);
-          }}
-          onPointAdded={() => setShowHint(false)}
-        />
       </div>
     </APIProvider>
   );
@@ -168,7 +138,7 @@ const PolygonDrawer: React.FC<{
         strokeColor: '#00acc1',
         strokeWeight: 4,
         clickable: false,
-        editable: true, // Ensure editable for path listening
+        editable: true,
         zIndex: 1,
       },
     });
@@ -244,4 +214,5 @@ const PolygonDrawer: React.FC<{
 
   return null;
 };
+
 export default SelectMapArea;
