@@ -37,9 +37,9 @@ export const PostFeed: React.FC<PostFeedProps> =  ({
   );
   const pathname = usePathname();
 
-  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
-  const openModal = (post: PostInfo) => setSelectedPostId(post.id);
-  const closeModal = () => setSelectedPostId(null);
+  const [selectedPostInfo, setSelectedPostInfo] = useState<PostInfo | null>(null);
+  const openModal = (post: PostInfo) => setSelectedPostInfo(post);
+  const closeModal = () => setSelectedPostInfo(null);
   
   
   return (
@@ -63,7 +63,7 @@ export const PostFeed: React.FC<PostFeedProps> =  ({
         ) : (
           <>
             <PostStream posts={data.posts as PostInfo[]} onPostClick={openModal} />
-            {selectedPostId && <PostModal postId={selectedPostId} onClose={closeModal} />}
+            {selectedPostInfo && <PostModal info={selectedPostInfo} onClose={closeModal} />}
           </>
         )}
       </div>

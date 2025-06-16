@@ -20,38 +20,28 @@ export type CommentInfo = {
 };
 
 export default function PostModal({ 
-  postId, 
+  info, 
   onClose 
 }: { 
-  postId: String, 
+  info: PostInfo, 
   onClose: () => void 
 }) {
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
-  const { data: post, isLoading } = useSWR<PostInfo>(`/api/posts/${postId}`, fetcher);
+  const { data: post, isLoading } = useSWR<PostInfo>(`/api/posts/${info.id}`, fetcher);
 
   
   const [comments, setComments] = useState<CommentInfo[]>([]);
   const [newComment, setNewComment] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
-  const [liked, setLiked] = useState(false);
-  const [disliked, setDisliked] = useState(false);
-  const [favourited, setFavourited] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
-  const [dislikeCount, setDislikeCount] = useState(0);
-  const [favouriteCount, setFavouriteCount] = useState(0);
+  const [liked, setLiked] = useState(info.hasLiked);
+  const [disliked, setDisliked] = useState(info.hasDisliked);
+  const [favourited, setFavourited] = useState(info.hasFavourited);
+  const [likeCount, setLikeCount] = useState(info.likeCount);
+  const [dislikeCount, setDislikeCount] = useState(info.dislikeCount);
+  const [favouriteCount, setFavouriteCount] = useState(info.favouriteCount);
 
-  useEffect(() => {
-    if (!post) return;
-    setLiked(post.hasLiked);
-    setDisliked(post.hasDisliked);
-    setFavourited(post.hasFavourited);
-    setLikeCount(post.likeCount);
-    setDislikeCount(post.dislikeCount);
-    setFavouriteCount(post.favouriteCount);
-  }, [post]);
 
-  
   /* -------------------------------------------------------------
   * Initial fetch – grab all existing comments (incl. authors) for the post.
   * -----------------------------------------------------------*/
@@ -88,6 +78,18 @@ export default function PostModal({
         method: isActive ? 'DELETE' : 'POST',
         body: JSON.stringify({ postId: post.id }),
       });
+
+      if (type == 'like') {
+        if(disliked) {
+          await handleToggle("dislike",true, setDisliked, setDislikeCount, dislikeCount)
+        }
+      }
+      else if (type == 'dislike') {
+        if(liked) {
+          await handleToggle("like",true, setLiked, setLikeCount, likeCount)
+        }
+      }
+
       if (response.ok) {
         setActive(!isActive);
         setCount(isActive ? count - 1 : count + 1);

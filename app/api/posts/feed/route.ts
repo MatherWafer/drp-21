@@ -19,6 +19,8 @@ export async function GET(req: NextRequest) {
       { status: 401 }
     );
   }
+
+  console.log("AEFIm")
   const filterPolygon = (req.headers.get('x-filter-roi') ?? '').toLowerCase() === 'true';
   let posts: FetchedPost[] = await prisma.post.findMany(
     postSelectOptions(userId)
