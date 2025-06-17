@@ -18,6 +18,7 @@ export default function Ask() {
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
   const [namespace, setNamespace] = useState('');
+  const [uploading, setUploading] = useState(false)
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
@@ -68,7 +69,7 @@ export default function Ask() {
       alert('Your post needs a title and location');
       return;
     }
-    console.log('file:', file);
+    setUploading(true)
     let imageUrl: string | null = null;
     if (file) {
       try {
@@ -93,6 +94,7 @@ export default function Ask() {
       setTimeout(() => router.push('/'), 1000); // Redirect after showing success
     } else {
       alert('Failed to create post');
+      setUploading(false)
     }
   };
 
@@ -194,9 +196,9 @@ export default function Ask() {
           </div>
           <button
             onClick={makePost}
-            disabled={isUploading}
+            disabled={uploading}
             className="w-full px-4 py-3 bg-emerald-600 text-white rounded-lg shadow hover:bg-emerald-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+          >n
             {isUploading ? 'Uploading...' : 'Submit Post'}
           </button>
         </div>
