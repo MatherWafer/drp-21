@@ -163,7 +163,7 @@ export const PostFeed: React.FC<PostFeedProps> = ({
               href="/create"
               className="inline-block px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-full hover:bg-teal-500 transition-colors duration-200"
             >
-              Start a post
+              Make a post
             </Link>
           </div>
         ) : (
