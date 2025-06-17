@@ -53,10 +53,19 @@ export default function RootLayout({
         >
           <UserProvider>
             <CategoryProvider>
-              {/* Header and Filters */}
-              <div className="w-full z-50">
-                {/* Floating Filters in Lozenge */}
-                <div className="fixed top-4 left-1/2 -translate-x-1/2 w-full md:w-auto bg-teal-900/95 backdrop-blur-sm rounded-full p-2 flex flex-row gap-2 shadow-lg z-50 overflow-visible">
+              {/* Slim White Header with Title */}
+              <header className="w-full bg-white text-black fixed top-0 left-0 z-50 shadow-md border-b-3 border-teal-500">
+                <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-center">
+                  <h1 className="text-xl md:text-2xl font-bold">
+                    Explore Local Ideas
+                  </h1>
+                </div>
+              </header>
+
+              {/* Main content with map and overlaying lozenges */}
+              <main className="flex-1 overflow-y-auto relative">
+                {/* Floating Filters in Lozenge, overlaying the map */}
+                <div className="absolute top-15 left-1/2 -translate-x-1/2 w-[95%] md:w-auto bg-teal-900/95 backdrop-blur-sm rounded-full p-1 flex flex-row gap-2 shadow-lg z-50">
                   <div className="w-1/2 md:w-44">
                     <FilterToggle />
                   </div>
@@ -64,10 +73,7 @@ export default function RootLayout({
                     <CategoryDropdown />
                   </div>
                 </div>
-              </div>
-
-              {/* Main content */}
-              <main className="flex-1 overflow-y-auto">
+                {/* Map view and other content */}
                 {children}
               </main>
 
@@ -86,6 +92,7 @@ export default function RootLayout({
       </html>
     );
   }
+
   // 📄 OTHER PAGES — standard layout
   return (
     <html lang="en" className="dark h-full">
@@ -99,11 +106,14 @@ export default function RootLayout({
             <main className="flex-1 overflow-y-auto">
               {children}
             </main>
-            
+
             {/* Footer */}
-            <div className="w-full pb-4" style={{
-              paddingBottom: 'calc(env(safe-area-inset-bottom, 0px))'
-            }}>
+            <div
+              className="w-full pb-4"
+              style={{
+                paddingBottom: 'calc(env(safe-area-inset-bottom, 0px))',
+              }}
+            >
               <Footer />
             </div>
           </CategoryProvider>
