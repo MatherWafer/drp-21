@@ -31,13 +31,16 @@ const WelcomeRoiPage = () => {
     <div className="min-h-screen bg-teal-900 text-white flex flex-col items-center justify-center p-6">
       <div className="max-w-4xl w-full bg-white rounded-lg shadow-md p-8">
         <h1 className="text-3xl font-bold text-emerald-900 mb-6 text-center">
-          Welcome to ChangeMaker! Connect with Issues That Matter to You
+          Welcome to ChangeMaker!
         </h1>
         
+        <h2 className="text-2xl font-bold text-emerald-900 mb-6 text-center">
+          Connect with issues that matter to you.
+        </h2>
         <p className="text-emerald-800 text-lg mb-8 text-center">
-          Discover and engage with local issues that impact your community. Select a region of interest to see relevant posts in the area and make a difference where it counts. You can update this anytime in your profile.
+          Select a region of interest to see relevant posts in the area and make a difference where it counts.
         </p>
-
+    
         {/* ROI Selector */}
         {showRoiSelector && (
           <div className="mb-8">

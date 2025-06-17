@@ -9,9 +9,10 @@ const SelectRoiPage = () => {
   const [poly, setPoly] = useState<google.maps.MVCArray<google.maps.LatLng>>();
   const [showModal, setShowModal] = useState(false);
   const [regionName, setRegionName] = useState('');
+  const [uploadingRegion, setUploadingRegion] = useState(false)
   const router = useRouter();
   const GOOGLE_MAPS_API_KEY = "AIzaSyCGTpExS27yGMpb0fccyQltC1xQe9R6NVY";
-  const { loadProfile, setInterestRegions, interestRegions } = useUser();
+  const { loadProfile } = useUser();
 
   const handlePolyComplete = (p: google.maps.Polygon) => {
     setPoly(p.getPath());
@@ -30,7 +31,7 @@ const SelectRoiPage = () => {
       alert("Please enter a name for the region.");
       return;
     }
-
+    setUploadingRegion(true)
     const res = await fetch("/api/select-roi", {
       method: "POST",
       body: JSON.stringify({
@@ -44,6 +45,7 @@ const SelectRoiPage = () => {
       router.push("/");
     } else {
       alert("Failed to save region.");
+      setUploadingRegion(false)
     }
   };
 
@@ -79,8 +81,9 @@ const SelectRoiPage = () => {
                 Cancel
               </button>
               <button
-                className="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600"
+                className="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={confirmSave}
+                disabled={uploadingRegion}
               >
                 Save
               </button>
