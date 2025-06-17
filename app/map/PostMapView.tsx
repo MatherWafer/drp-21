@@ -1,11 +1,10 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { APIProvider, Map, Marker, useMap } from '@vis.gl/react-google-maps';
 import PostOverview, { PostInfo } from '../user/posts/PostOverview';
 import PostMarker from './PostMarker';
 import { useFiltered } from '../user/posts/FilterContext';
 import { LatLng } from '../api/util/geoHelpers';
 import { RoiData, useUser } from '../context/userContext';
-import { parsePostsResponse } from '../../components/PostFeed';
 
 export interface LocationCoordinates {
   lat: number;
@@ -16,6 +15,10 @@ interface RegionPolygonProps {
   region: LatLng[];
   name: string;
   onClick?: () => void;
+}
+
+const maxLikes = (posts: PostInfo[]): number => {
+  return Math.max(...posts.map(post => post.likeCount))
 }
 
 const computeCentroid = (coords: LatLng[]): LatLng => {
@@ -101,7 +104,7 @@ const PostMapView: React.FC<PostMapViewProps> = ({
   const [focusedPost, setFocusedPost] = useState<PostInfo>();
   const [userLocation, setUserLocation] = useState<LocationCoordinates | null>(null);
   const alertRef = useRef<HTMLDivElement>(null);
-
+  const highestLikes = useMemo(() => maxLikes(posts),[posts])
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -196,7 +199,7 @@ useEffect(() => {
             {posts
               .filter((post) => category === 'None' || category === post.category)
               .map((post) => (
-                <PostMarker setter={setFocusedPost} key={post.id} post={post} />
+                <PostMarker setter={setFocusedPost} key={post.id} post={post} maxLikes ={highestLikes} />
               ))}
             {
               interestRegion && interestRegion.map(({perimeter, name},index) =>       
