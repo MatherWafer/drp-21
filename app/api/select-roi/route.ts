@@ -7,7 +7,7 @@ import { Prisma } from '@prisma/client';
 import { LatLng } from '../util/geoHelpers';
 
 
-export function latLngArrayToGeometry(coordinates: LatLng[]): Prisma.Sql {
+function latLngArrayToGeometry(coordinates: LatLng[]): Prisma.Sql {
   // Validate input
 
   // Ensure the polygon is closed by appending the first point if necessary
