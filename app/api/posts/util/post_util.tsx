@@ -93,7 +93,8 @@ export const transformPosts = (posts:FetchedPost[]) => posts.map(post => ({
     dislikeCount: post._count.Dislikes,
     hasDisliked: post.Dislikes.length > 0,
     favouriteCount: post._count.Favourites,
-    hasFavourited: post.Favourites.length > 0
+    hasFavourited: post.Favourites.length > 0,
+    commentCount: post._count.Comments,
   }));
 
 

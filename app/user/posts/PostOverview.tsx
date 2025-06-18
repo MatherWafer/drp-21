@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Post, Profile } from '@prisma/client';
-import { parseCookies } from 'nookies';
 import { format, isThisYear } from 'date-fns';
+import { useUser } from '../../context/userContext';
+import { createClient } from '@supabase/supabase-js';
 
 export type PostInfo = {
   id: string;
@@ -23,7 +24,7 @@ export type PostInfo = {
   hasLiked: boolean;
   dislikeCount: number;
   hasDisliked: boolean;
-  commentCount: number; // Added commentCount
+  commentCount: number;
   imageUrl?: string | null;
 };
 
@@ -40,63 +41,218 @@ export default function PostOverview({ post }: { post: PostInfo }) {
   const [currentDislikeCount, setCurrentDislikeCount] = useState(post.dislikeCount);
   const [favourited, setFavourited] = useState(post.hasFavourited);
   const [currentFavouriteCount, setCurrentFavouriteCount] = useState(post.favouriteCount);
+  const [pendingLike, setPendingLike] = useState<boolean | null>(null);
+  const [pendingDislike, setPendingDislike] = useState<boolean | null>(null);
+  const [pendingFavourite, setPendingFavourite] = useState<boolean | null>(null);
+  const  currentUserId: string | null = useUser().id
+
+  useEffect(() => {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL as string,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
+    );
+    // Like subscription
+    const likeChannel = supabase
+      .channel(`post-likes-${post.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'Like',
+          filter: `postId=eq.${post.id}`,
+        },
+        (payload) => {
+          if (payload.errors) {
+            console.error(`[${new Date().toISOString()}] Like event errors:`, payload.errors);
+            return;
+          }
+          const profileId = payload.eventType === 'INSERT' ? payload.new.profileId : payload.old.profileId;
+          if (currentUserId && profileId === currentUserId) {
+            setLiked(!liked)
+          }
+  
+          if (payload.eventType === 'INSERT') {
+            setCurrentLikeCount((prev) => prev + 1);
+          } else if (payload.eventType === 'DELETE') {
+            setCurrentLikeCount((prev) => Math.max(prev - 1, 0));
+          }
+        }
+      )
+      .subscribe((status, error) => {
+        if (status === 'SUBSCRIBED') {
+          console.log(`[${new Date().toISOString()}] Subscribed to likes for post ${post.id}`);
+        }
+        if (error) console.error(`[${new Date().toISOString()}] Like channel error:`, error);
+      });
+
+    // Dislike subscription
+    const dislikeChannel = supabase
+      .channel(`post-dislikes-${post.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'Dislike',
+          filter: `postId=eq.${post.id}`,
+        },
+        (payload) => {
+          if (payload.errors) {
+            console.error(`[${new Date().toISOString()}] Dislike event errors:`, payload.errors);
+            return;
+          }
+          const profileId = payload.eventType === 'INSERT' ? payload.new.profileId : payload.old.profileId;
+          if (currentUserId && profileId === currentUserId) {
+            return;
+          }
+          if (payload.eventType === 'INSERT') {
+            setCurrentDislikeCount((prev) => prev + 1);
+          } else if (payload.eventType === 'DELETE') {
+            setCurrentDislikeCount((prev) => Math.max(prev - 1, 0));
+          }
+        }
+      )
+      .subscribe((status, error) => {
+        if (status === 'SUBSCRIBED') {
+          console.log(`[${new Date().toISOString()}] Subscribed to dislikes for post ${post.id}`);
+        }
+        if (error) console.error(`[${new Date().toISOString()}] Dislike channel error:`, error);
+      });
+
+    // Favourite subscription
+    const favouriteChannel = supabase
+      .channel(`post-favourites-${post.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'Favourite',
+          filter: `postId=eq.${post.id}`,
+        },
+        (payload) => {
+          if (payload.errors) {
+            console.error(`[${new Date().toISOString()}] Favourite event errors:`, payload.errors);
+            return;
+          }
+          const profileId = payload.eventType === 'INSERT' ? payload.new.profileId : payload.old.profileId;
+          if (currentUserId && profileId === currentUserId) {
+            return;
+          }
+          if (payload.eventType === 'INSERT') {
+            setCurrentFavouriteCount((prev) => prev + 1);
+          } else if (payload.eventType === 'DELETE') {
+            setCurrentFavouriteCount((prev) => Math.max(prev - 1, 0));
+          }
+        }
+      )
+      .subscribe((status, error) => {
+        if (status === 'SUBSCRIBED') {
+          console.log(`[${new Date().toISOString()}] Subscribed to favourites for post ${post.id}`);
+        }
+        if (error) console.error(`[${new Date().toISOString()}] Favourite channel error:`, error);
+      });
+
+    return () => {
+      console.log(`[${new Date().toISOString()}] Unsubscribing from channels for post ${post.id}`);
+      supabase.removeChannel(likeChannel);
+      supabase.removeChannel(dislikeChannel);
+      supabase.removeChannel(favouriteChannel);
+    };
+  }, [post.id]);
 
   const handleLike = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent modal trigger
+    e.stopPropagation();
+    if (pendingLike !== null) return;
+
+    const optimisticLiked = !liked;
+    const optimisticCount = liked ? currentLikeCount - 1 : currentLikeCount + 1;
+    setPendingLike(optimisticLiked);
+    setLiked(optimisticLiked);
+    setCurrentLikeCount(optimisticCount);
+
     try {
-      setLiked(!liked);
-      setCurrentLikeCount(liked ? currentLikeCount - 1 : currentLikeCount + 1);
       const response = await fetch(`/api/posts/${post.id}/like`, {
         method: liked ? 'DELETE' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ postId: post.id }),
       });
 
-      if (!response.ok) throw new Error('Failed to update like');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Failed to update like: ${errorData.message || response.statusText}`);
+      }
     } catch (error) {
-      console.error('Error updating like:', error);
-      setLiked(!liked);
-      setCurrentLikeCount(liked ? currentLikeCount - 1 : currentLikeCount + 1);
+      console.error(`[${new Date().toISOString()}] Error updating like:`, error);
+      setLiked(liked);
+      setCurrentLikeCount(liked ? currentLikeCount + 1 : currentLikeCount - 1);
+    } finally {
+      setPendingLike(null);
     }
   };
 
   const handleDislike = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent modal trigger
+    e.stopPropagation();
+    if (pendingDislike !== null) return;
+
+    const optimisticDisliked = !disliked;
+    const optimisticCount = disliked ? currentDislikeCount - 1 : currentDislikeCount + 1;
+    setPendingDislike(optimisticDisliked);
+    setDisliked(optimisticDisliked);
+    setCurrentDislikeCount(optimisticCount);
+
     try {
-      setDisliked(!disliked);
-      setCurrentDislikeCount(disliked ? currentDislikeCount - 1 : currentDislikeCount + 1);
       const response = await fetch(`/api/posts/${post.id}/dislike`, {
         method: disliked ? 'DELETE' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ postId: post.id }),
       });
 
-      if (!response.ok) throw new Error('Failed to update dislike');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Failed to update dislike: ${errorData.message || response.statusText}`);
+      }
     } catch (error) {
-      console.error('Error updating dislike:', error);
-      setDisliked(!disliked);
-      setCurrentDislikeCount(disliked ? currentDislikeCount - 1 : currentDislikeCount + 1);
+      console.error(`[${new Date().toISOString()}] Error updating dislike:`, error);
+      setDisliked(disliked);
+      setCurrentDislikeCount(disliked ? currentDislikeCount + 1 : currentDislikeCount - 1);
+    } finally {
+      setPendingDislike(null);
     }
   };
 
   const handleFavourite = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent modal trigger
+    e.stopPropagation();
+    if (pendingFavourite !== null) return;
+
+    const optimisticFavourited = !favourited;
+    const optimisticCount = favourited ? currentFavouriteCount - 1 : currentFavouriteCount + 1;
+    setPendingFavourite(optimisticFavourited);
+    setFavourited(optimisticFavourited);
+    setCurrentFavouriteCount(optimisticCount);
+
     try {
-      setFavourited(!favourited);
-      setCurrentFavouriteCount(favourited ? currentFavouriteCount - 1 : currentFavouriteCount + 1);
       const response = await fetch(`/api/posts/${post.id}/favourite`, {
         method: favourited ? 'DELETE' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ postId: post.id }),
       });
 
-      if (!response.ok) throw new Error('Failed to update favourite');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Failed to update favourite: ${errorData.message || response.statusText}`);
+      }
     } catch (error) {
-      console.error('Error updating favourite:', error);
-      setFavourited(!favourited);
-      setCurrentFavouriteCount(favourited ? currentFavouriteCount - 1 : currentFavouriteCount + 1);
+      console.error(`[${new Date().toISOString()}] Error updating favourite:`, error);
+      setFavourited(favourited);
+      setCurrentFavouriteCount(favourited ? currentFavouriteCount + 1 : currentFavouriteCount - 1);
+    } finally {
+      setPendingFavourite(null);
     }
   };
 
   const handleOpenModal = (e: React.MouseEvent) => {
-    // Placeholder for modal trigger; implement in parent or via state management
     console.log(`Opening modal for post ${post.id}`);
   };
 
@@ -107,9 +263,7 @@ export default function PostOverview({ post }: { post: PostInfo }) {
       onClick={handleOpenModal}
     >
       <div className="flex justify-between items-start mb-4 border-b border-emerald-300 pb-2">
-        <h3 className="text-xl font-bold text-emerald-900 tracking-normal">
-          {post.title}
-        </h3>
+        <h3 className="text-xl font-bold text-emerald-900 tracking-normal">{post.title}</h3>
         <div className="flex flex-col items-end">
           <span className="text-sm font-medium text-gray-700">By {post.creator.name}</span>
           <span className="text-sm text-emerald-600">{formatSmartDate(post.postedOn)}</span>
@@ -120,17 +274,30 @@ export default function PostOverview({ post }: { post: PostInfo }) {
         {post.category}
       </p>
 
-      <p
-        className="text-sm text-emerald-900 mb-4 p-1 rounded hover:bg-emerald-50 transition-colors"
-      >
+      <p className="text-sm text-emerald-900 mb-4 p-1 rounded hover:bg-emerald-50 transition-colors">
         {post.description}
       </p>
 
       <div className="flex justify-between items-center mb-2 border-t border-emerald-300 pt-2">
         <div className="flex items-center text-sm sm:text-base font-medium text-gray-700 bg-white p-2 sm:p-1 rounded shadow-sm">
-          <svg className="w-4 h-4 mr-2 sm:mr-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          <svg
+            className="w-4 h-4 mr-2 sm:mr-1 text-emerald-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+            />
           </svg>
           <span>{post.locationText.split(',').slice(0, 2).join(',')}</span>
         </div>

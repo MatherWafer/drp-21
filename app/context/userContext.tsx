@@ -58,7 +58,8 @@ const UserContext = createContext<
 {
   userLoaded: boolean
   displayName: string | null,
-  interestRegions: RoiData[]
+  interestRegions: RoiData[],
+  id: string | null,
   loadProfile:  (() => Promise<void> )| null
   setInterestRegions: Dispatch<SetStateAction<RoiData[]>>
 }
@@ -67,6 +68,7 @@ const UserContext = createContext<
   displayName: null,
   interestRegions: [defaultRoiData],
   loadProfile: null,
+  id: null,
   setInterestRegions: () => {}
 });
 
@@ -81,6 +83,7 @@ const loadProfile = async (
   setDisplayName: Dispatch<SetStateAction<string | null>>, 
   setInterestRegion: Dispatch<SetStateAction<RoiData[]>>,
   setUserLoaded: Dispatch<SetStateAction<boolean>>,
+  setId: Dispatch<SetStateAction<string | null>>
   ) => {
   const supabase = createClientComponentClient();
   const data = await supabase.auth.getUser();
@@ -94,6 +97,7 @@ const loadProfile = async (
   }
   if(res){
     body.interestRegion && setInterestRegion(regionDatas)
+    setId(body.id)
     setUserLoaded(true)
   }
 }
@@ -101,12 +105,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [interestRegions, setInterestRegions] = useState<RoiData[]>([defaultRoiData])
   const [userLoaded, setUserLoaded] = useState<boolean>(false);
+  const [id, setId] = useState<string | null>(null);
   useEffect(() => {
-    loadProfile(setDisplayName, setInterestRegions, setUserLoaded);
+    loadProfile(setDisplayName, setInterestRegions, setUserLoaded, setId);
   }, []);
 
   return (
-    <UserContext.Provider value={{ userLoaded, setInterestRegions, displayName, interestRegions:interestRegions, loadProfile:() => loadProfile(setDisplayName, setInterestRegions, setUserLoaded)}}>
+    <UserContext.Provider value={{ userLoaded, setInterestRegions, id, displayName, interestRegions:interestRegions, loadProfile:() => loadProfile(setDisplayName, setInterestRegions, setUserLoaded, setId)}}>
       {children}
     </UserContext.Provider>
   );
