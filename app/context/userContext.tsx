@@ -90,7 +90,7 @@ const loadProfile = async (
   const body = await res.json()
   let regionDatas = [defaultRoiData]
   if(body.interestRegion) {
-    regionDatas = (body.interestRegion as ROIResponse[]).map(rd => getRoiData(rd.region as LatLng[], rd.id, rd.name ? rd.name : ''))
+    regionDatas = (body.interestRegion as ROIResponse[]).map(rd => getRoiData(rd.regionJson as LatLng[], rd.id, rd.name ? rd.name : ''))
   }
   if(res){
     body.interestRegion && setInterestRegion(regionDatas)

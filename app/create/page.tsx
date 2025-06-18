@@ -198,7 +198,7 @@ export default function Ask() {
             onClick={makePost}
             disabled={uploading}
             className="w-full px-4 py-3 bg-emerald-600 text-white rounded-lg shadow hover:bg-emerald-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-          >n
+          >
             {isUploading ? 'Uploading...' : 'Submit Post'}
           </button>
         </div>

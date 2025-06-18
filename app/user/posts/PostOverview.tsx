@@ -43,6 +43,8 @@ export default function PostOverview({ post }: { post: PostInfo }) {
 
   const handleLike = async () => {
     try {
+      setLiked(!liked);
+      setCurrentLikeCount(liked ? currentLikeCount - 1 : currentLikeCount + 1);
       const response = await fetch(`/api/posts/${post.id}/like`, {
         method: liked ? 'DELETE' : 'POST',
         body: JSON.stringify({
@@ -51,16 +53,18 @@ export default function PostOverview({ post }: { post: PostInfo }) {
       });
 
       if (response.ok) {
-        setLiked(!liked);
-        setCurrentLikeCount(liked ? currentLikeCount - 1 : currentLikeCount + 1);
       }
     } catch (error) {
       console.error('Error updating like:', error);
+      setLiked(!liked);
+      setCurrentLikeCount(liked ? currentLikeCount - 1 : currentLikeCount + 1);
     }
   };
 
   const handleDislike = async () => {
     try {
+      setDisliked(!disliked);
+      setCurrentDislikeCount(disliked ? currentDislikeCount - 1 : currentDislikeCount + 1);
       const response = await fetch(`/api/posts/${post.id}/dislike`, {
         method: disliked ? 'DELETE' : 'POST',
         body: JSON.stringify({
@@ -69,16 +73,18 @@ export default function PostOverview({ post }: { post: PostInfo }) {
       });
 
       if (response.ok) {
-        setDisliked(!disliked);
-        setCurrentDislikeCount(disliked ? currentDislikeCount - 1 : currentDislikeCount + 1);
       }
     } catch (error) {
       console.error('Error updating dislike:', error);
+      setDisliked(!disliked);
+      setCurrentDislikeCount(disliked ? currentDislikeCount - 1 : currentDislikeCount + 1);
     }
   };
 
   const handleFavourite = async () => {
     try {
+      setFavourited(!favourited);
+      setCurrentFavouriteCount(favourited ? currentFavouriteCount - 1 : currentFavouriteCount + 1);
       const response = await fetch(`/api/posts/${post.id}/favourite`, {
         method: favourited ? 'DELETE' : 'POST',
         body: JSON.stringify({
@@ -87,11 +93,12 @@ export default function PostOverview({ post }: { post: PostInfo }) {
       });
 
       if (response.ok) {
-        setFavourited(!favourited);
-        setCurrentFavouriteCount(favourited ? currentFavouriteCount - 1 : currentFavouriteCount + 1);
+  
       }
     } catch (error) {
       console.error('Error updating favourite:', error);
+      setFavourited(!favourited);
+      setCurrentFavouriteCount(favourited ? currentFavouriteCount - 1 : currentFavouriteCount + 1);
     }
   };
 

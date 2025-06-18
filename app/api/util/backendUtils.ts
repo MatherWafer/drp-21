@@ -24,16 +24,17 @@ export async function withProfileId<T extends object>(
 
 // backendUtils.ts
 import { Prisma } from '@prisma/client';
+import { LatLng } from "./geoHelpers"
 
 export type SortType = 'most_recent' | 'most_liked' | 'most_comments';
 
-export const sortMapping: Record<SortType, { orderBy: Prisma.PostOrderByWithRelationInput | Prisma.PostOrderByWithRelationInput[] }> = {
-  most_recent: { orderBy: { postedOn: 'desc' } },
-  most_liked: { orderBy: [{ Likes: { _count: 'desc' } }] },
-  most_comments: { orderBy: [{ Comments: { _count: 'desc' } }] },
+export const sortMapping: Record<SortType, { orderBy: string }> = {
+  most_recent: { orderBy: 'p."postedOn"' },
+  most_liked: { orderBy: '(SELECT COUNT(*) FROM "Like" l WHERE l."postId" = p.id)' },
+  most_comments: { orderBy: '(SELECT COUNT(*) FROM "Comment" cm WHERE cm."postId" = p.id)' },
 };
-
   export type ROIResponse  = {
+    regionJson: LatLng[]
     name: string | null;
     region: JsonValue;
     id: string

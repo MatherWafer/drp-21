@@ -216,9 +216,7 @@ export default function PostModal({
           </button>
         </form>
 
-        {/* ───────────────────────────────────────── */}
-        {/* Comments list (no independent scrollbar) */}
-        {/* ───────────────────────────────────────── */}
+ 
         <section>
           <h4 className="text-lg font-semibold mb-4">
             <span className="text-gray-500">Comments ({comments.length})</span>

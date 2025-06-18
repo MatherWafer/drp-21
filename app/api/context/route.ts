@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
         name:true,
         InterestRegions: {
           select: {
-            region: true,
+            regionJson: true,
             name: true,
             id: true,
           }

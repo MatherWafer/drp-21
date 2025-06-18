@@ -1,24 +1,10 @@
 generator client {
-  provider             = "prisma-client-js"
-  interface            = "sync"
-  recursive_type_depth = "-1"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-}
-
-model Profile {
-  id              String           @id @db.Uuid
-  name            String
-  Comments        Comment[]
-  Dislikes        Dislike[]
-  Favourites      Favourite[]
-  InterestRegions InterestRegion[]
-  Likes           Like[]
-  Posts           Post[]
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Post {
@@ -39,11 +25,33 @@ model Post {
   creator      Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
+model InterestRegion {
+  profileId  String                   @db.Uuid
+  id         String                   @id @default(uuid())
+  name       String?
+  region     Unsupported("geometry")?
+  regionJson Json?
+  user       Profile                  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([region], map: "interest_region_temp_idx", type: Gist)
+}
+
+model Profile {
+  id              String           @id @default(uuid()) @db.Uuid
+  name            String
+  Comments        Comment[]
+  Dislikes        Dislike[]
+  Favourites      Favourite[]
+  InterestRegions InterestRegion[]
+  Likes           Like[]
+  Posts           Post[]
+}
+
 model Like {
   postId    String  @db.Uuid
   profileId String  @db.Uuid
   post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user      Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@id([postId, profileId])
 }
@@ -52,7 +60,16 @@ model Dislike {
   postId    String  @db.Uuid
   profileId String  @db.Uuid
   post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user      Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@id([postId, profileId])
+}
+
+model Favourite {
+  postId    String  @db.Uuid
+  profileId String  @db.Uuid
+  post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@id([postId, profileId])
 }
@@ -64,22 +81,15 @@ model Comment {
   content   String
   createdAt DateTime @default(now())
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user      Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
-model InterestRegion {
-  profileId String  @db.Uuid
-  region    Json
-  id        String  @id @default(uuid())
-  name      String?
-  user      Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-}
+model Test_InterestRegion {
+  id          String                   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  profileId   String?                  @db.Uuid
+  region      Json?
+  name        String?                  @db.VarChar
+  region_geom Unsupported("geometry")?
 
-model Favourite {
-  postId    String  @db.Uuid
-  profileId String  @db.Uuid
-  post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user      Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-
-  @@id([postId, profileId])
+  @@index([region_geom], map: "test_interest_region_geom_idx", type: Gist)
 }
