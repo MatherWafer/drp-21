@@ -29,7 +29,7 @@ export default function Home() {
     console.log('Parsed posts:', parsePostsResponse(data));
   }, [data]);
 
-  if (!userLoaded || isLoading) {
+  if (!userLoaded) {
     return (
         <div className="flex justify-center items-center h-full flex-col">
             <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-opacity-75 mb-4"></div>

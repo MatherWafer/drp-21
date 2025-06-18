@@ -23,6 +23,7 @@ export type PostInfo = {
   hasLiked: boolean;
   dislikeCount: number;
   hasDisliked: boolean;
+  commentCount: number; // Added commentCount
   imageUrl?: string | null;
 };
 
@@ -38,22 +39,19 @@ export default function PostOverview({ post }: { post: PostInfo }) {
   const [disliked, setDisliked] = useState(post.hasDisliked);
   const [currentDislikeCount, setCurrentDislikeCount] = useState(post.dislikeCount);
   const [favourited, setFavourited] = useState(post.hasFavourited);
-  const [collapsed, setCollapsed] = useState(false);
   const [currentFavouriteCount, setCurrentFavouriteCount] = useState(post.favouriteCount);
 
-  const handleLike = async () => {
+  const handleLike = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent modal trigger
     try {
       setLiked(!liked);
       setCurrentLikeCount(liked ? currentLikeCount - 1 : currentLikeCount + 1);
       const response = await fetch(`/api/posts/${post.id}/like`, {
         method: liked ? 'DELETE' : 'POST',
-        body: JSON.stringify({
-          postId: post.id,
-        }),
+        body: JSON.stringify({ postId: post.id }),
       });
 
-      if (response.ok) {
-      }
+      if (!response.ok) throw new Error('Failed to update like');
     } catch (error) {
       console.error('Error updating like:', error);
       setLiked(!liked);
@@ -61,19 +59,17 @@ export default function PostOverview({ post }: { post: PostInfo }) {
     }
   };
 
-  const handleDislike = async () => {
+  const handleDislike = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent modal trigger
     try {
       setDisliked(!disliked);
       setCurrentDislikeCount(disliked ? currentDislikeCount - 1 : currentDislikeCount + 1);
       const response = await fetch(`/api/posts/${post.id}/dislike`, {
         method: disliked ? 'DELETE' : 'POST',
-        body: JSON.stringify({
-          postId: post.id,
-        }),
+        body: JSON.stringify({ postId: post.id }),
       });
 
-      if (response.ok) {
-      }
+      if (!response.ok) throw new Error('Failed to update dislike');
     } catch (error) {
       console.error('Error updating dislike:', error);
       setDisliked(!disliked);
@@ -81,20 +77,17 @@ export default function PostOverview({ post }: { post: PostInfo }) {
     }
   };
 
-  const handleFavourite = async () => {
+  const handleFavourite = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent modal trigger
     try {
       setFavourited(!favourited);
       setCurrentFavouriteCount(favourited ? currentFavouriteCount - 1 : currentFavouriteCount + 1);
       const response = await fetch(`/api/posts/${post.id}/favourite`, {
         method: favourited ? 'DELETE' : 'POST',
-        body: JSON.stringify({
-          postId: post.id,
-        }),
+        body: JSON.stringify({ postId: post.id }),
       });
 
-      if (response.ok) {
-  
-      }
+      if (!response.ok) throw new Error('Failed to update favourite');
     } catch (error) {
       console.error('Error updating favourite:', error);
       setFavourited(!favourited);
@@ -102,10 +95,16 @@ export default function PostOverview({ post }: { post: PostInfo }) {
     }
   };
 
+  const handleOpenModal = (e: React.MouseEvent) => {
+    // Placeholder for modal trigger; implement in parent or via state management
+    console.log(`Opening modal for post ${post.id}`);
+  };
+
   return (
     <div
-      className="w-full p-4 mb-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 border"
+      className="w-full p-4 mb-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 border cursor-pointer"
       style={{ backgroundColor: '#d0f4d4', borderColor: '#c0e4c4' }}
+      onClick={handleOpenModal}
     >
       <div className="flex justify-between items-start mb-4 border-b border-emerald-300 pb-2">
         <h3 className="text-xl font-bold text-emerald-900 tracking-normal">
@@ -121,11 +120,11 @@ export default function PostOverview({ post }: { post: PostInfo }) {
         {post.category}
       </p>
 
-        <p
-          className="text-sm text-emerald-900 mb-4 p-1 rounded hover:bg-emerald-50 transition-colors cursor-pointer"
-        >
-          {post.description}
-        </p>
+      <p
+        className="text-sm text-emerald-900 mb-4 p-1 rounded hover:bg-emerald-50 transition-colors"
+      >
+        {post.description}
+      </p>
 
       <div className="flex justify-between items-center mb-2 border-t border-emerald-300 pt-2">
         <div className="flex items-center text-sm sm:text-base font-medium text-gray-700 bg-white p-2 sm:p-1 rounded shadow-sm">
@@ -138,10 +137,7 @@ export default function PostOverview({ post }: { post: PostInfo }) {
 
         <div className="flex space-x-2">
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleFavourite();
-            }}
+            onClick={handleFavourite}
             className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${
               favourited
                 ? 'bg-yellow-400 text-white hover:bg-yellow-300'
@@ -166,10 +162,7 @@ export default function PostOverview({ post }: { post: PostInfo }) {
           </button>
 
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleLike();
-            }}
+            onClick={handleLike}
             className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${
               liked
                 ? 'bg-yellow-400 text-white hover:bg-yellow-300'
@@ -188,10 +181,7 @@ export default function PostOverview({ post }: { post: PostInfo }) {
           </button>
 
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDislike();
-            }}
+            onClick={handleDislike}
             className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${
               disliked
                 ? 'bg-red-400 text-white hover:bg-red-300'
@@ -207,6 +197,30 @@ export default function PostOverview({ post }: { post: PostInfo }) {
               <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z" />
             </svg>
             <span className="text-sm font-medium">{currentDislikeCount}</span>
+          </button>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log(`Opening comments for post ${post.id}`);
+            }}
+            className="flex items-center space-x-1 px-3 py-1 rounded-full transition-colors bg-gray-200 text-gray-800 hover:bg-gray-300 shadow"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 12h8m-8 4h8m-4-8v8m4-12H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2z"
+              />
+            </svg>
+            <span className="text-sm font-medium">{post.commentCount}</span>
           </button>
         </div>
       </div>
