@@ -69,7 +69,7 @@ export default function PostOverview({ post }: { post: PostInfo }) {
           }
           const profileId = payload.eventType === 'INSERT' ? payload.new.profileId : payload.old.profileId;
           if (currentUserId && profileId === currentUserId) {
-            setLiked(!liked)
+            return
           }
   
           if (payload.eventType === 'INSERT') {
