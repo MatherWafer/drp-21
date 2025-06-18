@@ -35,7 +35,7 @@ const SelectRoiPage = () => {
     const res = await fetch("/api/select-roi", {
       method: "POST",
       body: JSON.stringify({
-        region: poly!.getArray(),
+        regionJson: poly!.getArray(),
         name: regionName
       }),
     });

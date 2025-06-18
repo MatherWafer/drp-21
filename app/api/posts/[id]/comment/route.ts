@@ -21,7 +21,7 @@ export async function GET(
     const comments = await prisma.comment.findMany({
       where: { postId: id },
       orderBy: { createdAt: "desc" },
-      include: { user: true }, // pull commenter name/id in one query
+      include: { profile: true }, // pull commenter name/id in one query
     });
 
     return NextResponse.json(comments, { status: 200 });
@@ -61,7 +61,7 @@ export async function POST(
 
     const created = await prisma.comment.create({
       data: dataWithProfile,
-      include: { user: true },
+      include: { profile: true },
     });
 
     return NextResponse.json(created, { status: 201 });

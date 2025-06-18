@@ -98,20 +98,23 @@ export const transformPosts = (posts:FetchedPost[]) => posts.map(post => ({
 
 
 export const filterByLocation = async (posts:FetchedPost[], userId: string, prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>) => {
-  const regions = ((await prisma.interestRegion.findMany({
-    where: {
-      profileId: userId
-    },
-    select: {
-      region: true
-  }}))?.map(r => r.region) ?? []) as LatLng[][]
+  // const regions = ((await prisma.interestRegion.findMany({
+  //   where: {
+  //     profileId: userId
+  //   },
+  //   select: {
+  //     region: true
+  // }}))?.map(r => r.regionJson) ?? []) as LatLng[][]
 
-  if (regions.length === 0 ) {
-    return posts
-  }
-  return posts.filter(({ latitude, longitude }) =>
-    regions.some((region) =>
-      isInside({ lat: latitude, lng: longitude }, region)
-    )
-  );
+  // if (regions.length === 0 ) {
+  //   return posts
+  // }
+  // return posts.filter(({ latitude, longitude }) =>
+  //   regions.some((region) =>
+  //     isInside({ lat: latitude, lng: longitude }, region)
+  //   )
+  // );
+  
+    return []
+  
 }
