@@ -30,7 +30,7 @@ model InterestRegion {
   id         String                   @id @default(uuid())
   name       String?
   region     Unsupported("geometry")?
-  regionJson Json?
+  regionJson Json
   user       Profile                  @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@index([region], map: "interest_region_temp_idx", type: Gist)
