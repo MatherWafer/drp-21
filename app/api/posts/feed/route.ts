@@ -37,8 +37,6 @@ export async function GET(req: NextRequest) {
     }
 
     // Extract pagination parameters
-    const page = parseInt(req.nextUrl.searchParams.get('page') ?? '1', 10);
-    const pageSize = parseInt(req.nextUrl.searchParams.get('pageSize') ?? '10', 10);
 
     // Use raw SQL orderBy
     const orderBy = sortMapping[sortType]?.orderBy;
@@ -49,16 +47,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Log parameters for debugging
-    console.log('Query Parameters:', {
-      userId,
-      filterPolygon,
-      sortType,
-      orderBy,
-      page,
-      pageSize,
-      offset: (page - 1) * pageSize,
-    });
+
 
     // Construct the query using Prisma.sql with explicit UUID casting
     const posts = await prisma.$queryRaw<PrismaPost[]>(Prisma.sql`
@@ -112,7 +101,6 @@ export async function GET(req: NextRequest) {
         : Prisma.sql`WHERE 1=1`
       }
       ORDER BY ${Prisma.raw(orderBy)} DESC
-      LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}
     `);
 
     return NextResponse.json({ posts: transformPosts(posts) });
